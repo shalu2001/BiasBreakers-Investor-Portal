@@ -1,0 +1,52 @@
+.page {
+  padding: 24px 24px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title {
+  font-size: 28px;
+  margin: 0;
+}
+
+.rangeTabs {
+  display: flex;
+  gap: 8px;
+}
+
+.rangeTab,
+.rangeTabActive {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font: inherit;
+}
+
+.rangeTabActive {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  font-weight: 600;
+  border-color: var(--color-accent);
+}
+
+.helperText {
+  color: var(--color-text-muted);
+  max-width: 70ch;
+  line-height: 1.5;
+  margin: 16px 0 24px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}

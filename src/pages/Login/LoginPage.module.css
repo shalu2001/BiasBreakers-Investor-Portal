@@ -1,0 +1,107 @@
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  min-height: 100vh;
+}
+
+.brandSide {
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.brand {
+  font-weight: 700;
+  font-size: 18px;
+  margin-bottom: 120px;
+}
+
+.headline {
+  font-size: 40px;
+  line-height: 1.15;
+  margin: 0 0 16px;
+  max-width: 12ch;
+}
+
+.subcopy {
+  color: var(--color-text-muted);
+  max-width: 42ch;
+  line-height: 1.5;
+}
+
+.formSide {
+  background: var(--color-surface);
+  border-left: 1px solid var(--color-border);
+  padding: 48px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.formTitle {
+  font-size: 24px;
+  margin: 0 0 4px;
+}
+
+.formSubtitle {
+  color: var(--color-text-muted);
+  margin: 0 0 32px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  max-width: 360px;
+}
+
+.label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 6px;
+}
+
+.input {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 10px 12px;
+  margin-bottom: 20px;
+  font: inherit;
+}
+
+.forgotLink {
+  align-self: flex-end;
+  color: var(--color-accent-text);
+  font-size: 13px;
+  text-decoration: none;
+  margin-bottom: 24px;
+}
+
+.submitButton {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 7px;
+  padding: 12px;
+  font-weight: 600;
+  font: inherit;
+  cursor: pointer;
+}
+
+.submitButton:hover {
+  background: var(--color-accent-hover);
+}
+
+.createAccount {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 13px;
+  margin-top: 24px;
+}
+
+.createAccount a {
+  color: var(--color-accent-text);
+  text-decoration: underline;
+}

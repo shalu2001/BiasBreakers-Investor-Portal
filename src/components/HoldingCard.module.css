@@ -1,0 +1,52 @@
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.ticker {
+  color: var(--color-accent-text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 18px;
+  margin-top: 2px;
+}
+
+.changePositive,
+.changeNegative {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.changePositive {
+  color: var(--color-success);
+}
+
+.changeNegative {
+  color: var(--color-danger);
+}
+
+.dateRange {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.footer {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  margin-top: 12px;
+}

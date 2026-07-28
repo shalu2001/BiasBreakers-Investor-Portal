@@ -1,0 +1,125 @@
+.page {
+  padding: 24px 24px 48px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.archetypeCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 32px;
+}
+
+.eyebrow {
+  color: var(--color-accent-text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.archetypeTitle {
+  font-size: 24px;
+  margin: 8px 0 12px;
+}
+
+.archetypeSummary {
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  max-width: 70ch;
+  margin: 0 0 12px;
+}
+
+.viewMoreLink {
+  color: var(--color-accent-text);
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.sectionTitle {
+  font-size: 20px;
+  margin: 0;
+}
+
+.snapshotHeader,
+.newsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.snapshotActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.viewFullLink {
+  color: var(--color-accent-text);
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.optimizeButton {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 7px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font: inherit;
+  cursor: pointer;
+}
+
+.snapshotScroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+  margin-bottom: 40px;
+}
+
+.snapshotCard {
+  min-width: 340px;
+  flex: none;
+}
+
+.newsList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.newsItem {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 16px;
+}
+
+.newsTags {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.tickerTag,
+.categoryTag {
+  font-size: 11px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+.newsHeadline {
+  font-weight: 600;
+}
+
+.newsMeta {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
