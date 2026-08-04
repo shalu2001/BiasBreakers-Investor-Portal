@@ -6,12 +6,14 @@ import { DashboardPage } from './pages/Dashboard/DashboardPage';
 import { PortfolioPage } from './pages/Portfolio/PortfolioPage';
 import { RecommendPage } from './pages/Recommend/RecommendPage';
 import { NewsPage } from './pages/News/NewsPage';
+import { BehaviouralGamePage } from './pages/BehaviouralGame/BehaviouralGamePage';
 
 function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/onboarding" element={<OnboardingPage />} />
+      <Route path="/behavioural-game" element={<BehaviouralGamePage />} />
 
       <Route element={<AppLayout />}>
         <Route path="/" element={<DashboardPage />} />

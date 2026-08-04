@@ -5,20 +5,36 @@ import { getPortfolio, type Holding } from '../../api/portfolio';
 import { getNews, type NewsItem } from '../../api/news';
 import { PERSONA_FIXTURE, PORTFOLIO_FIXTURE, NEWS_FIXTURE } from '../../mocks/fixtures';
 import { HoldingCard } from '../../components/HoldingCard';
+import { useSession } from '../../session/SessionContext';
+import { profileToPersona } from '../../session/profileToPersona';
 import styles from './DashboardPage.module.css';
 
+const GOAL_LABELS: Record<string, string> = {
+  grow: 'Grow wealth',
+  income: 'Steady income',
+  learn: 'Learn & experiment',
+  beat: 'Beat the market',
+};
+
 export function DashboardPage() {
-  const [persona, setPersona] = useState<PersonaProfile>(PERSONA_FIXTURE);
+  const { profile, onboarding } = useSession();
+  const [persona, setPersona] = useState<PersonaProfile>(
+    () => (profile ? profileToPersona(profile) : null) ?? PERSONA_FIXTURE,
+  );
   const [holdings, setHoldings] = useState<Holding[]>(PORTFOLIO_FIXTURE);
   const [news, setNews] = useState<NewsItem[]>(NEWS_FIXTURE.slice(0, 3));
 
   useEffect(() => {
-    getPersona().then(setPersona).catch(() => setPersona(PERSONA_FIXTURE));
+    // The behavioural game's live result (if the user just played) takes
+    // priority over the API/fixture persona.
+    const mapped = profile ? profileToPersona(profile) : null;
+    if (mapped) setPersona(mapped);
+    else getPersona().then(setPersona).catch(() => setPersona(PERSONA_FIXTURE));
     getPortfolio().then(setHoldings).catch(() => setHoldings(PORTFOLIO_FIXTURE));
     getNews()
       .then((items) => setNews(items.slice(0, 3)))
       .catch(() => setNews(NEWS_FIXTURE.slice(0, 3)));
-  }, []);
+  }, [profile]);
 
   return (
     <div className={styles.page}>
@@ -26,6 +42,14 @@ export function DashboardPage() {
         <span className={styles.eyebrow}>Your archetype</span>
         <h1 className={styles.archetypeTitle}>{persona.archetype}</h1>
         <p className={styles.archetypeSummary}>{persona.summary}</p>
+        {onboarding.investmentAmount != null && (
+          <p className={styles.archetypeSummary} style={{ marginTop: 10, fontWeight: 600 }}>
+            Your plan: LKR {new Intl.NumberFormat('en-LK').format(onboarding.investmentAmount)}
+            {onboarding.goal && GOAL_LABELS[onboarding.goal]
+              ? ` · ${GOAL_LABELS[onboarding.goal]}`
+              : ''}
+          </p>
+        )}
         <Link to="/portfolio" className={styles.viewMoreLink}>
           View more
         </Link>

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { applyColorTheme } from './theme/colors'
 import { applyFontTheme } from './theme/fonts'
+import { SessionProvider } from './session/SessionContext'
 import './index.css'
 import App from './App.tsx'
 
@@ -12,7 +13,9 @@ applyFontTheme()
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <BrowserRouter>
-      <App />
+      <SessionProvider>
+        <App />
+      </SessionProvider>
     </BrowserRouter>
   </StrictMode>,
 )

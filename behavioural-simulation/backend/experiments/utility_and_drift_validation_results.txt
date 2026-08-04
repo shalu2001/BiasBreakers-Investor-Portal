@@ -1,0 +1,22 @@
+UTILITY-SCORE & DYNAMIC-DRIFT VALIDATION — results summary
+(reproduce: python utility_validation.py ; python drift_validation.py)
+
+UTILITY SCORE (utility_validation.py -> utility_validation.png)
+  1. Face validity   : U is S-shaped; loss arm steeper than gain arm by factor lambda; regret penalty grows with gamma. PASS.
+  2. Fidelity        : reward uses RECOVERED (not true) params. Utility(recovered) vs Utility(true) over a common battery:
+                       median per-investor Pearson r = 0.998 ; normalised MAE (median) = 0.102.
+                       -> parameter-recovery error induces only small distortion in the reward signal.
+  3. Discrimination  : on one shared market path (2022 crash) distinct personas produce distinct cumulative-utility paths. PASS.
+
+DYNAMIC DRIFT TRACKING (drift_validation.py -> drift_validation.png)
+  Setup  : synthetic investor whose TRUE lambda and gamma drift over time (lambda spikes in a simulated crash, relaxes after;
+           gamma rises then eases). Dynamic estimator run over the resulting decision stream.
+  gamma  : tracked CONTINUOUSLY from the rolling window -> tracking correlation r = 0.784
+  lambda : refreshed by periodic matched-stakes CHECK-INS (8 check-ins)     -> tracking correlation r = 0.801
+  Caveats: drift is PLANTED (proves the machinery can follow drift, not that real investors drift); rolling window lags/smooths
+           sharp changes (bias-variance trade-off tunable via window length).
+
+DEPLOYMENT DEPENDENCY (dynamic_estimator.py data contract)
+  Continuous re-estimation + drift-responsive reward updates for a REAL user require a live trading-platform / CSE-API
+  integration that logs per-decision transactions, daily portfolio snapshots, and a market+benchmark feed. In-project the
+  loop is validated in SIMULATION (looping the three historical scenarios); live operation is contingent on that integration.
