@@ -1,0 +1,17 @@
+# Web server
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+
+# RL model + environment (versions match the ones the v14 model was
+# trained/evaluated with in BiasBreakers-porfolio-optimization)
+stable-baselines3==2.7.1
+gymnasium==1.2.3
+torch==2.11.0
+finrl==0.3.8
+
+# Data pipeline
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+pymongo>=4.6.0
+python-dotenv>=1.0.0
