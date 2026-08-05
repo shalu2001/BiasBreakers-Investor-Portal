@@ -1,5 +1,5 @@
-from allocation_engine import AllocationSession
-from stratified_checkpoints import select_stratified_checkpoints
+from game.allocation_engine import AllocationSession
+from game.stratified_checkpoints import select_stratified_checkpoints
 
 
 class AllocationCheckpointSession(AllocationSession):

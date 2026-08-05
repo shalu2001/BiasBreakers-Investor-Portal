@@ -1,4 +1,4 @@
-from utility_function import get_utility, calibrate_raw_estimate
+from reward.utility_function import get_utility, calibrate_raw_estimate
 
 
 class BehavioralRewardModel:

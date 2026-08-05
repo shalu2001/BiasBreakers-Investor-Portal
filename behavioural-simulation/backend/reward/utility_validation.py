@@ -20,9 +20,9 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from utility_function import get_utility
+from reward.utility_function import get_utility
 
-BASE = os.path.dirname(__file__)
+from paths import ROOT as BASE
 SE = 1_000_000.0
 
 
@@ -31,8 +31,8 @@ def _recovered_params(df):
     (out-of-fold), lambda from the matched-stakes event round."""
     from sklearn.ensemble import GradientBoostingRegressor
     from sklearn.model_selection import KFold
-    from lambda_events import EVENT_GRID, event_cpt_value, fit_lambda_events
-    import calibration as C
+    from estimation.lambda_events import EVENT_GRID, event_cpt_value, fit_lambda_events
+    import estimation.calibration as C
     X = df[C.FEATURES].values
 
     def oof(y):

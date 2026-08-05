@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from trading_engine_v2 import TradingSession
+from game.trading_engine_v2 import TradingSession
 
 
 class AllocationSession(TradingSession):

@@ -17,13 +17,13 @@ reward; it only produces the psychological utility that feeds it.
 
 Example
 -------
-    from utility_handoff import BehaviouralUtility
+    from reward.utility_handoff import BehaviouralUtility
     u = BehaviouralUtility.from_profile(profile)     # profile from /finish
     U_t = u.utility(wealth_change=+12500, market_gap=-0.8)   # -> hand this over
 """
 import json
 import numpy as np
-from utility_function import get_utility
+from reward.utility_function import get_utility
 
 
 class BehaviouralUtility:

@@ -32,7 +32,7 @@ import numpy as np
 import pandas as pd
 warnings.filterwarnings("ignore")
 
-BASE = os.path.dirname(__file__)
+from paths import ROOT as BASE
 ARCH_CSV = os.path.join(BASE, "archetype_data.csv")
 CALIB_CSV = os.path.join(BASE, "calib_data.csv")
 
@@ -58,10 +58,10 @@ def _load_scenarios():
 
 
 def _play_and_featurize(a, l, g, k, noise, data, rng):
-    from multi_block_session import MultiBlockSession
-    from final_estimator import fit_full_profile
-    from estimator_v2 import fit_profile_v2
-    from calibration import features_from_fits
+    from game.multi_block_session import MultiBlockSession
+    from estimation.final_estimator import fit_full_profile
+    from estimation.estimator_v2 import fit_profile_v2
+    from estimation.calibration import features_from_fits
     WC = 5000.0
     sig = lambda x: 1 / (1 + np.exp(-np.clip(x, -30, 30)))
     s = MultiBlockSession(data, 1_000_000, n_per_bin=3)
@@ -108,7 +108,7 @@ def analyze():
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
-    import calibration as C
+    import estimation.calibration as C
 
     feats = C.FEATURES
     df = pd.read_csv(CALIB_CSV)

@@ -7,11 +7,11 @@ alpha/gamma, matched-stakes for lambda). Writes one row per persona-rep to ROWS_
 """
 import os, sys, csv, numpy as np, pandas as pd
 sys.path.insert(0, os.environ.get("BACKEND","."))
-from multi_block_session import MultiBlockSession
-from final_estimator import fit_full_profile
-from estimator_v2 import fit_profile_v2
-from calibration import load_default_calibrator, features_from_fits
-from lambda_events import make_events, event_cpt_value, fit_lambda_events
+from game.multi_block_session import MultiBlockSession
+from estimation.final_estimator import fit_full_profile
+from estimation.estimator_v2 import fit_profile_v2
+from estimation.calibration import load_default_calibrator, features_from_fits
+from estimation.lambda_events import make_events, event_cpt_value, fit_lambda_events
 PERSONAS={  # ground-truth answer key (ground_truth_pipeline/config.py)
     "INV_01":(0.88,2.25,0.5),"INV_02":(0.70,4.50,0.1),"INV_03":(0.92,1.25,4.5),
     "INV_04":(0.98,1.05,0.0),"INV_05":(0.75,2.75,0.8)}

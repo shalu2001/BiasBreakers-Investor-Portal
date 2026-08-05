@@ -1,5 +1,5 @@
-from trading_engine_v2 import TradingSession
-from stratified_checkpoints import select_stratified_checkpoints
+from game.trading_engine_v2 import TradingSession
+from game.stratified_checkpoints import select_stratified_checkpoints
 
 
 class CheckpointedSession(TradingSession):

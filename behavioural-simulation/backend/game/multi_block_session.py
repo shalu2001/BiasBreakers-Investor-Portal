@@ -1,5 +1,5 @@
 import pandas as pd
-from allocation_checkpoint_session import AllocationCheckpointSession
+from game.allocation_checkpoint_session import AllocationCheckpointSession
 
 SCENARIO_ORDER = ["2021_bull_run", "2022_crash", "2023_recovery"]
 NEUTRAL_TICKER = "DIAL"

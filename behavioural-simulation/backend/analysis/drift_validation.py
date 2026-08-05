@@ -19,10 +19,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from dynamic_estimator import DynamicProfile
-from lambda_events import EVENT_GRID, event_cpt_value
+from estimation.dynamic_estimator import DynamicProfile
+from estimation.lambda_events import EVENT_GRID, event_cpt_value
 
-BASE = os.path.dirname(__file__)
+from paths import ROOT as BASE
 SE = 1_000_000.0
 sig = lambda x: 1 / (1 + np.exp(-np.clip(x, -30, 30)))
 
@@ -91,7 +91,7 @@ def main():
     ts = prof.track(decisions, step=8, checkins=dict(checkins))
 
     # lambda check-in estimates (for plotting the discrete refreshes)
-    from lambda_events import fit_lambda_events
+    from estimation.lambda_events import fit_lambda_events
     ci_t = checkin_idx
     ci_lam = [fit_lambda_events(checkins[i])["estimate"] for i in checkin_idx]
 

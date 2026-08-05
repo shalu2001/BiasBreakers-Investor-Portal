@@ -31,20 +31,21 @@ USAGE
     python calibration.py --generate 400
 
     # then, in the app:
-    from calibration import load_default_calibrator
+    from estimation.calibration import load_default_calibrator
     cal = load_default_calibrator()               # trains from bundled CSV (fast)
     params = cal.calibrate(feature_dict)          # -> {"alpha":..,"lambda":..,"gamma":..}
 
 FEATURES (must match between training and deployment): see FEATURES below.
 """
 import os
+from paths import ROOT as _ROOT
 import numpy as np
 import pandas as pd
 
 FEATURES = ["ra", "rl", "rg2", "v2l", "v2g", "bg", "bl", "rv1", "rv2"]
 TARGETS = ["ta", "tl", "tg"]
 TARGET_ALIASES = {"ta": "alpha", "tl": "lambda", "tg": "gamma"}
-DEFAULT_CSV = os.path.join(os.path.dirname(__file__), "calib_data.csv")
+DEFAULT_CSV = os.path.join(_ROOT, "calib_data.csv")
 
 
 def features_from_fits(old_raw, v2):
@@ -138,11 +139,11 @@ def _generate(n, out_csv, seed=0):
     """Slow: run the game with known params to build calibration training data."""
     import csv, warnings
     warnings.filterwarnings("ignore")
-    from multi_block_session import MultiBlockSession
-    from final_estimator import fit_full_profile
-    from estimator_v2 import fit_profile_v2
+    from game.multi_block_session import MultiBlockSession
+    from estimation.final_estimator import fit_full_profile
+    from estimation.estimator_v2 import fit_profile_v2
     scn = ["2021_bull_run", "2022_crash", "2023_recovery"]
-    base = os.path.dirname(__file__)
+    base = _ROOT
     data = {}
     for s in scn:
         b = os.path.join(base, "scenario_build", s)

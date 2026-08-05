@@ -25,11 +25,11 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 BACKEND = os.path.dirname(HERE)
 sys.path.insert(0, BACKEND)
 
-from multi_block_session import MultiBlockSession
-from final_estimator import fit_full_profile
-from estimator_v2 import fit_profile_v2
-from calibration import load_default_calibrator, features_from_fits
-from lambda_events import make_events, event_cpt_value, fit_lambda_events
+from game.multi_block_session import MultiBlockSession
+from estimation.final_estimator import fit_full_profile
+from estimation.estimator_v2 import fit_profile_v2
+from estimation.calibration import load_default_calibrator, features_from_fits
+from estimation.lambda_events import make_events, event_cpt_value, fit_lambda_events
 
 WC = 5000.0
 sig = lambda x: 1 / (1 + np.exp(-np.clip(x, -30, 30)))

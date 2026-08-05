@@ -10,8 +10,8 @@ and correctly abstains when it isn't.
 """
 import os, sys, numpy as np, pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from multi_block_session import MultiBlockSession
-from estimator_v2 import fit_regret
+from game.multi_block_session import MultiBlockSession
+from estimation.estimator_v2 import fit_regret
 
 sig = lambda x: 1.0 / (1.0 + np.exp(-np.clip(x, -30, 30)))
 BASE = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scenario_build")
