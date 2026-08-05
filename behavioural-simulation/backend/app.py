@@ -18,6 +18,23 @@ CALIBRATOR = load_default_calibrator()   # simulation-based inverse map; None if
 app = FastAPI(title="Behavioral Trading Simulator")
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
 
+# Portal auth + profile API (Cosmos-backed). Mounted defensively so the game
+# engine still runs even if the DB / .env isn't configured on this machine.
+try:
+    from portal_routes import router as portal_router
+    app.include_router(portal_router)
+
+    @app.on_event("startup")
+    def _portal_startup():
+        try:
+            import portal_db
+            portal_db.ensure_indexes()
+            print("[portal] Cosmos collections ready (portal_users, portal_profiles)")
+        except Exception as e:
+            print("[portal] DB not initialised (portal routes will 500 until .env is set):", e)
+except Exception as e:  # pragma: no cover
+    print("[portal] portal routes unavailable:", e)
+
 SESSIONS = {}
 EVENT_ROUNDS = {}                          # session_id -> EventRound (matched-stakes lambda round)
 BASE_DIR = Path(__file__).resolve().parent

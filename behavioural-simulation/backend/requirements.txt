@@ -35,3 +35,6 @@ lxml>=4.9.0
 azure-cosmos>=4.5.0
 pymongo>=4.6.0
 certifi>=2024.0.0
+
+# Portal auth (pure-Python: no native extension, avoids Windows App-Control blocks)
+pyjwt>=2.8.0

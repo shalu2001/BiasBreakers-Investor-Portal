@@ -15,6 +15,15 @@ export const colors = {
 
   success: '#34d399',
   danger: '#f2777a',
+
+  // Shades promoted from the behavioural game so the whole app shares its
+  // exact look: an elevated surface, a dim text, and soft accent/gain/loss
+  // tints. (Mirror to --color-surface2, --color-accent-soft, etc.)
+  surface2: '#1b2029',
+  textDim: '#6b7280',
+  accentSoft: 'rgba(217, 164, 65, 0.14)',
+  gainSoft: 'rgba(52, 211, 153, 0.14)',
+  lossSoft: 'rgba(242, 119, 122, 0.14)',
 } as const;
 
 export type ColorToken = keyof typeof colors;

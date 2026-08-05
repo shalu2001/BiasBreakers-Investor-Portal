@@ -8,7 +8,7 @@ interface AllocationSliderProps {
   showNudges?: boolean;
 }
 
-// The continuous "position dial" — a custom track/fill/handle with an invisible
+// The continuous "position dial", a custom track/fill/handle with an invisible
 // range input on top for accessibility and dragging. Used in both the trading
 // screen and the matched-stakes event round.
 export function AllocationSlider({ value, onChange, leftLabel, rightLabel, showNudges = true }: AllocationSliderProps) {

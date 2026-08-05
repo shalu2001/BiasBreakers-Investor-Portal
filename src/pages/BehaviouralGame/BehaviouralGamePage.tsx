@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../session/SessionContext';
+import { saveParameters } from '../../api/portal';
 import {
-  createSession, getHistory, allocate, advance, getLog, commitEvent, finishSession,
-  type MarketState, type Benchmark, type HistoryBar, type LogEntry, type GameEvent, type FinishResult,
+  createSession, getHistory, allocate, advance, commitEvent, finishSession,
+  type MarketState, type Benchmark, type HistoryBar, type GameEvent, type FinishResult,
 } from '../../api/behaviouralGame';
 import { AllocationSlider } from './AllocationSlider';
 import { GameCandles } from './GameCandles';
@@ -12,7 +13,7 @@ import { GameTour, type TourStep } from './GameTour';
 import styles from './game.module.css';
 
 // ============================================================================
-//  Behavioural-simulation onboarding game — React port of the standalone
+//  Behavioural-simulation onboarding game, React port of the standalone
 //  research instrument. Single-stock-at-a-time UI over the FastAPI game engine.
 // ============================================================================
 
@@ -21,6 +22,17 @@ type Tone = 'neutral' | 'gain' | 'loss';
 interface Consequence { tone: Tone; text: string }
 interface DriftInfo { dir: 'up' | 'down'; ticker: string; priceChg: number; from: number; to: number }
 interface TransitionInfo { title: string; sub: string; onContinue: () => void }
+// One row in the Activity log. Built on the client at each checkpoint so it can
+// carry the full story (allocation, outcome, and the market-vs-you gap), and is
+// reset per round so the panel only ever shows the current round's decisions.
+interface ActivityEntry {
+  n: number;
+  ticker: string;
+  allocationPct: number;
+  pnl: number;
+  pnlPct: number;
+  gap: { index: number; you: number } | null;
+}
 
 const REDUCED_MOTION = typeof window !== 'undefined'
   && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -31,9 +43,9 @@ const TOUR_STEPS: TourStep[] = [
   { key: 'money', title: 'Your money', text: 'Total Equity is all the money you have; Cash is the part not invested yet. You start with Rs. 1,000,000 in cash.' },
   { key: 'market', title: 'The market', text: 'These are the companies you can invest in, and how each one moved today. Click one to choose it.' },
   { key: 'position', title: 'Your position', text: "Your chosen company's price shows here (recent chart just below), along with how much of it you're currently holding." },
-  { key: 'slider', title: 'Set your split', text: "This slider is the share of your money you want in the stock. 0% = all cash, 100% = all in — whatever's left stays as cash." },
+  { key: 'slider', title: 'Set your split', text: "This slider is the share of your money you want in the stock. 0% = all cash, 100% = all in, and whatever's left stays as cash." },
   { key: 'preview', title: 'Before you confirm', text: 'This previews what confirming will do: how much ends up in the stock, how much stays as cash, and the trade it makes.' },
-  { key: 'confirm', title: 'Move forward', text: "When you're happy, lock it in to jump forward in time and see how your money did. That's the whole loop — enjoy!" },
+  { key: 'confirm', title: 'Move forward', text: "When you're happy, lock it in to jump forward in time and see how your money did. That's the whole loop. Enjoy!" },
 ];
 
 export function BehaviouralGamePage() {
@@ -52,7 +64,7 @@ export function BehaviouralGamePage() {
   const [benchmark, setBenchmark] = useState<Benchmark | null>(null);
   const [consequence, setConsequence] = useState<Consequence>({ tone: 'neutral', text: '' });
   const [drift, setDrift] = useState<DriftInfo | null>(null);
-  const [log, setLog] = useState<LogEntry[]>([]);
+  const [roundLog, setRoundLog] = useState<ActivityEntry[]>([]);
   const [history, setHistory] = useState<HistoryBar[]>([]);
   const [confirmBusy, setConfirmBusy] = useState(false);
   const [advancing, setAdvancing] = useState(false);
@@ -88,7 +100,7 @@ export function BehaviouralGamePage() {
     return {
       tone: 'neutral',
       text: fixed
-        ? `New fund. You can only trade ${fixed} this round — but watch how the rest of the market moves.`
+        ? `New fund. You can only trade ${fixed} this round, but watch how the rest of the market moves.`
         : 'Fresh fund, all in cash. Pick a company and decide how much of your money to commit.',
     };
   }
@@ -126,13 +138,9 @@ export function BehaviouralGamePage() {
     setSelectedTicker(sel);
     setRoundLabel(data.round_label); setDay(data.day); setTotalDays(data.total_days);
     setConsequence(introConsequence(data.fixed_ticker));
-    setDrift(null); setTargetPct(50);
+    setDrift(null); setTargetPct(50); setRoundLog([]);
     setScreen('trading');
     setTourActive(true);
-  }
-
-  async function refreshLog(id: string) {
-    try { setLog(await getLog(id)); } catch { /* ignore */ }
   }
 
   function startFreshFund(
@@ -150,6 +158,7 @@ export function BehaviouralGamePage() {
     setSelectedTicker(sel);
     setRoundLabel(data.round_label); setDay(data.day); setTotalDays(data.total_days);
     setConsequence(introConsequence(newFixed)); setDrift(null); setTargetPct(50);
+    setRoundLog([]); // a fresh fund starts a fresh activity log
     setTransition({ title, sub, onContinue: () => { setTransition(null); setScreen('trading'); } });
     setScreen('transition');
   }
@@ -168,7 +177,8 @@ export function BehaviouralGamePage() {
     refStockPrice.current = marketState[ticker] ? marketState[ticker].Close : null;
     refStockTicker.current = ticker;
 
-    await refreshLog(sessionId);
+    const decidedTicker = lockedLocal;
+    const decidedPct = targetPct;
     if (!REDUCED_MOTION) { setAdvancing(true); await sleep(620); }
 
     const data = await advance(sessionId);
@@ -182,20 +192,34 @@ export function BehaviouralGamePage() {
       setEquity(data.equity); setCash(data.cash);
       setSelectedTicker(bound);
       setRoundLabel(data.round_label); setDay(data.day); setTotalDays(data.total_days);
-      setConsequence(consequenceFromDelta(data.equity - equityBeforeDecision.current, equityBeforeDecision.current));
+      const before = equityBeforeDecision.current;
+      const delta = data.equity - before;
+      setConsequence(consequenceFromDelta(delta, before));
       const actualPct = data.equity > 0 ? Math.round(((data.equity - data.cash) / data.equity) * 100) : 0;
       setTargetPct(actualPct);
       setDrift(computeDrift(bound, actualPct, data.market_state));
+      const b = data.benchmark;
+      setRoundLog((prev) => [
+        ...prev,
+        {
+          n: prev.length + 1,
+          ticker: decidedTicker,
+          allocationPct: decidedPct,
+          pnl: delta,
+          pnlPct: before > 0 ? (delta / before) * 100 : 0,
+          gap: b && b.show ? { index: b.index_return, you: b.held_return } : null,
+        },
+      ]);
     } else if (data.status === 'new_scenario_started') {
       startFreshFund(data, 'New Market Conditions',
-        'A new era begins. Your fund resets to a fresh Rs. 1,000,000 — pick a company and start again.', false);
+        'A new era begins. Your fund resets to a fresh Rs. 1,000,000. Pick a company and start again.', false);
     } else if (data.status === 'new_block_started') {
       startFreshFund(data, `${data.round_label}: A Different Fund`,
         'You are handed a new fund, tied to a single stock. Watch the S&P SL20 benchmark bar at the top: when the market runs ahead and you fall behind, that gap is the moment that counts.', true);
     } else if (data.status === 'events_started') {
       const total = data.total_events || 16;
       setTransition({
-        title: 'One last thing — quick market calls',
+        title: 'One last thing: quick market calls',
         sub: 'A handful of one-off 50/50 bets. Decide how much you would commit to each. This is where your instinct for risk really shows.',
         onContinue: () => { setTransition(null); setEvent({ ...data.event, total }); setEventCommit(50); setScreen('events'); },
       });
@@ -221,6 +245,19 @@ export function BehaviouralGamePage() {
     // Carry the measured behavioural profile into the app session so the
     // dashboard can greet the user with their real result.
     setProfile(data.profile);
+    // Persist to the user's profile in Cosmos (best-effort, a DB hiccup must
+    // not break the results screen).
+    try {
+      await saveParameters({
+        alpha: data.profile.alpha,
+        lambda: data.profile.lambda,
+        gamma: data.profile.gamma,
+        confidence: (data.confidence ?? null) as Record<string, unknown> | null,
+        source: 'behavioural_game',
+      });
+    } catch {
+      /* keep the local session copy */
+    }
     setScreen('results');
   }
 
@@ -242,7 +279,7 @@ export function BehaviouralGamePage() {
             <h1>Portfolio Session</h1>
             <p className={styles.subcopy}>
               You will run two funds through real historical market conditions. Each fund starts with{' '}
-              <span className={styles.mono}>Rs.&nbsp;1,000,000</span>. Grow it, protect it — react however you see fit.
+              <span className={styles.mono}>Rs.&nbsp;1,000,000</span>. Grow it, protect it, react however you see fit.
             </p>
             <button type="button" className={`${styles.btn} ${styles.btnPrimary}`} onClick={startGame}>Begin Session</button>
           </div>
@@ -278,7 +315,7 @@ export function BehaviouralGamePage() {
               <span className={styles.roundBadge}>{event.index} / {event.total}</span>
             </div>
             <div className={styles.eventCard}>
-              <p className={styles.eventIntro}>A one-off market call. Equal odds either way — you decide how much to put on it.</p>
+              <p className={styles.eventIntro}>A one-off market call. Equal odds either way, so you decide how much to put on it.</p>
               <h2 className={styles.eventTitle}><span className={styles.mono}>{event.ticker}</span></h2>
 
               <div className={styles.eventOdds}>
@@ -286,7 +323,7 @@ export function BehaviouralGamePage() {
                   <span className={`${styles.oddsHalf} ${styles.oddsUp}`}>50%</span>
                   <span className={`${styles.oddsHalf} ${styles.oddsDown}`}>50%</span>
                 </div>
-                <p className={styles.oddsCaption}>Equal odds — <b>50% chance each way</b></p>
+                <p className={styles.oddsCaption}>Equal odds, <b>50% chance each way</b></p>
               </div>
 
               <div className={styles.eventOutcomes}>
@@ -301,7 +338,7 @@ export function BehaviouralGamePage() {
                 </div>
               </div>
 
-              <p className={styles.eventClarify}>These percentages are <b>how far the stock moves</b> — not how likely. Both outcomes are equally likely.</p>
+              <p className={styles.eventClarify}>These percentages are <b>how far the stock moves</b>, not how likely. Both outcomes are equally likely.</p>
               <p className={styles.eventPrompt}>How much of your <span className={styles.mono}>{money(event.stake)}</span> stake do you commit?</p>
 
               <AllocationSlider value={eventCommit} onChange={setEventCommit} leftLabel="Skip it (0%)" rightLabel="All in (100%)" showNudges={false} />
@@ -397,7 +434,7 @@ export function BehaviouralGamePage() {
               const disabled = isLocked && ticker !== bound;
               const change = ti.ticker_return_pct;
               const changeCls = change == null ? styles.flat : change > 0 ? styles.up : change < 0 ? styles.down : styles.flat;
-              const changeText = change == null ? '—' : (change > 0 ? '+' : '') + change.toFixed(2) + '%';
+              const changeText = change == null ? '-' : (change > 0 ? '+' : '') + change.toFixed(2) + '%';
               return (
                 <div
                   key={ticker}
@@ -420,9 +457,9 @@ export function BehaviouralGamePage() {
           <div className={styles.panelHeader}><h2>Your Position</h2></div>
 
           <div className={styles.selectedRow} data-tour="position">
-            <span className={`${styles.selectedName} ${styles.mono}`}>{selectedTicker || '—'}</span>
+            <span className={`${styles.selectedName} ${styles.mono}`}>{selectedTicker || '-'}</span>
             <span className={styles.selectedPrices}>
-              <span className={`${styles.selectedPrice} ${styles.mono}`}>{info ? info.Close.toFixed(2) : '—'}</span>
+              <span className={`${styles.selectedPrice} ${styles.mono}`}>{info ? info.Close.toFixed(2) : '-'}</span>
               <span className={`${styles.selectedPrev} ${styles.mono} ${prevTone}`}>{prevText}</span>
             </span>
           </div>
@@ -437,13 +474,13 @@ export function BehaviouralGamePage() {
           {drift && (
             <div className={`${styles.driftNote} ${drift.dir === 'up' ? styles.driftUp : styles.driftDown}`}>
               {drift.ticker} {drift.priceChg > 0 ? 'rose' : 'fell'} <b>{Math.abs(drift.priceChg).toFixed(2)}%</b> since your last move,
-              so your share shifted from <b>{drift.from}%</b> to <b>{drift.to}%</b> on its own — no trade, just the price. Slide only to change it.
+              so your share shifted from <b>{drift.from}%</b> to <b>{drift.to}%</b> on its own, no trade, just the price. Slide only to change it.
             </div>
           )}
 
           <div className={styles.beamCaption}>
-            Share of your <b>current total money</b> held in <span className={styles.mono}>{bound || '—'}</span>{' '}
-            <span className={styles.beamHint} title="A percentage of your CURRENT total money (top right), not your starting million. It shifts as the stock moves — a rising stock becomes a bigger share even if you don't trade.">ⓘ</span>
+            Share of your <b>current total money</b> held in <span className={styles.mono}>{bound || '-'}</span>{' '}
+            <span className={styles.beamHint} title="A percentage of your CURRENT total money (top right), not your starting million. It shifts as the stock moves, and a rising stock becomes a bigger share even if you don't trade.">ⓘ</span>
           </div>
           <div data-tour="slider">
             <AllocationSlider value={targetPct} onChange={setTargetPct} leftLabel="0% · all cash" rightLabel="100% · all in" />
@@ -463,24 +500,40 @@ export function BehaviouralGamePage() {
           </button>
         </section>
 
-        {/* ACTIVITY */}
+        {/* ACTIVITY — current round only */}
         <section className={styles.panel}>
-          <div className={styles.panelHeader}><h2>Activity</h2></div>
+          <div className={styles.panelHeader}>
+            <h2>Activity</h2>
+            <span className={`${styles.logRound} ${styles.mono}`}>{roundLabel}</span>
+          </div>
           <div className={styles.logList}>
-            {log.length === 0 ? (
-              <div className={styles.logEmpty}>No decisions yet.</div>
+            {roundLog.length === 0 ? (
+              <div className={styles.logEmpty}>No decisions yet this round.</div>
             ) : (
-              log.slice().reverse().map((entry, i) => {
-                const n = log.length - i;
-                const detail = entry.target_pct != null ? `${Math.round(entry.target_pct * 100)}% in ${entry.ticker}` : '—';
-                const wc = entry.wealth_change;
-                const wcCls = wc == null ? styles.flat : wc > 0 ? styles.up : wc < 0 ? styles.down : styles.flat;
-                const wcText = wc == null ? '' : (wc > 0 ? '+' : '') + Math.round(wc).toLocaleString();
+              roundLog.slice().reverse().map((e) => {
+                const pnlCls = e.pnl > 0 ? styles.up : e.pnl < 0 ? styles.down : styles.flat;
+                const rs = (e.pnl > 0 ? '+' : e.pnl < 0 ? '-' : '') + 'Rs. ' + Math.abs(Math.round(e.pnl)).toLocaleString();
+                const pct = (e.pnlPct > 0 ? '+' : '') + e.pnlPct.toFixed(1) + '%';
+                const gClass = (v: number) => (v > 0 ? styles.up : v < 0 ? styles.down : styles.flat);
+                const gFmt = (v: number) => (v > 0 ? '+' : '') + v.toFixed(1) + '%';
                 return (
-                  <div key={n} className={styles.logEntry}>
-                    <span className={`${styles.logDate} ${styles.mono}`}>#{n}</span>
-                    <span className={styles.logDetail}>{detail}</span>
-                    <span className={`${styles.logPnl} ${styles.mono} ${wcCls}`}>{wcText}</span>
+                  <div key={e.n} className={styles.logEntry}>
+                    <span className={`${styles.logDate} ${styles.mono}`}>#{e.n}</span>
+                    <div className={styles.logMain}>
+                      <span className={styles.logDetail}>
+                        Moved to <b>{e.allocationPct}%</b> in <span className={styles.mono}>{e.ticker}</span>
+                      </span>
+                      {e.gap && (
+                        <span className={`${styles.logGap} ${styles.mono}`}>
+                          market <span className={gClass(e.gap.index)}>{gFmt(e.gap.index)}</span>
+                          {'  ·  '}you <span className={gClass(e.gap.you)}>{gFmt(e.gap.you)}</span>
+                        </span>
+                      )}
+                    </div>
+                    <span className={styles.logPnl}>
+                      <span className={`${styles.mono} ${pnlCls}`}>{rs}</span>
+                      <span className={styles.logPnlPct}>{pct}</span>
+                    </span>
                   </div>
                 );
               })

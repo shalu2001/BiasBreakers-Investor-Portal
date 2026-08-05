@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { submitHasExistingPortfolio } from '../../api/onboarding';
+import { saveOnboarding } from '../../api/portal';
 import { useSession } from '../../session/SessionContext';
 import styles from './OnboardingPage.module.css';
 
@@ -29,17 +29,18 @@ export function OnboardingPage() {
     step === 1 ? hasExisting !== null : step === 2 ? amountValid : goal !== null;
 
   async function handleFinish() {
-    setOnboarding({
+    const answers = {
       hasExistingPortfolio: hasExisting,
       investmentAmount: amountValid ? amountNum : null,
       goal,
-    });
-    // Best-effort: the portal has no backend for this yet, so a 404 must not
-    // block the flow into the behavioural game.
+    };
+    setOnboarding(answers);
+    // Save to the user's profile in Cosmos. Best-effort: a DB/backend hiccup
+    // must not trap the user out of the game.
     try {
-      if (hasExisting !== null) await submitHasExistingPortfolio(hasExisting);
+      await saveOnboarding(answers);
     } catch {
-      /* no-op until a portal onboarding endpoint exists */
+      /* keep going on the local session copy */
     }
     navigate('/behavioural-game');
   }
