@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+.env
+
+# FinRL's base env writes diagnostic plots here as a step() side effect --
+# the directory needs to exist, but the generated PNGs don't need tracking.
+results/*.png
+!results/.gitkeep
