@@ -27,7 +27,7 @@ import pandas as pd
 from scipy.stats import pearsonr
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from estimator_v2 import fit_regret, WC_SCALE_DIV
+from estimation.estimator_v2 import fit_regret, WC_SCALE_DIV
 
 STARTING_EQUITY = 1_000_000.0
 WC_DIV = STARTING_EQUITY / WC_SCALE_DIV

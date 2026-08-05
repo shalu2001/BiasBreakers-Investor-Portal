@@ -3,7 +3,7 @@ Each run processes a small batch of players and appends to ROWS_CSV so it fits t
 45s shell limit. Final `python bench_test.py agg` prints the comparison."""
 import os, sys, csv, numpy as np, pandas as pd
 sys.path.insert(0,os.environ.get("BACKEND","."))
-from multi_block_session import MultiBlockSession
+from game.multi_block_session import MultiBlockSession
 
 ROWS_CSV="/tmp/bench_rows.csv"
 N=40; SEED=7

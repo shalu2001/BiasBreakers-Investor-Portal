@@ -2,45 +2,67 @@ import type { PersonaProfile } from '../api/persona';
 import type { BehaviouralProfile } from './SessionContext';
 
 // Translates the behavioural game's raw parameters (alpha, lambda, gamma) into
-// the PersonaProfile the dashboard already knows how to render. This is the
-// "logic bridge" that carries the game result into the rest of the app.
+// the PersonaProfile the dashboard renders. Two ORTHOGONAL axes:
 //
-//   lambda (loss aversion)   ~1.0 (even) .. ~4.5 (very loss-averse)
-//   gamma  (regret / FOMO)   ~0.0 (calm) .. ~4.5 (strong chaser)
-//   alpha  (diminishing sensitivity) ~0.55 .. 1.0  (kept for future use)
+//   Risk posture  <- loss aversion (lambda):  Bold / Balanced / Cautious
+//   Market style  <- regret / FOMO (gamma):   Strategist / Realist / Momentum-Seeker
+//
+// WHY THESE CUT-OFFS: the theoretical ranges ([1,4.5] / [0,4.5]) are NOT the
+// ranges the game actually recovers -- the estimator+calibrator compress them,
+// so a linear map to 0..100 made almost everyone read "Realist". Instead the
+// bands are set at the TERCILES of the RECOVERED distribution, measured by
+// running 75 synthetic investors (spanning the trait space) through the real
+// game and recovering with the production pipeline
+// (backend/experiments/archetype_calibration.py).
+//
+// Validation on that population:
+//   * recovery: recovered lambda/gamma track truth (Pearson 0.81 / 0.93)
+//   * spread:   ~1/3 of players fall in each band on each axis (was heavily skewed)
+//   * validity: the band matches a player's TRUE tercile 83% (risk) / 77% (style)
+//               of the time, vs 33% by chance; the two axes are ~independent (r=-0.12)
+//
+// Endpoints below map recovered lambda/gamma to a 0..100 display score such that
+// the tercile band cut-offs land at 33 and 67.
 
 const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
 const toScore = (x: number) => Math.round(clamp01(x) * 100);
 
+// recovered-parameter -> 0..100 score (calibrated so terciles sit at 33 / 67)
+const LAM_LO = 1.47, LAM_HI = 3.09;
+const GAM_LO = 0.24, GAM_HI = 4.36;
+// tercile band cut-offs on the recovered parameters themselves
+const LAM_BALANCED = 2.0, LAM_CAUTIOUS = 2.55; // below BALANCED = Bold
+const GAM_REALIST = 1.6, GAM_MOMENTUM = 3.0; // below REALIST = Strategist
+
 export function profileToPersona(p: BehaviouralProfile): PersonaProfile | null {
   if (p.lambda == null || p.gamma == null) return null;
+  const lam = p.lambda;
+  const gam = p.gamma;
 
-  const lossAversion = toScore((p.lambda - 1) / 3.5); // λ 1..4.5 -> 0..100
-  const regretAversion = toScore(p.gamma / 4.5); // γ 0..4.5 -> 0..100
-  const riskTolerance = toScore(1 - (p.lambda - 1) / 3.5); // inverse of loss aversion
+  const lossAversion = toScore((lam - LAM_LO) / (LAM_HI - LAM_LO));
+  const regretAversion = toScore((gam - GAM_LO) / (GAM_HI - GAM_LO));
+  const riskTolerance = 100 - lossAversion;
 
-  const riskLabel = riskTolerance >= 66 ? 'Bold' : riskTolerance >= 33 ? 'Balanced' : 'Cautious';
-  const styleLabel =
-    regretAversion >= 60 ? 'Momentum-Seeker' : lossAversion >= 60 ? 'Capital-Preserver' : 'Realist';
-  const archetype = `${riskLabel} ${styleLabel}`;
+  const risk = lam >= LAM_CAUTIOUS ? 'Cautious' : lam >= LAM_BALANCED ? 'Balanced' : 'Bold';
+  const style =
+    gam >= GAM_MOMENTUM ? 'Momentum-Seeker' : gam >= GAM_REALIST ? 'Realist' : 'Strategist';
+  const archetype = `${risk} ${style}`;
 
   const riskClause =
-    riskTolerance >= 66
-      ? "you're comfortable riding out volatility for upside"
-      : riskTolerance >= 33
-        ? 'you weigh upside against comfort fairly evenly'
-        : 'you prioritise protecting capital over chasing gains';
+    risk === 'Bold'
+      ? "you're comfortable taking on risk for higher potential returns"
+      : risk === 'Balanced'
+        ? 'you balance the chase for returns against your comfort with risk'
+        : 'you prioritise protecting your capital over chasing the biggest gains';
 
   const styleClause =
-    regretAversion >= 60
-      ? ', though a strong pull to chase the market when it runs without you means we damp impulsive switches.'
-      : lossAversion >= 60
-        ? ', and because losses weigh heavily on you, we keep drawdowns gentle.'
-        : ', with a fairly balanced response to gains and losses.';
+    style === 'Momentum-Seeker'
+      ? ', and you tend to move with the market, so we damp impulsive, FOMO-driven switches for you.'
+      : style === 'Strategist'
+        ? ', and you stay disciplined, largely ignoring what the rest of the market is doing.'
+        : ', with a measured response to what the wider market is doing.';
 
-  const summary =
-    `Read live from your five-minute game: risk tolerance ${riskTolerance}/100, ` +
-    `loss aversion ${lossAversion}/100, regret sensitivity ${regretAversion}/100. In short, ${riskClause}${styleClause}`;
+  const summary = `In short, ${riskClause}${styleClause}`;
 
   return { archetype, summary, riskTolerance, lossAversion, regretAversion };
 }
@@ -74,9 +96,10 @@ export function buildInsight(p: {
   lossAversion: number;
   regretAversion: number;
 }): BehaviouralInsight {
-  const rt = bandOf(p.riskTolerance, 33, 66);
-  const la = bandOf(p.lossAversion, 33, 66);
-  const rg = bandOf(p.regretAversion, 30, 60);
+  // Tercile bands, matching the empirically-calibrated 33/67 score cut-offs.
+  const rt = bandOf(p.riskTolerance, 33, 67);
+  const la = bandOf(p.lossAversion, 33, 67);
+  const rg = bandOf(p.regretAversion, 33, 67);
 
   const traits: TraitInsight[] = [
     {

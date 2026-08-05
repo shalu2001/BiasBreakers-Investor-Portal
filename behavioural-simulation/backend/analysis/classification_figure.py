@@ -19,7 +19,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-BASE = os.path.dirname(__file__)
+from paths import ROOT as BASE
 
 BANDS = {
     "lambda": ([(-1, 1.5), (1.5, 2.75), (2.75, 99)], ["Loss-\nneutral", "Moderate", "Strongly\nloss-averse"]),
@@ -46,7 +46,7 @@ def _confusion(true_vals, rec_vals, edges):
 
 
 def lambda_recovery(n=800, n_events=16, seed=0):
-    from lambda_events import EVENT_GRID, event_cpt_value, fit_lambda_events
+    from estimation.lambda_events import EVENT_GRID, event_cpt_value, fit_lambda_events
     rng = np.random.default_rng(seed)
     grid = EVENT_GRID[:n_events]
     tl, el = [], []
@@ -66,7 +66,7 @@ def lambda_recovery(n=800, n_events=16, seed=0):
 def oof_recovery(param):
     from sklearn.ensemble import GradientBoostingRegressor
     from sklearn.model_selection import KFold
-    import calibration as C
+    import estimation.calibration as C
     df = pd.read_csv(os.path.join(BASE, "calib_data.csv"))
     df["v2l"] = pd.to_numeric(df["v2l"], errors="coerce").fillna(df["rl"])
     X = df[C.FEATURES].values

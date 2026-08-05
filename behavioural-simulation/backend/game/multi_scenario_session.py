@@ -1,5 +1,5 @@
 import pandas as pd
-from checkpointed_session import CheckpointedSession
+from game.checkpointed_session import CheckpointedSession
 
 
 class MultiScenarioSession:

@@ -26,8 +26,8 @@ TWO SIGNALS, matching identifiability:
 import numpy as np
 import pandas as pd
 
-from estimator_v2 import fit_loss_aversion, fit_regret
-from lambda_events import fit_lambda_events
+from estimation.estimator_v2 import fit_loss_aversion, fit_regret
+from estimation.lambda_events import fit_lambda_events
 
 
 def reconstruct_decisions(snapshots, index_returns, target_col=None):

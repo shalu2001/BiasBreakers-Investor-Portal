@@ -9,9 +9,9 @@ share flagged 'uninformative'. Uses the real scenario data, so gap units are rea
 """
 import os, sys, time, numpy as np, pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from multi_block_session import MultiBlockSession
-from estimator_v2 import fit_regret
-import allocation_checkpoint_session
+from game.multi_block_session import MultiBlockSession
+from estimation.estimator_v2 import fit_regret
+import game.allocation_checkpoint_session as allocation_checkpoint_session
 from scipy.stats import pearsonr
 
 sig = lambda x: 1.0 / (1.0 + np.exp(-np.clip(x, -30, 30)))

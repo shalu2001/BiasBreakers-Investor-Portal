@@ -6,12 +6,12 @@ import pandas as pd
 import math
 import uuid
 
-from multi_block_session import MultiBlockSession
-from final_estimator import fit_full_profile
-from estimator_v2 import fit_profile_v2
-from calibration import load_default_calibrator, features_from_fits
-from event_round import EventRound
-from behavioral_reward_interface import BehavioralRewardModel
+from game.multi_block_session import MultiBlockSession
+from estimation.final_estimator import fit_full_profile
+from estimation.estimator_v2 import fit_profile_v2
+from estimation.calibration import load_default_calibrator, features_from_fits
+from game.event_round import EventRound
+from reward.behavioral_reward_interface import BehavioralRewardModel
 
 CALIBRATOR = load_default_calibrator()   # simulation-based inverse map; None if unavailable
 
@@ -21,13 +21,13 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 # Portal auth + profile API (Cosmos-backed). Mounted defensively so the game
 # engine still runs even if the DB / .env isn't configured on this machine.
 try:
-    from portal_routes import router as portal_router
+    from portal.portal_routes import router as portal_router
     app.include_router(portal_router)
 
     @app.on_event("startup")
     def _portal_startup():
         try:
-            import portal_db
+            import portal.portal_db as portal_db
             portal_db.ensure_indexes()
             print("[portal] Cosmos collections ready (portal_users, portal_profiles)")
         except Exception as e:

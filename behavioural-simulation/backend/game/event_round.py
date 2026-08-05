@@ -10,7 +10,7 @@ gain/loss asymmetry, and lambda is estimated with rank correlation ~0.9
 (vs ~0.1 from free allocation). See lambda_events.py for the validation.
 """
 import numpy as np
-from lambda_events import make_events, fit_lambda_events
+from estimation.lambda_events import make_events, fit_lambda_events
 
 EVENT_STAKE = 200_000                       # nominal LKR stake per event (framing only)
 TICKERS = ["COMB", "DIAL", "HNB", "JKH", "LIOC", "NDB"]

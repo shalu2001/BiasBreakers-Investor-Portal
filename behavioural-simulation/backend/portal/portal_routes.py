@@ -17,8 +17,8 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel, Field
 
-import portal_db
-from portal_auth import hash_password, verify_password, make_token, get_current_user_id
+import portal.portal_db as portal_db
+from portal.portal_auth import hash_password, verify_password, make_token, get_current_user_id
 
 router = APIRouter(prefix="/portal", tags=["portal"])
 
