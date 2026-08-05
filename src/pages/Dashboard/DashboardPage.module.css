@@ -5,7 +5,11 @@
 }
 
 .archetypeCard {
-  background: var(--color-surface);
+  /* Echoes the game's result panel: elevated surface + a soft accent glow,
+     so landing here straight after the game feels like the same product. */
+  background:
+    radial-gradient(circle at 100% 0%, var(--color-accent-soft), transparent 55%),
+    var(--color-surface2);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 24px;
@@ -29,6 +33,158 @@
   color: var(--color-text-muted);
   line-height: 1.5;
   max-width: 70ch;
+  margin: 0 0 12px;
+}
+
+.narrative {
+  color: var(--color-text);
+  line-height: 1.6;
+  max-width: 84ch;
+  margin: 6px 0 2px;
+  font-size: 15px;
+}
+
+/* strengths / watch-outs */
+.insightCols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin: 6px 0 18px;
+}
+
+@media (max-width: 760px) {
+  .insightCols {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.insightColTitle {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-accent-text);
+  margin-bottom: 8px;
+}
+
+.insightList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.insightList li {
+  position: relative;
+  padding-left: 22px;
+  color: var(--color-text-muted);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.strengthItem::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+.watchItem::before {
+  content: '!';
+  position: absolute;
+  left: 4px;
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.implicationLead {
+  color: var(--color-accent-text);
+}
+
+/* trait breakdown */
+.traitGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin: 18px 0 20px;
+}
+
+@media (max-width: 760px) {
+  .traitGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.traitHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.traitLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.traitScore {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-accent-text);
+}
+
+.traitScoreMax {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-left: 1px;
+}
+
+.traitTrack {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.traitFill {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 999px;
+}
+
+.traitMeaning {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 8px 0 0;
+}
+
+/* bottom-line takeaway */
+.implication {
+  color: var(--color-text);
+  line-height: 1.55;
+  max-width: 82ch;
+  margin: 0 0 14px;
+  padding: 12px 16px;
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.planLine {
+  color: var(--color-text-muted);
+  font-weight: 600;
   margin: 0 0 12px;
 }
 

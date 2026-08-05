@@ -1,0 +1,40 @@
+# Core
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# ML
+scikit-learn>=1.3.0
+xgboost>=1.7.0
+lightgbm>=3.3.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.18.0
+
+# Notebooks
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# Utilities
+python-dotenv>=1.0.0
+tqdm>=4.65.0
+
+# Web / API (Behavioural Simulator backend)
+fastapi>=0.110.0
+uvicorn>=0.29.0
+pydantic>=2.6.0
+
+# Web Scraping
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+lxml>=4.9.0
+
+# Azure Cosmos DB
+azure-cosmos>=4.5.0
+pymongo>=4.6.0
+certifi>=2024.0.0
+
+# Portal auth (pure-Python: no native extension, avoids Windows App-Control blocks)
+pyjwt>=2.8.0

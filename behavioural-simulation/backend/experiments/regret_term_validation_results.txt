@@ -1,0 +1,18 @@
+REGRET-TERM VALIDATION — inclusion of gamma*market_gap in the Behavioural Utility Score
+(alpha=0.85, lambda=2.25; wealth_change held fixed so only the regret term moves U)
+
+Case A — flat P&L, player 2% behind the market (gap=+2):
+  gamma=0.0 -> U=+0.000 ; 0.5 -> -1.000 ; 1.0 -> -2.000 ; 2.0 -> -4.000 ; 3.0 -> -6.000
+  => a more regret-sensitive investor is penalised more for the same underperformance (monotone in gamma).
+
+Case B — a modest GAIN (+5000) but still 3% behind the market (gap=+3):
+  gamma=0.0 -> U=+1.000 ; 1.0 -> -2.000 ; 3.0 -> -8.000
+  => regret can turn a nominal gain into a net-negative experience (FOMO), as intended.
+
+Case C — monotonicity in the gap for fixed gamma=2.0:
+  gap=0% -> 0.000 ; 1% -> -2.000 ; 2% -> -4.000 ; 4% -> -8.000
+  => the penalty grows with how far the investor trails the market.
+
+Grounding: regret as a penalty on the foregone-vs-obtained gap follows Regret Theory
+(Loomes & Sugden 1982; Bell 1982; Bleichrodt & Wakker 2015). The linear gamma*gap form is a
+first-order approximation of the (generally convex) regret function and is flagged as such.

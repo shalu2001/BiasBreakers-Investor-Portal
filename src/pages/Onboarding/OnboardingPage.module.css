@@ -13,10 +13,55 @@
   text-transform: uppercase;
 }
 
+.progress {
+  margin: 12px 0 20px;
+  height: 4px;
+  width: 100%;
+  max-width: 520px;
+  background: var(--color-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+}
+
 .question {
   font-size: 28px;
   margin: 8px 0 12px;
   max-width: 20ch;
+}
+
+.amountField {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  max-width: 360px;
+}
+
+.amountPrefix {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.amountInput {
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 22px;
+  width: 100%;
+  outline: none;
 }
 
 .subcopy {
@@ -62,10 +107,23 @@
   padding-top: 24px;
   border-top: 1px solid var(--color-border);
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
+.backButton {
+  background: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  padding: 12px 18px;
+  font-weight: 600;
+  font: inherit;
+  cursor: pointer;
 }
 
 .continueButton {
+  margin-left: auto;
   background: var(--color-accent);
   color: var(--color-bg);
   border: none;

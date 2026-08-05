@@ -4,7 +4,12 @@
 
 body {
   margin: 0;
-  background: var(--color-bg);
+  /* Same atmospheric accent glow the game uses on its start/results screens,
+     so every page shares the game's look. Fixed so it doesn't scroll away. */
+  background:
+    radial-gradient(circle at 18% 12%, rgba(217, 164, 65, 0.06), transparent 42%),
+    var(--color-bg);
+  background-attachment: fixed;
   color: var(--color-text);
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
@@ -22,4 +27,32 @@ button {
 
 a {
   color: inherit;
+}
+
+/* Dark-theme scrollbars, so they stop looking like the OS default light bars. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
 }
