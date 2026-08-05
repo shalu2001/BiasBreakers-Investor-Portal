@@ -1,0 +1,36 @@
+# Narrative Intelligence Prediction Engine — serve-time dependencies only.
+# (Enrichment deps — torch/transformers/FinBERT, playwright/scrapers — are intentionally
+#  excluded: the engine reads already-enriched news from Cosmos and starts at clustering.)
+
+# API
+fastapi>=0.110.0
+uvicorn[standard]>=0.29.0
+pydantic>=2.6.0
+
+# Core numerics
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+scikit-learn>=1.3.0
+
+# Portfolio / Black-Litterman
+PyPortfolioOpt>=1.5.6
+
+# Clustering (uses precomputed embeddings + OpenAI representation)
+bertopic>=0.16.0
+umap-learn>=0.5.6
+hdbscan>=0.8.40
+
+# LLM (topic labels + macro-to-ticker mapping)
+openai>=1.30.0
+
+# Data (Cosmos DB, Mongo API)
+pymongo>=4.6.0
+certifi>=2024.0.0
+
+# Config
+python-dotenv>=1.0.0
+
+# NOTE: bertopic may transitively install sentence-transformers/torch. Because embeddings
+# are precomputed and topic labels come from the OpenAI representation model, a lighter
+# install may be achievable; verify in your target environment.
