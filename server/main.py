@@ -2,10 +2,24 @@
 Investor Portal frontend. Endpoint paths/shapes match what src/api/*.ts
 already expects (built ahead of this backend existing)."""
 import os
+import sys
+import types
 import numpy as np
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from stable_baselines3 import PPO
+
+# finrl's own __init__.py unconditionally does `from finrl.{test,trade,train}
+# import {test,trade,train}`, and those pull in unrelated broker/data-vendor
+# SDKs (alpaca, wrds, yfinance, ...) that this service never uses -- only
+# finrl.config.INDICATORS, FeatureEngineer, and StockPortfolioEnv are used
+# below and in model_env.py. Stub the three submodules out before finrl is
+# first imported so it loads without those optional extras installed.
+for _name in ("test", "trade", "train"):
+    _mod = types.ModuleType(f"finrl.{_name}")
+    setattr(_mod, _name, None)
+    sys.modules.setdefault(f"finrl.{_name}", _mod)
+
 from finrl.config import INDICATORS
 
 from model_env import PersonaPortfolioEnv, prepare_market_data, latest_day_frame

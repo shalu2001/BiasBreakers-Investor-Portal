@@ -1,0 +1,64 @@
+# Unified backend -- union of server/requirements.txt, narrative_engine/requirements.txt,
+# and behavioural-simulation/backend/requirements.txt (highest floor wins on shared
+# packages, every service-specific pin kept as-is). No conflicting exact-version pins
+# existed across the three original files.
+#
+# Verified by actually installing this file and importing/booting all three
+# composed services end-to-end (RL model load + Azure data pull + feature
+# engineering; narrative + behavioral lifespans; /session, /portal, /health
+# routes). bertopic's transitive sentence-transformers/torch pull resolved
+# fine alongside the pinned torch==2.11.0 -- no conflict in practice.
+
+# --- Web server (shared) ---
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.6.0
+
+# --- Core numerics (shared) ---
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# --- Data (Cosmos DB, Mongo API) (shared) ---
+pymongo>=4.6.0
+certifi>=2024.0.0
+azure-cosmos>=4.5.0
+
+# --- Config (shared) ---
+python-dotenv>=1.0.0
+
+# ============================================================
+# RL engine (server/) -- versions match the trained v14 model
+# ============================================================
+stable-baselines3==2.7.1
+gymnasium==1.2.3
+torch==2.11.0
+finrl==0.3.7  # 0.3.8 (server/requirements.txt's original pin) does not exist on PyPI
+yfinance  # undeclared transitive dep of finrl.meta.preprocessor.preprocessors (FeatureEngineer)
+stockstats  # undeclared transitive dep of the same module -- used by FeatureEngineer internally
+
+# ============================================================
+# Narrative engine (narrative_engine/)
+# ============================================================
+scikit-learn>=1.3.0
+PyPortfolioOpt>=1.5.6
+bertopic>=0.16.0
+umap-learn>=0.5.6
+hdbscan>=0.8.40
+openai>=1.30.0
+
+# ============================================================
+# Behavioral simulator (behavioural-simulation/backend/)
+# ============================================================
+xgboost>=1.7.0
+lightgbm>=3.3.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.18.0
+jupyter>=1.0.0
+ipykernel>=6.0.0
+tqdm>=4.65.0
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+lxml>=4.9.0
+pyjwt>=2.8.0

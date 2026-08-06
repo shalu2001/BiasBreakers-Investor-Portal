@@ -670,12 +670,27 @@ def prepare_market_data():
 
 
 def latest_day_frame(processed):
-    """Slices `processed` down to just the most recent date, re-indexed to
-    day 0 -- the same index-per-unique-date convention FinRL's data_split()
-    produces, but for a single day, so PersonaPortfolioEnv.reset() (which
-    reads self.df.loc[self.day, :]) gets exactly one day of data: right now,
-    not a historical backtest window."""
+    """Slices `processed` down to just the most recent date, duplicated into
+    two consecutive index days (0 and 1) -- the same index-per-unique-date
+    convention FinRL's data_split() produces, but for "today" repeated twice
+    rather than a historical backtest window.
+
+    A single day isn't enough: StockPortfolioEnv.step() treats
+    `self.day >= len(self.df.index.unique()) - 1` as terminal, and with only
+    one day that's true on the very first step -- its terminal branch never
+    sets self.reward (crashes with AttributeError) and never appends to
+    self.actions_memory, so the model's real predicted action would be
+    silently discarded even if it didn't crash. Duplicating today's row into
+    a second day makes step() take the normal branch instead; since both
+    days have identical prices, the resulting "return" for this throwaway
+    step is exactly 0 (correct -- no time has actually passed), and
+    PersonaPortfolioEnv.step()'s own post-processing (mask, cash policy,
+    current_weights) is unaffected since it reads day 0's data before this
+    step ever advances to day 1."""
     latest_date = processed['date'].max()
     today_df = processed[processed['date'] == latest_date].copy()
-    today_df.index = today_df['date'].factorize()[0]
-    return today_df, latest_date
+    day0 = today_df.copy()
+    day0.index = [0] * len(day0)
+    day1 = today_df.copy()
+    day1.index = [1] * len(day1)
+    return pd.concat([day0, day1]), latest_date
