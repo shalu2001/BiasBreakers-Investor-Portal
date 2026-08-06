@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
-import { getPersona, type PersonaProfile } from '../../api/persona';
+import type { PersonaProfile } from '../../api/persona';
+import { getProfile } from '../../api/portal';
+import { profileToPersona } from '../../session/profileToPersona';
+import { useSession } from '../../session/SessionContext';
 import {
   getRecommendation,
   getPastRecommendations,
@@ -22,7 +25,10 @@ function changeBadge(current: number, recommended: number) {
 }
 
 export function RecommendPage() {
-  const [persona, setPersona] = useState<PersonaProfile>(PERSONA_FIXTURE);
+  const { profile } = useSession();
+  const [persona, setPersona] = useState<PersonaProfile>(
+    () => (profile ? profileToPersona(profile) : null) ?? PERSONA_FIXTURE,
+  );
   const [rows, setRows] = useState<ReallocationRow[]>(RECOMMENDATION_FIXTURE);
   const [pastRecommendations, setPastRecommendations] = useState<PastRecommendation[]>(
     PAST_RECOMMENDATIONS_FIXTURE,
@@ -31,12 +37,40 @@ export function RecommendPage() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    getPersona().then(setPersona).catch(() => setPersona(PERSONA_FIXTURE));
+    let cancelled = false;
+
+    // Same source-of-truth chain as DashboardPage: saved Cosmos profile ->
+    // in-session game result -> fixture. Keeps the archetype label
+    // consistent across pages for the same signed-in user (there's no
+    // /persona/me route -- this data already lives on /portal/profile).
+    (async () => {
+      try {
+        const saved = await getProfile();
+        if (cancelled) return;
+        const p = saved.parameters ?? {};
+        const mapped =
+          p.lambda != null || p.gamma != null
+            ? profileToPersona({ alpha: p.alpha ?? null, lambda: p.lambda ?? null, gamma: p.gamma ?? null })
+            : null;
+        if (mapped) setPersona(mapped);
+        else if (profile) setPersona(profileToPersona(profile) ?? PERSONA_FIXTURE);
+      } catch {
+        if (!cancelled) {
+          const mapped = profile ? profileToPersona(profile) : null;
+          if (mapped) setPersona(mapped);
+        }
+      }
+    })();
+
     getRecommendation().then(setRows).catch(() => setRows(RECOMMENDATION_FIXTURE));
     getPastRecommendations()
       .then(setPastRecommendations)
       .catch(() => setPastRecommendations(PAST_RECOMMENDATIONS_FIXTURE));
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [profile]);
 
   async function handleSubmitFeedback() {
     if (rating === null) return;
@@ -125,7 +159,7 @@ export function RecommendPage() {
             <div className={styles.pastDate}>{item.date.toUpperCase()}</div>
             <p className={styles.pastDescription}>{item.description}</p>
             <div className={styles.pastFooter}>
-              <span>Rated {item.rating}/5</span>
+              <span>{item.rating != null ? `Rated ${item.rating}/5` : 'Not yet rated'}</span>
               <a href="#">View →</a>
             </div>
           </div>

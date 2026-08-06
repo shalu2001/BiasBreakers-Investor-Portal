@@ -1,0 +1,108 @@
+.editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 480px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.select {
+  flex: 1;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: var(--color-text);
+  font: inherit;
+}
+
+.weightField {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  width: 90px;
+}
+
+.weightInput {
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  width: 100%;
+  outline: none;
+  text-align: right;
+}
+
+.weightSuffix {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.removeButton {
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  color: var(--color-text-muted);
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.removeButton:hover {
+  color: var(--color-text);
+}
+
+.addButton {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  padding: 10px 16px;
+  color: var(--color-accent-text);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.addButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.total {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+.totalWarn {
+  color: #e5484d;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.hint {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.error {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { saveOnboarding } from '../../api/portal';
+import { saveOnboarding, type ExistingHolding } from '../../api/portal';
 import { useSession } from '../../session/SessionContext';
+import { ExistingHoldingsEditor } from '../../components/ExistingHoldingsEditor';
 import styles from './OnboardingPage.module.css';
 
 const GOALS = [
@@ -11,28 +12,38 @@ const GOALS = [
   { key: 'beat', title: 'Beat the market', sub: 'Chase above-index returns.' },
 ];
 
-const TOTAL_STEPS = 3;
-
 export function OnboardingPage() {
   const navigate = useNavigate();
   const { setOnboarding } = useSession();
 
   const [step, setStep] = useState(1);
   const [hasExisting, setHasExisting] = useState<boolean | null>(null);
+  const [holdings, setHoldings] = useState<ExistingHolding[]>([]);
   const [amount, setAmount] = useState('');
   const [goal, setGoal] = useState<string | null>(null);
+
+  // The holdings step only exists when they said "yes" -- computed from
+  // current state so it also disappears cleanly if they go back and change
+  // their answer to "no".
+  const steps = hasExisting ? ['existing', 'holdings', 'amount', 'goal'] : ['existing', 'amount', 'goal'];
+  const totalSteps = steps.length;
+  const current = steps[step - 1];
 
   const amountNum = Number(amount.replace(/[^0-9.]/g, ''));
   const amountValid = amount.trim() !== '' && !Number.isNaN(amountNum) && amountNum > 0;
 
   const canProceed =
-    step === 1 ? hasExisting !== null : step === 2 ? amountValid : goal !== null;
+    current === 'existing' ? hasExisting !== null
+    : current === 'holdings' ? true // optional -- always skippable
+    : current === 'amount' ? amountValid
+    : goal !== null;
 
   async function handleFinish() {
     const answers = {
       hasExistingPortfolio: hasExisting,
       investmentAmount: amountValid ? amountNum : null,
       goal,
+      existingHoldings: hasExisting ? holdings : null,
     };
     setOnboarding(answers);
     // Save to the user's profile in Cosmos. Best-effort: a DB/backend hiccup
@@ -48,13 +59,13 @@ export function OnboardingPage() {
   return (
     <div className={styles.page}>
       <span className={styles.eyebrow}>
-        Onboarding · Step {step} of {TOTAL_STEPS}
+        Onboarding · Step {step} of {totalSteps}
       </span>
       <div className={styles.progress} aria-hidden>
-        <span className={styles.progressFill} style={{ width: `${(step / TOTAL_STEPS) * 100}%` }} />
+        <span className={styles.progressFill} style={{ width: `${(step / totalSteps) * 100}%` }} />
       </div>
 
-      {step === 1 && (
+      {current === 'existing' && (
         <>
           <h1 className={styles.question}>Do you already hold any S&amp;P SL20 stocks?</h1>
           <p className={styles.subcopy}>
@@ -82,7 +93,18 @@ export function OnboardingPage() {
         </>
       )}
 
-      {step === 2 && (
+      {current === 'holdings' && (
+        <>
+          <h1 className={styles.question}>Which stocks do you currently hold?</h1>
+          <p className={styles.subcopy}>
+            This helps us show your real starting point instead of an estimate. Optional — skip if
+            you're not sure yet.
+          </p>
+          <ExistingHoldingsEditor value={holdings} onChange={setHoldings} />
+        </>
+      )}
+
+      {current === 'amount' && (
         <>
           <h1 className={styles.question}>How much are you planning to invest?</h1>
           <p className={styles.subcopy}>
@@ -102,7 +124,7 @@ export function OnboardingPage() {
         </>
       )}
 
-      {step === 3 && (
+      {current === 'goal' && (
         <>
           <h1 className={styles.question}>What's your main goal?</h1>
           <p className={styles.subcopy}>
@@ -134,7 +156,7 @@ export function OnboardingPage() {
             ← Back
           </button>
         )}
-        {step < TOTAL_STEPS ? (
+        {step < totalSteps ? (
           <button
             type="button"
             className={styles.continueButton}
