@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { apiClient } from './client';
 
 // Portal auth + profile API. These routes live on the same FastAPI backend as
 // the behavioural game (mounted under /portal), so we reuse its base URL. The
@@ -9,19 +10,27 @@ export const portalClient = axios.create({ baseURL: BASE, timeout: 15_000 });
 
 const TOKEN_KEY = 'sl20.token';
 
+// The RL recommendation routes (via apiClient) now require the same bearer
+// token as /portal/* -- both point at the same unified backend, so the token
+// is set/cleared on both clients' defaults together.
 export function setToken(token: string | null) {
   if (token) {
     sessionStorage.setItem(TOKEN_KEY, token);
     portalClient.defaults.headers.common.Authorization = `Bearer ${token}`;
+    apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
   } else {
     sessionStorage.removeItem(TOKEN_KEY);
     delete portalClient.defaults.headers.common.Authorization;
+    delete apiClient.defaults.headers.common.Authorization;
   }
 }
 
 export function loadToken(): string | null {
   const token = sessionStorage.getItem(TOKEN_KEY);
-  if (token) portalClient.defaults.headers.common.Authorization = `Bearer ${token}`;
+  if (token) {
+    portalClient.defaults.headers.common.Authorization = `Bearer ${token}`;
+    apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
+  }
   return token;
 }
 
@@ -36,10 +45,20 @@ interface AuthResponse {
   user: PortalUser;
 }
 
+export interface ExistingHolding {
+  ticker: string;
+  weightPct: number;
+}
+
 export interface OnboardingAnswers {
   hasExistingPortfolio: boolean | null;
   investmentAmount: number | null;
   goal: string | null;
+  // Only meaningful when hasExistingPortfolio is true. Omitted/null means
+  // "not entered" (skipped, or an older account) -- distinct from an empty
+  // array ("entered, holds nothing"). See server/main.py's
+  // _existing_holdings_from_doc for how the backend uses that distinction.
+  existingHoldings?: ExistingHolding[] | null;
 }
 
 export interface SavedParameters {
@@ -83,6 +102,18 @@ export async function getProfile(): Promise<SavedProfile> {
 
 export async function saveOnboarding(answers: OnboardingAnswers): Promise<void> {
   await portalClient.put('/portal/profile/onboarding', answers);
+}
+
+export interface UniverseTicker {
+  ticker: string;
+  name: string;
+}
+
+// The real tracked ticker universe, for the existing-holdings picker --
+// lives on apiClient (the RL engine's routes), not portalClient.
+export async function getUniverse(): Promise<UniverseTicker[]> {
+  const { data } = await apiClient.get<UniverseTicker[]>('/universe');
+  return data;
 }
 
 export async function saveParameters(params: SavedParameters): Promise<void> {

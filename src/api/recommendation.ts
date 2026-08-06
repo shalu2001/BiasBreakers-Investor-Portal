@@ -10,10 +10,11 @@ export interface ReallocationRow {
 export interface PastRecommendation {
   date: string;
   description: string;
-  rating: number;
+  // null until feedback submitted via submitRecommendationFeedback is
+  // correlated back to a specific past recommendation (not built yet).
+  rating: number | null;
 }
 
-// TODO: confirm the real path/shape with the RL optimization backend.
 export async function getRecommendation(): Promise<ReallocationRow[]> {
   const { data } = await apiClient.get<ReallocationRow[]>('/recommendation/current');
   return data;

@@ -55,7 +55,11 @@ SUB_APPS = (rl_app, narrative_app, behavioral_app)
 async def lifespan(app: FastAPI):
     # Runs each service's own startup/shutdown (RL model + market data load,
     # narrative engine init, behavioral Cosmos index setup) unmodified,
-    # regardless of whether it uses @app.on_event or lifespan=.
+    # regardless of whether it uses @app.on_event or lifespan=. No ordering
+    # dependency between them -- RL reads Black-Litterman predictions from a
+    # static JSON file (server/main.py's BL_PREDICTIONS_PATH), not from
+    # narrative_app's in-process state, so it doesn't need narrative's
+    # lifespan to have entered first.
     async with rl_app.router.lifespan_context(rl_app), \
             narrative_app.router.lifespan_context(narrative_app), \
             behavioral_app.router.lifespan_context(behavioral_app):

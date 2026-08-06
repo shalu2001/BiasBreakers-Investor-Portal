@@ -19,7 +19,6 @@ export interface Holding {
 
 export type PortfolioRange = '1M' | '3M' | '6M' | '1Y';
 
-// TODO: confirm the real path/shape with the trading-simulation backend.
 export async function getPortfolio(range: PortfolioRange = '3M'): Promise<Holding[]> {
   const { data } = await apiClient.get<Holding[]>('/portfolio/holdings', {
     params: { range },
