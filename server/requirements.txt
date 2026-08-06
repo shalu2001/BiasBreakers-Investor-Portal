@@ -7,7 +7,9 @@ uvicorn[standard]>=0.30.0
 stable-baselines3==2.7.1
 gymnasium==1.2.3
 torch==2.11.0
-finrl==0.3.8
+finrl==0.3.7  # 0.3.8 does not exist on PyPI (latest is 0.3.7) -- was an unpublishable pin
+yfinance  # undeclared transitive dep of finrl.meta.preprocessor.preprocessors (FeatureEngineer)
+stockstats  # undeclared transitive dep of the same module -- used by FeatureEngineer internally
 
 # Data pipeline
 numpy>=1.24.0
