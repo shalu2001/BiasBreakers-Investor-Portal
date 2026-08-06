@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../session/AuthContext';
-import { getProfile, updateAccount, saveOnboarding, authErrorMessage } from '../../api/portal';
+import { getProfile, updateAccount, saveOnboarding, authErrorMessage, type ExistingHolding } from '../../api/portal';
 import { profileToPersona } from '../../session/profileToPersona';
 import type { PersonaProfile } from '../../api/persona';
+import { ExistingHoldingsEditor } from '../../components/ExistingHoldingsEditor';
 import styles from './AccountPage.module.css';
 
 const GOALS = [
@@ -21,6 +22,7 @@ export function AccountPage() {
   const [amount, setAmount] = useState('');
   const [goal, setGoal] = useState<string | null>(null);
   const [hasExisting, setHasExisting] = useState<boolean | null>(null);
+  const [holdings, setHoldings] = useState<ExistingHolding[]>([]);
   const [persona, setPersona] = useState<PersonaProfile | null>(null);
 
   const [accountMsg, setAccountMsg] = useState<string | null>(null);
@@ -37,6 +39,7 @@ export function AccountPage() {
         setAmount(ob.investmentAmount != null ? String(ob.investmentAmount) : '');
         setGoal(ob.goal ?? null);
         setHasExisting(ob.hasExistingPortfolio ?? null);
+        setHoldings(ob.existingHoldings ?? []);
         const params = p.parameters ?? {};
         if (params.lambda != null || params.gamma != null) {
           setPersona(
@@ -79,6 +82,10 @@ export function AccountPage() {
         hasExistingPortfolio: hasExisting,
         investmentAmount: amount.trim() !== '' && !Number.isNaN(amt) && amt > 0 ? amt : null,
         goal,
+        // Must be included here too -- PUT /portal/profile/onboarding
+        // replaces the whole onboarding doc, so omitting this would
+        // silently wipe out holdings entered during onboarding.
+        existingHoldings: hasExisting ? holdings : null,
       });
       setPlanMsg('Saved ✓');
     } catch (err) {
@@ -138,6 +145,13 @@ export function AccountPage() {
           <button type="button" className={hasExisting === true ? styles.chipOn : styles.chip} onClick={() => setHasExisting(true)}>Yes</button>
           <button type="button" className={hasExisting === false ? styles.chipOn : styles.chip} onClick={() => setHasExisting(false)}>No</button>
         </div>
+
+        {hasExisting === true && (
+          <>
+            <label className={styles.label}>Your current holdings</label>
+            <ExistingHoldingsEditor value={holdings} onChange={setHoldings} />
+          </>
+        )}
 
         <div className={styles.actions}>
           <button type="submit" className={styles.saveBtn} disabled={savingPlan}>

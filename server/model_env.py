@@ -32,6 +32,19 @@ from finrl.config import INDICATORS
 BASE_DIR = os.path.dirname(__file__)
 # BL_DIR = os.path.join(BASE_DIR, 'data', 'bl')  # disabled, see BL loader functions below
 
+# Independently toggleable: narrative_engine's Black-Litterman posterior
+# returns can influence candidate-eligibility ranking (a hand-coded
+# heuristic layered on top of the trained policy -- lower risk) and/or the
+# observation vector fed directly into the trained PersonaAwareExtractor's
+# fixed weights (higher risk: unverifiable whether the v14 model was
+# trained with real or zeroed values in this slot, since the original
+# trainer script lives in a separate repo not present here -- feeding real
+# values now could introduce train/inference skew that's silently wrong,
+# not an error). Default the riskier one off until someone can verify
+# against the original training data; flip via env var, no code change.
+ENABLE_BL_IN_RANKING = os.getenv("ENABLE_BL_IN_RANKING", "true").lower() == "true"
+ENABLE_BL_IN_OBSERVATION = os.getenv("ENABLE_BL_IN_OBSERVATION", "false").lower() == "true"
+
 
 class PersonaAwareExtractor(BaseFeaturesExtractor):
     """Must match the trainer's PersonaAwareExtractor EXACTLY -- this is
@@ -127,11 +140,7 @@ class PersonaPortfolioEnv(StockPortfolioEnv):
 
     MIN_CANDIDATES = 5
     DRIFT_THRESHOLD_RELATIVE = 0.20
-    # BL_WEIGHT = 0.3  # disabled -- Black-Litterman pipeline is a teammate's
-    # in-progress module, not wired up here yet. See _unified_candidate_rank()
-    # below: the bl_rank term is commented out of combined_badness entirely
-    # (not just zero-weighted), so the mask currently ranks on alpha/lambda/
-    # gamma only. Re-enable both once the real BL data is ready.
+    BL_WEIGHT = 0.3  # only applied to combined_badness when ENABLE_BL_IN_RANKING (module level) is True
 
     BASE_CASH_WEIGHT = 0.10
     CASH_SENSITIVITY = 0.06
@@ -202,12 +211,12 @@ class PersonaPortfolioEnv(StockPortfolioEnv):
         vol = stock_volatility.reindex(real_tickers)
         downside = stock_lambda_risk.reindex(real_tickers)
         track_err = stock_tracking_error.reindex(real_tickers)
-        # bl_return = stock_bl_return.reindex(real_tickers)  # disabled, see BL_WEIGHT comment above
+        bl_return = stock_bl_return.reindex(real_tickers)
 
         vol_rank = vol.rank(pct=True)
         downside_rank = downside.rank(pct=True)
         track_err_rank = track_err.rank(pct=True)
-        # bl_rank = (1.0 - bl_return.rank(pct=True)).fillna(0.5)  # disabled, see BL_WEIGHT comment above
+        bl_rank = (1.0 - bl_return.rank(pct=True)).fillna(0.5)
 
         alpha_rank = (vol_rank if alpha < self.ALPHA_POP_MEAN else (1.0 - vol_rank)).fillna(0.5)
         lam_rank = (downside_rank if lam >= self.LAMBDA_POP_MEAN else (1.0 - downside_rank)).fillna(0.5)
@@ -217,7 +226,7 @@ class PersonaPortfolioEnv(StockPortfolioEnv):
             alpha_intensity * alpha_rank
             + lam_intensity * lam_rank
             + gamma_intensity * gamma_rank
-            # + self.BL_WEIGHT * bl_rank  # disabled, see BL_WEIGHT comment above
+            + (self.BL_WEIGHT * bl_rank if ENABLE_BL_IN_RANKING else 0.0)
         )
 
         overall_intensity = (
@@ -443,6 +452,11 @@ class PersonaPortfolioEnv(StockPortfolioEnv):
         downside_arr = np.nan_to_num(np.asarray(self.data['lambda_risk_arr'].values[0], dtype=np.float32), nan=0.0)
         track_arr = np.nan_to_num(np.asarray(self.data['tracking_error_arr'].values[0], dtype=np.float32), nan=0.0)
         bl_arr = np.nan_to_num(np.asarray(self.data['bl_return_arr'].values[0], dtype=np.float32), nan=0.0)
+        if not ENABLE_BL_IN_OBSERVATION:
+            # Ranking (_unified_candidate_rank) can see real BL values while
+            # this stays zeroed -- intentional asymmetric default, see the
+            # module-level toggle comment for why.
+            bl_arr = np.zeros_like(bl_arr)
 
         return np.concatenate([
             state.flatten(),
@@ -694,3 +708,18 @@ def latest_day_frame(processed):
     day1 = today_df.copy()
     day1.index = [1] * len(day1)
     return pd.concat([day0, day1]), latest_date
+
+
+def apply_live_bl_returns(today_df, bl_returns, tickers):
+    """Overwrites the live single-shot frame's bl_return_arr (both duplicated
+    day rows from latest_day_frame(), which broadcast the same whole-array
+    value across every ticker-row for a date -- same convention as
+    _load_bl_stats_placeholder) with real narrative_engine posterior
+    returns, keyed by full ticker. Tickers with no narrative coverage get
+    0.0, matching the placeholder's neutral semantics. Does not touch
+    state["processed"]'s historical rows -- there's no real historical BL
+    time series to retroactively backfill, and that's not what this is for."""
+    bl_arr = np.array([bl_returns.get(t, 0.0) for t in tickers], dtype=float)
+    today_df = today_df.copy()
+    today_df['bl_return_arr'] = [bl_arr] * len(today_df)
+    return today_df

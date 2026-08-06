@@ -42,10 +42,17 @@ def profiles():
     return _db()[PREFIX + "profiles"]
 
 
+def recommendations():
+    return _db()[PREFIX + "recommendations"]
+
+
 def ensure_indexes():
     """Unique email per user, one profile per user. Safe to call repeatedly."""
     users().create_index([("email", ASCENDING)], unique=True)
     profiles().create_index([("user_id", ASCENDING)], unique=True)
+    # Not unique on its own -- (user_id, date) together are the upsert key
+    # RL's recommendation persistence uses (one doc per investor per day).
+    recommendations().create_index([("user_id", ASCENDING), ("date", ASCENDING)])
 
 
 def ping():

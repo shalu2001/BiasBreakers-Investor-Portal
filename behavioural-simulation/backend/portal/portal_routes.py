@@ -6,7 +6,7 @@ Endpoints (all under /portal):
   POST /portal/auth/login        {email, password}         -> {token, user}
   GET  /portal/auth/me                                     -> user            (Bearer)
   GET  /portal/profile                                     -> {onboarding, parameters}
-  PUT  /portal/profile/onboarding {hasExistingPortfolio, investmentAmount, goal}
+  PUT  /portal/profile/onboarding {hasExistingPortfolio, investmentAmount, goal, existingHoldings?}
   PUT  /portal/profile/parameters {alpha, lambda, gamma, confidence?, source?}
   GET  /portal/health                                      -> {db: "up"|"down"}
 """
@@ -41,10 +41,20 @@ class AccountReq(BaseModel):
     name: str | None = None
 
 
+class ExistingHolding(BaseModel):
+    ticker: str
+    weightPct: float = Field(ge=0, le=100)
+
+
 class OnboardingReq(BaseModel):
     hasExistingPortfolio: bool | None = None
     investmentAmount: float | None = None
     goal: str | None = None
+    # Only meaningful when hasExistingPortfolio is True; None (not entered,
+    # or skipped) is distinct from an empty list (entered, none held) --
+    # see server/main.py's _existing_holdings_from_doc for how that
+    # distinction is used.
+    existingHoldings: list[ExistingHolding] | None = None
 
 
 class ParametersReq(BaseModel):
