@@ -47,7 +47,9 @@ interface AuthResponse {
 
 export interface ExistingHolding {
   ticker: string;
-  weightPct: number;
+  // Real share count, not a percentage -- value/% are derived server-side
+  // from this plus the current price.
+  shares: number;
 }
 
 export interface OnboardingAnswers {

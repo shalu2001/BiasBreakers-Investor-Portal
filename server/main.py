@@ -1,4 +1,4 @@
-"""FastAPI service that serves the v14 behavioral portfolio model to the
+"""FastAPI service that serves the v15 behavioral portfolio model to the
 Investor Portal frontend. Endpoint paths/shapes match what src/api/*.ts
 already expects (built ahead of this backend existing)."""
 import datetime as dt
@@ -6,6 +6,7 @@ import json
 import os
 import sys
 import types
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
 import numpy as np
 import pandas as pd
 from fastapi import Depends, FastAPI
@@ -34,25 +35,21 @@ from finrl.config import INDICATORS
 
 from model_env import PersonaPortfolioEnv, prepare_market_data, latest_day_frame, apply_live_bl_returns
 
-MODEL_PATH = os.path.join(os.path.dirname(__file__), 'model', 'behavioral_ppo_candidate_list_v14.zip')
+# For real ticker -> company name lookup (state["ticker_names"], populated
+# at startup below) -- narrative_engine already loads this exact mapping
+# from Cosmos for its own ticker resolution, so it's reused here rather
+# than maintaining a second, inevitably-incomplete hardcoded list.
+from narrative_engine.config import get_settings as get_narrative_settings
+from narrative_engine.data.mongo import MongoConnection
+from narrative_engine.data.ticker_info_repository import TickerInfoRepository
+
+MODEL_PATH = os.path.join(os.path.dirname(__file__), 'model', 'behavioral_ppo_candidate_list_v15.zip')
 
 # Population-mean "typical investor" values used throughout training
 # (ALPHA_POP_MEAN/LAMBDA_POP_MEAN/GAMMA_POP_MEAN) -- the fallback for any
 # investor who hasn't completed the behavioral game yet (no portal_profiles
 # doc, or one with empty `parameters`), and for any Cosmos lookup failure.
 POPULATION_MEAN_PERSONA = np.array([0.88, 2.25, 2.00])
-
-# Best-effort ticker -> display name. Fill in the rest of the S&P SL20
-# constituents as they come up; falls back to the raw ticker otherwise.
-TICKER_NAMES = {
-    'JKH.N0000': 'John Keells Holdings',
-    'COMB.N0000': 'Commercial Bank',
-    'LOLC.N0000': 'LOLC Holdings',
-    'DIAL.N0000': 'Dialog Axiata',
-    'HHL.N0000': 'Hemas Holdings',
-    'SAMP.N0000': 'Sampath Bank',
-    'CASH': 'Cash',
-}
 
 ENV_KWARGS_BASE = {
     "hmax": 100,
@@ -99,6 +96,50 @@ def load_model_and_data():
     print(f"Ready. {len(tickers)} tickers, data through {processed['date'].max()}.")
 
     state["bl_returns"] = _fetch_bl_returns(tickers)
+    state["ticker_names"] = _fetch_ticker_names()
+
+
+TICKER_NAMES_TIMEOUT_SECONDS = 30
+
+
+def _load_ticker_reference():
+    settings = get_narrative_settings()
+    connection = MongoConnection(settings)
+    try:
+        return TickerInfoRepository(connection, settings).load()
+    finally:
+        connection.close()
+
+
+def _fetch_ticker_names() -> dict:
+    """Real S&P SL20 company names from narrative_engine's authoritative
+    Ticker_Info Cosmos collection (the exact same source narrative uses for
+    its own ticker resolution) -- replaces what used to be a hardcoded,
+    always-incomplete 6-of-20 map. A single Cosmos query here is far
+    lighter than narrative's full predict() pipeline, but any network call
+    has proven unreliable enough in this environment (see
+    BL_FETCH_TIMEOUT_SECONDS above) to still need a bounded timeout rather
+    than trusting it to fail cleanly on its own. Any failure or timeout
+    degrades to an empty dict, so callers just fall back to showing raw
+    ticker codes -- same behavior as the old dict's default, just now
+    populated for everything when it works instead of only 6 tickers."""
+    pool = ThreadPoolExecutor(max_workers=1)
+    try:
+        future = pool.submit(_load_ticker_reference)
+        reference = future.result(timeout=TICKER_NAMES_TIMEOUT_SECONDS)
+        names = dict(reference.ticker_to_company)
+    except FutureTimeoutError:
+        print(f"Ticker name lookup timed out after {TICKER_NAMES_TIMEOUT_SECONDS}s, using raw ticker codes.")
+        names = {}
+    except Exception as e:
+        print(f"Ticker name lookup failed, using raw ticker codes: {e}")
+        names = {}
+    finally:
+        pool.shutdown(wait=False)
+
+    names["CASH"] = "Cash"  # synthetic, never in the real ticker-info collection
+    print(f"Ticker names: {len(names) - 1} real company names loaded.")
+    return names
 
 
 # Static snapshot the narrative/BL team drops here manually (same shape
@@ -115,32 +156,34 @@ BL_PREDICTIONS_PATH = os.path.normpath(
 
 
 def _fetch_bl_returns(tickers) -> dict:
-    """Black-Litterman posterior returns from BL_PREDICTIONS_PATH, mapped
-    from narrative's short ticker form ('JKH') to RL's full suffixed form
-    ('JKH.N0000') via RL's own already-loaded ticker list -- no extra
-    Cosmos dependency needed. Any failure (file missing, malformed JSON,
-    missing coverage) degrades to an empty dict, which downstream
+    """Black-Litterman posterior returns from BL_PREDICTIONS_PATH. RL's own
+    tickers are already the same short form narrative uses ('JKH', not a
+    '.N0000'-suffixed variant -- confirmed via GET /universe against the
+    live data), so this is a direct ticker-string match, no format
+    conversion needed. CASH is excluded -- narrative never has a BL view on
+    cash itself. Any failure (file missing, malformed JSON, missing
+    coverage) degrades to an empty dict, which downstream
     (apply_live_bl_returns) treats as all-zero/neutral, same as the
     disabled placeholder's semantics -- never blocks startup."""
-    short_to_full = {t.split('.')[0]: t for t in tickers if '.' in t}
+    real_tickers = [t for t in tickers if t != "CASH"]
     try:
         with open(BL_PREDICTIONS_PATH, 'r') as f:
             data = json.load(f)
-        bl_by_short = {
+        bl_by_ticker = {
             p["ticker"]: p["posterior"]
             for p in data.get("predictions", [])
             if p.get("posterior") is not None
         }
     except FileNotFoundError:
         print(f"No BL predictions file at {BL_PREDICTIONS_PATH} yet, falling back to zeros.")
-        bl_by_short = {}
+        bl_by_ticker = {}
     except Exception as e:
         print(f"Failed to read BL predictions from {BL_PREDICTIONS_PATH}, falling back to zeros: {e}")
-        bl_by_short = {}
+        bl_by_ticker = {}
 
-    bl_returns = {full: bl_by_short.get(short, 0.0) for short, full in short_to_full.items()}
-    n_real = sum(1 for short in short_to_full if short in bl_by_short)
-    print(f"BL returns: {n_real}/{len(short_to_full)} tickers have real coverage from {BL_PREDICTIONS_PATH}.")
+    bl_returns = {t: bl_by_ticker.get(t, 0.0) for t in real_tickers}
+    n_real = sum(1 for t in real_tickers if t in bl_by_ticker)
+    print(f"BL returns: {n_real}/{len(real_tickers)} tickers have real coverage from {BL_PREDICTIONS_PATH}.")
     return bl_returns
 
 
@@ -180,16 +223,50 @@ def _has_existing_portfolio(doc: dict) -> bool:
 
 
 def _existing_holdings_from_doc(doc: dict) -> dict | None:
-    """{ticker: weightPct} from onboarding.existingHoldings, or None if the
+    """{ticker: shares} from onboarding.existingHoldings, or None if the
     investor never entered any (they said "yes" to having a portfolio but
     skipped the holdings step, or this is an older account from before that
     step existed) -- None signals the caller to fall back to the uniform
     placeholder, distinct from an empty dict (which would mean "entered
-    holdings, all zero" -- not the same thing)."""
+    holdings, holds nothing" -- not the same thing). Real share counts, not
+    a self-reported percentage -- value/pct are derived from this plus the
+    current price, not asked for directly (avoids the investor having to do
+    that math themselves, and avoids a self-reported value silently
+    disagreeing with the share count if the price has moved)."""
     holdings = (doc.get("onboarding") or {}).get("existingHoldings")
     if not holdings:
         return None
-    return {h["ticker"]: float(h["weightPct"]) for h in holdings if h.get("ticker") is not None}
+    return {h["ticker"]: float(h["shares"]) for h in holdings if h.get("ticker") is not None}
+
+
+def _investment_amount_from_doc(doc: dict) -> float | None:
+    """From the onboarding "how much are you planning to invest?" question.
+    None if never set (or a non-positive/garbage value) -- callers use this
+    to decide whether to compute a share quantity at all, rather than
+    showing a meaningless number derived from a missing budget."""
+    amount = (doc.get("onboarding") or {}).get("investmentAmount")
+    return float(amount) if amount is not None and amount > 0 else None
+
+
+def _quantity(pct: float, investment_amount: float | None, price: float | None) -> int | None:
+    """Whole shares this pct of the investor's stated budget would buy at
+    the given price -- None (not 0) when we don't have enough to compute a
+    real number (no budget set, no price for this ticker (CASH), or a
+    non-positive price), so the frontend can distinguish "unknown" from
+    "literally zero shares". Rounds down: a fractional remainder becomes
+    leftover cash, same as any real brokerage order would leave -- not
+    fabricating fractional-share support the CSE may not actually offer."""
+    if investment_amount is None or price is None or price <= 0:
+        return None
+    return int((pct / 100 * investment_amount) // price)
+
+
+def _value(pct: float, investment_amount: float | None) -> float | None:
+    """LKR value this pct of the investor's stated budget represents. None
+    (not 0) when there's no budget to compute it from."""
+    if investment_amount is None:
+        return None
+    return round(pct / 100 * investment_amount)
 
 
 def _run_recommendation(uid: str):
@@ -201,6 +278,26 @@ def _run_recommendation(uid: str):
     doc = _get_profile_doc(uid)
     has_existing_portfolio = _has_existing_portfolio(doc)
     existing_holdings = _existing_holdings_from_doc(doc) if has_existing_portfolio else None
+    # Real current close price per ticker, for converting pct -> share
+    # quantity. today_df has 2 rows per ticker (latest_day_frame's day0/day1
+    # duplication) with identical close values, so this just overwrites
+    # each ticker's entry with the same price twice -- harmless.
+    prices = dict(zip(today_df["tic"], today_df["close"]))
+
+    if existing_holdings is not None:
+        # Real shares entered -- the budget for a rebalance is naturally
+        # whatever their current holdings are already worth, so onboarding
+        # doesn't separately ask "how much are you investing" for these
+        # investors; it's derived, not collected.
+        total_value = sum(
+            shares * prices[t] for t, shares in existing_holdings.items() if prices.get(t)
+        )
+        investment_amount = total_value if total_value > 0 else None
+    else:
+        # No real holdings to derive a total from (no existing portfolio, or
+        # said yes but skipped the holdings step) -- fall back to the
+        # separately-asked onboarding budget.
+        investment_amount = _investment_amount_from_doc(doc)
 
     env = PersonaPortfolioEnv(
         df=today_df,
@@ -227,28 +324,54 @@ def _run_recommendation(uid: str):
     env.step(raw_action)
     recommended_weights = env.current_weights
 
+    # Real per-ticker share counts only count as "real" if we also have a
+    # budget to price them against -- without investment_amount there's no
+    # denominator to turn shares into a %, so that combination falls back to
+    # the uniform placeholder below, same as "said yes but entered nothing".
+    have_real_shares = existing_holdings is not None and investment_amount is not None
+
     rows = []
     for i, ticker in enumerate(tickers):
-        if existing_holdings is not None:
-            # Real holdings the investor entered during onboarding/account
-            # settings -- 0 for anything they didn't list. Independent of
-            # current_weights (the model's own internal reset-time baseline,
-            # unaffected by any of this -- see the comment above reset()).
-            current_pct = round(existing_holdings.get(ticker, 0.0))
+        # No share-quantity/price concept for cash itself.
+        price = None if ticker == "CASH" else prices.get(ticker)
+
+        if have_real_shares:
+            # 0 for anything they didn't list -- distinct from never having
+            # entered holdings at all (have_real_shares would be False then).
+            shares_held = existing_holdings.get(ticker, 0.0)
+            current_value = round(shares_held * price) if price else 0.0
+            current_pct = round(current_value / investment_amount * 100)
+            # No share-quantity concept for cash -- None (not a possibly-
+            # nonzero share count someone could have entered against it, and
+            # not the misleading 0 that int(shares_held) would give here).
+            current_qty = None if ticker == "CASH" else int(shares_held)
         elif has_existing_portfolio:
             # Said "yes" but never entered real holdings (skipped the step,
-            # or an older account from before it existed) -- fall back to
-            # the uniform-eligible-tickers placeholder.
+            # or an older account from before it existed), or entered
+            # holdings but no budget to price them against -- fall back to
+            # the uniform-eligible-tickers placeholder. Independent of
+            # current_weights (the model's own internal reset-time baseline,
+            # unaffected by any of this -- see the comment above reset()).
             current_pct = round(float(current_weights[i]) * 100)
+            current_value = _value(current_pct, investment_amount)
+            current_qty = _quantity(current_pct, investment_amount, price)
         else:
             # No existing portfolio -- initial allocation, nothing to
             # rebalance from.
             current_pct = 0
+            current_value = _value(current_pct, investment_amount)
+            current_qty = _quantity(current_pct, investment_amount, price)
+
+        recommended_pct = round(float(recommended_weights[i]) * 100)
         rows.append({
             "ticker": ticker,
-            "name": TICKER_NAMES.get(ticker, ticker),
+            "name": state["ticker_names"].get(ticker, ticker),
             "currentPct": current_pct,
-            "recommendedPct": round(float(recommended_weights[i]) * 100),
+            "recommendedPct": recommended_pct,
+            "currentValue": current_value,
+            "recommendedValue": _value(recommended_pct, investment_amount),
+            "currentQty": current_qty,
+            "recommendedQty": _quantity(recommended_pct, investment_amount, price),
         })
 
     # Only the selected tickers -- most of the universe gets masked out to 0%
@@ -310,7 +433,7 @@ def _candles_for_range(processed: pd.DataFrame, ticker: str, latest_date, range_
     sub = processed[
         (processed["tic"] == ticker) & (processed["date"] >= start_date) & (processed["date"] <= latest_date)
     ].sort_values("date")
-    return [
+    candles = [
         {
             "time": row.date.strftime("%Y-%m-%d"),
             "open": float(row.open),
@@ -320,6 +443,25 @@ def _candles_for_range(processed: pd.DataFrame, ticker: str, latest_date, range_
         }
         for row in sub.itertuples()
     ]
+    # The underlying Cosmos data is end-of-day only -- open always equals
+    # close on every row, not genuine intraday OHLC. Since the chart colors
+    # a candle green whenever close >= open, that made every single candle
+    # trivially green regardless of real price movement (open == close is
+    # always ">="), never red. Re-pointing each day's open at the PREVIOUS
+    # day's close is the standard fix for daily-close-only data: the color
+    # then reflects whether today's close beat yesterday's, which is what
+    # "up/down day" actually means for EOD data. First candle in the
+    # window keeps its own (open == close) value -- there's no prior day
+    # in range to compare it against.
+    for i in range(len(candles) - 1, 0, -1):
+        candles[i]["open"] = candles[i - 1]["close"]
+        # high/low were computed as a band around the day's own (old)
+        # open==close value, so a prior close that gapped past that band
+        # would otherwise sit outside the wick -- clamp so open is always
+        # visually inside [low, high], same as any real candle guarantees.
+        candles[i]["high"] = max(candles[i]["high"], candles[i]["open"])
+        candles[i]["low"] = min(candles[i]["low"], candles[i]["open"])
+    return candles
 
 
 def _change_pct(candles: list) -> float:
@@ -368,7 +510,7 @@ def get_universe():
     existing-holdings picker so it doesn't have to hardcode/guess at the
     S&P SL20 constituent list. No auth needed -- not investor-specific."""
     return [
-        {"ticker": t, "name": TICKER_NAMES.get(t, t)}
+        {"ticker": t, "name": state["ticker_names"].get(t, t)}
         for t in state["tickers"] if t != "CASH"
     ]
 
