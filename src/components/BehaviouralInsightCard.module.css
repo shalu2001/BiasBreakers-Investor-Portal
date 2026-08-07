@@ -1,0 +1,299 @@
+.card {
+  /* Echoes the game's result panel: elevated surface + a soft accent glow. */
+  background:
+    radial-gradient(circle at 100% 0%, var(--color-accent-soft), transparent 55%),
+    var(--color-surface2);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.eyebrow {
+  color: var(--color-accent-text);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.archetypeTitle {
+  font-size: 24px;
+  margin: 8px 0 12px;
+}
+
+.narrative {
+  color: var(--color-text);
+  line-height: 1.6;
+  max-width: 84ch;
+  margin: 14px 0 2px;
+  font-size: 15px;
+}
+
+/* risk × style breakdown under the archetype name */
+.axes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.axisChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  padding: 6px 14px;
+}
+
+.axisKey {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-dim);
+}
+
+/* ---- compact (dashboard) --------------------------------------------------- */
+.summary {
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  max-width: 74ch;
+  margin: 0 0 18px;
+  font-size: 14.5px;
+}
+
+.traitGridCompact {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+@media (max-width: 640px) {
+  .traitGridCompact {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.traitCompact {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.traitScoreSm {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--color-accent-text);
+}
+
+.viewFull {
+  display: inline-block;
+  color: var(--color-accent-text);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.viewFull:hover {
+  text-decoration: underline;
+}
+
+.traitProvisional {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: var(--color-accent-soft);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+/* ---- trait tiles (full) ---------------------------------------------------- */
+.traitGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 20px 0 22px;
+}
+
+@media (max-width: 760px) {
+  .traitGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.trait {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.traitHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 20px;
+  margin-bottom: 10px;
+}
+
+.traitLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.traitScore {
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--color-text);
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.traitScoreMax {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-left: 2px;
+}
+
+.traitTrack {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.traitFill {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 999px;
+}
+
+.traitMeaning {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  margin: 12px 0 0;
+}
+
+/* ---- strengths / worth-watching -------------------------------------------- */
+.insightPanels {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 0 0 20px;
+}
+
+@media (max-width: 760px) {
+  .insightPanels {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.insightPanel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-left-width: 3px;
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.strengthsPanel {
+  border-left-color: var(--color-success);
+}
+
+.watchPanel {
+  border-left-color: var(--color-accent);
+}
+
+.panelHead {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.strengthsPanel .panelHead {
+  color: var(--color-success);
+}
+
+.watchPanel .panelHead {
+  color: var(--color-accent-text);
+}
+
+.panelList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.panelList li {
+  position: relative;
+  padding-left: 18px;
+  color: var(--color-text-muted);
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+
+.panelList li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 7px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+.strengthsPanel .panelList li::before {
+  background: var(--color-success);
+}
+
+.watchPanel .panelList li::before {
+  background: var(--color-accent);
+}
+
+/* ---- strategy -------------------------------------------------------------- */
+.strategyBox {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--color-accent-soft);
+  border-radius: 10px;
+}
+
+.strategyLabel {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-accent-text);
+  margin-bottom: 6px;
+}
+
+.strategyText {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.55;
+}

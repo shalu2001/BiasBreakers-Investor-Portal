@@ -45,8 +45,34 @@
   margin: 16px 0 24px;
 }
 
+/* horizontal carousel: three holdings per screen, then scroll */
 .list {
   display: flex;
-  flex-direction: column;
   gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-dim) var(--color-surface);
+}
+
+.list > * {
+  flex: 0 0 calc((100% - 40px) / 3);
+  min-width: 320px;
+  scroll-snap-align: start;
+}
+
+.list::-webkit-scrollbar {
+  height: 10px;
+}
+.list::-webkit-scrollbar-track {
+  background: var(--color-surface);
+  border-radius: 999px;
+}
+.list::-webkit-scrollbar-thumb {
+  background: var(--color-text-dim);
+  border-radius: 999px;
+}
+.list::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
 }

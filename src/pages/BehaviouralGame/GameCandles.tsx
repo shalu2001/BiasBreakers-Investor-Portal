@@ -1,4 +1,5 @@
 import { CandlestickChart } from '../../components/CandlestickChart';
+import { Spinner } from '../../components/ui';
 import type { Candle } from '../../api/portfolio';
 import type { HistoryBar } from '../../api/behaviouralGame';
 import styles from './game.module.css';
@@ -16,7 +17,13 @@ export function GameCandles({ history }: { history: HistoryBar[] }) {
   if (!history || history.length < 5) {
     return (
       <div className={styles.chartWrap}>
-        <div className={styles.chartBuilding}>Building price history…</div>
+        <div
+          className={styles.chartBuilding}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}
+        >
+          <Spinner size={22} />
+          <span>Building price history…</span>
+        </div>
       </div>
     );
   }

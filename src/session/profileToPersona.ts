@@ -88,7 +88,6 @@ export interface BehaviouralInsight {
   strengths: string[];
   watchouts: string[];
   strategy: string;
-  caveat: string | null; // set when something wasn't measured confidently
 }
 
 export interface TraitConfidence {
@@ -191,13 +190,5 @@ export function buildInsight(
   if (gamOk && rg === 'high') parts.push("damp impulsive switches so you're not chasing every rally");
   const strategy = `Your recommendations will ${parts.join(', ')}.`;
 
-  // --- caveat (positive, forward-looking; never "the game failed") -----------
-  const unmeasured: string[] = [];
-  if (!lamOk) unmeasured.push('risk appetite');
-  if (!gamOk) unmeasured.push('FOMO');
-  const caveat = unmeasured.length
-    ? `Your ${unmeasured.join(' and ')} ${unmeasured.length > 1 ? 'reads are' : 'read is'} still early — ${unmeasured.length > 1 ? 'they sharpen' : 'it sharpens'} the more you play. Retake the 5-minute game anytime to refine your profile.`
-    : null;
-
-  return { traits, narrative, strengths, watchouts, strategy, caveat };
+  return { traits, narrative, strengths, watchouts, strategy };
 }

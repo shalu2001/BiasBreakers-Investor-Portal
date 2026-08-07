@@ -51,7 +51,17 @@ export function MultiSelectDropdown({
   return (
     <div className={styles.container} ref={containerRef}>
       <button type="button" className={styles.trigger} onClick={() => setIsOpen((v) => !v)}>
-        {triggerLabel} <span className={styles.chevron}>⌄</span>
+        <span>{triggerLabel}</span>
+        <svg
+          className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ''}`}
+          width="12"
+          height="12"
+          viewBox="0 0 12 12"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path d="M2.5 4.5 6 8l3.5-3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
       </button>
 
       {isOpen && (
