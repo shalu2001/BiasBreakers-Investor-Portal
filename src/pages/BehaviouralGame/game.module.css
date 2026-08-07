@@ -45,7 +45,16 @@
     radial-gradient(circle at 20% 20%, rgba(217, 164, 65, 0.06), transparent 40%),
     var(--color-bg);
 }
+.startStack {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20px;
+  width: 100%;
+  max-width: 520px;
+}
 .card { max-width: 520px; width: 100%; text-align: center; }
+.startStack .card { max-width: none; }
 .mark { font-size: 28px; color: var(--color-accent); margin-bottom: 24px; }
 .card h1, .card h2 {
   font-family: var(--font-body);

@@ -4,9 +4,42 @@
   margin: 0 auto;
 }
 
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.avatar {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--color-bg);
+  background: linear-gradient(135deg, var(--color-accent-text), var(--color-accent));
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .title {
-  font-size: 26px;
-  margin: 0 0 20px;
+  font-size: 24px;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.email {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
 }
 
 .card {
@@ -132,24 +165,59 @@
 }
 
 .archetype {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--color-text);
-  margin-bottom: 14px;
+  margin-bottom: 18px;
 }
 
-.scoreRow {
+.traits {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.trait {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.traitHead {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--color-border);
-  font-size: 14px;
-  color: var(--color-text-muted);
+  align-items: baseline;
+}
+
+.traitLabel {
+  font-size: 13.5px;
+  color: var(--color-text);
+}
+
+.meterTrack {
+  height: 6px;
+  background: var(--color-border);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.meterFill {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+  border-radius: 999px;
 }
 
 .mono {
   font-family: var(--font-mono);
+  font-size: 14px;
   color: var(--color-accent-text);
+}
+
+.scoreMax {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-left: 1px;
 }
 
 .hint {
