@@ -53,58 +53,76 @@ export const PAST_RECOMMENDATIONS_FIXTURE: PastRecommendation[] = [
   },
 ];
 
+const hoursAgo = (hours: number) => new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+
 export const NEWS_FIXTURE: NewsItem[] = [
   {
     ticker: 'COMB.N0000',
     category: 'micro',
     headline: 'Commercial Bank of Ceylon reports steady loan growth in Q2',
+    content:
+      'Commercial Bank of Ceylon posted steady loan growth in the second quarter, supported by improving demand across its retail and SME segments.',
     source: 'Banking Desk',
-    timeAgo: '2h ago',
+    publishedDate: hoursAgo(2),
   },
   {
     ticker: 'DIAL.N0000',
     category: 'micro',
     headline: 'Dialog Axiata expands 5G rollout to Kandy and Galle',
+    content:
+      'Dialog Axiata extended its 5G network coverage to Kandy and Galle, marking the next phase of its nationwide rollout.',
     source: 'Telecom Wire',
-    timeAgo: '4h ago',
+    publishedDate: hoursAgo(4),
   },
   {
     category: 'macro',
     headline: 'Central Bank holds policy rate steady amid inflation watch',
+    content:
+      'The Central Bank kept its benchmark policy rate unchanged, signalling a cautious stance as it monitors inflation trends.',
     source: 'Macro Desk',
-    timeAgo: '5h ago',
+    publishedDate: hoursAgo(5),
   },
   {
     ticker: 'JKH.N0000',
     category: 'micro',
     headline: 'John Keells Holdings announces new leisure sector investment',
+    content:
+      'John Keells Holdings unveiled a new investment in its leisure segment, aiming to capitalise on the recovery in tourism.',
     source: 'Markets Desk',
-    timeAgo: '6h ago',
+    publishedDate: hoursAgo(6),
   },
   {
     category: 'macro',
     headline: 'Rupee strengthens against the dollar on remittance inflows',
+    content:
+      'The Sri Lankan rupee appreciated against the US dollar, buoyed by stronger worker remittance inflows.',
     source: 'Macro Desk',
-    timeAgo: '9h ago',
+    publishedDate: hoursAgo(9),
   },
   {
     ticker: 'LOLC.N0000',
     category: 'micro',
     headline: 'LOLC Holdings sees continued growth across microfinance arm',
+    content:
+      'LOLC Holdings reported continued expansion in its microfinance business, driven by rising demand in regional markets.',
     source: 'Finance Wire',
-    timeAgo: '1d ago',
+    publishedDate: hoursAgo(24),
   },
   {
     ticker: 'HHL.N0000',
     category: 'micro',
     headline: 'Hemas Holdings posts stable earnings in consumer segment',
+    content:
+      'Hemas Holdings delivered stable earnings in its consumer segment, with resilient demand for personal care products.',
     source: 'Markets Desk',
-    timeAgo: '2d ago',
+    publishedDate: hoursAgo(48),
   },
   {
     category: 'macro',
     headline: 'CSE All-Share Index closes higher on banking sector gains',
+    content:
+      'The Colombo Stock Exchange All-Share Index closed higher, led by gains in banking sector counters.',
     source: 'Market Wrap',
-    timeAgo: '2d ago',
+    publishedDate: hoursAgo(50),
   },
 ];

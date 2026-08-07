@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import type { PersonaProfile } from '../../api/persona';
 import { getPortfolio, type Holding } from '../../api/portfolio';
 import { getNews, type NewsItem } from '../../api/news';
+import { formatTimeAgo } from '../../utils/timeAgo';
 import { PERSONA_FIXTURE, PORTFOLIO_FIXTURE, NEWS_FIXTURE } from '../../mocks/fixtures';
 import { HoldingCard } from '../../components/HoldingCard';
 import { useSession } from '../../session/SessionContext';
@@ -185,7 +186,7 @@ export function DashboardPage() {
             </div>
             <div className={styles.newsHeadline}>{item.headline}</div>
             <div className={styles.newsMeta}>
-              {item.source} · {item.timeAgo}
+              {item.source} · {formatTimeAgo(item.publishedDate)}
             </div>
           </div>
         ))}
