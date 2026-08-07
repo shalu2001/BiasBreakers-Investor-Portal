@@ -5,6 +5,16 @@ export interface ReallocationRow {
   name: string;
   currentPct: number;
   recommendedPct: number;
+  // LKR value this pct of the investor's stated onboarding budget
+  // represents. null when there's no budget set yet to compute it from.
+  currentValue: number | null;
+  recommendedValue: number | null;
+  // Whole shares this pct of the investor's stated onboarding budget would
+  // buy at the current price. null when there's nothing to compute it from
+  // (no budget set yet, or -- for CASH -- no share-price concept at all),
+  // not 0 -- so the UI can tell "unknown" apart from "literally zero".
+  currentQty: number | null;
+  recommendedQty: number | null;
 }
 
 export interface PastRecommendation {

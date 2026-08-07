@@ -1,5 +1,7 @@
 """
-Data pipeline + RL environment for the v14 behavioral portfolio model.
+Data pipeline + RL environment for the behavioral portfolio model
+(currently serving v15 -- see server/main.py's MODEL_PATH; v14 and v15
+share this exact architecture/observation shape, verified by loading both).
 
 Adapted from BiasBreakers-porfolio-optimization/src/rl/evaluate_dynamicCandidateList_v14.py
 -- PersonaAwareExtractor, PersonaPortfolioEnv, RunningStats and the market
@@ -36,12 +38,13 @@ BASE_DIR = os.path.dirname(__file__)
 # returns can influence candidate-eligibility ranking (a hand-coded
 # heuristic layered on top of the trained policy -- lower risk) and/or the
 # observation vector fed directly into the trained PersonaAwareExtractor's
-# fixed weights (higher risk: unverifiable whether the v14 model was
-# trained with real or zeroed values in this slot, since the original
-# trainer script lives in a separate repo not present here -- feeding real
-# values now could introduce train/inference skew that's silently wrong,
-# not an error). Default the riskier one off until someone can verify
-# against the original training data; flip via env var, no code change.
+# fixed weights (higher risk: unverifiable whether the currently-loaded
+# model (see server/main.py's MODEL_PATH) was trained with real or zeroed
+# values in this slot, since the original trainer script lives in a
+# separate repo not present here -- feeding real values now could
+# introduce train/inference skew that's silently wrong, not an error).
+# Default the riskier one off until someone can verify against the
+# original training data; flip via env var, no code change.
 ENABLE_BL_IN_RANKING = os.getenv("ENABLE_BL_IN_RANKING", "true").lower() == "true"
 ENABLE_BL_IN_OBSERVATION = os.getenv("ENABLE_BL_IN_OBSERVATION", "false").lower() == "true"
 

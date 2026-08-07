@@ -17,11 +17,51 @@ import {
 } from '../../mocks/fixtures';
 import styles from './RecommendPage.module.css';
 
-function changeBadge(current: number, recommended: number) {
-  const diff = recommended - current;
-  if (diff === 0) return { label: 'Hold', className: styles.badgeHold };
-  if (diff > 0) return { label: `Buy +${diff}%`, className: styles.badgeBuy };
-  return { label: `Sell ${diff}%`, className: styles.badgeSell };
+const lkr = new Intl.NumberFormat('en-LK');
+const formatLkr = (value: number) => `LKR ${lkr.format(Math.round(value))}`;
+
+function assetLabel(row: ReallocationRow): string {
+  if (row.ticker === 'CASH') return 'Cash Reserve';
+  return row.name !== row.ticker ? `${row.name} (${row.ticker})` : row.ticker;
+}
+
+function formatValPct(value: number | null, pct: number): string {
+  return value == null ? `${pct}%` : `${formatLkr(value)} (${pct}%)`;
+}
+
+function formatNetChange(row: ReallocationRow): string {
+  // No budget set -- nothing to compute a value/share delta from, fall
+  // back to a plain percentage-point delta.
+  if (row.currentValue == null || row.recommendedValue == null) {
+    const pctDiff = row.recommendedPct - row.currentPct;
+    return pctDiff === 0 ? 'No change' : `${pctDiff > 0 ? '+' : ''}${pctDiff}%`;
+  }
+  const valueDiff = row.recommendedValue - row.currentValue;
+  const valuePart = `${valueDiff >= 0 ? '+' : '-'}${formatLkr(Math.abs(valueDiff))}`;
+  const qtyDiff =
+    row.currentQty != null && row.recommendedQty != null ? row.recommendedQty - row.currentQty : null;
+  // Cash has no share count to show alongside its value delta.
+  if (row.ticker === 'CASH' || qtyDiff == null) return valuePart;
+  return `${valuePart} (${qtyDiff >= 0 ? '+' : '-'}${Math.abs(qtyDiff)} sh)`;
+}
+
+// Action is driven by value (falls back to percentage with no budget set),
+// with cash using deposit/withdraw language instead of buy/sell.
+function getAction(row: ReallocationRow) {
+  const diff =
+    row.currentValue != null && row.recommendedValue != null
+      ? row.recommendedValue - row.currentValue
+      : row.recommendedPct - row.currentPct;
+
+  if (diff === 0) return { label: 'HOLD', className: styles.badgeHold };
+  if (row.ticker === 'CASH') {
+    return diff > 0
+      ? { label: 'DEPOSIT', className: styles.badgeBuy }
+      : { label: 'WITHDRAW', className: styles.badgeSell };
+  }
+  return diff > 0
+    ? { label: 'BUY', className: styles.badgeBuy }
+    : { label: 'SELL', className: styles.badgeSell };
 }
 
 export function RecommendPage() {
@@ -33,6 +73,12 @@ export function RecommendPage() {
   const [pastRecommendations, setPastRecommendations] = useState<PastRecommendation[]>(
     PAST_RECOMMENDATIONS_FIXTURE,
   );
+  // Drives whether the table shows a "Current" column at all (pointless
+  // when it's always 0) and whether the second column reads "Recommended"
+  // (a fresh initial allocation) or "Rebalanced" (moving from a real
+  // current position) -- from the same getProfile() call already made for
+  // persona above, no extra request.
+  const [hasExistingPortfolio, setHasExistingPortfolio] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
@@ -47,6 +93,7 @@ export function RecommendPage() {
       try {
         const saved = await getProfile();
         if (cancelled) return;
+        setHasExistingPortfolio(saved.onboarding?.hasExistingPortfolio === true);
         const p = saved.parameters ?? {};
         const mapped =
           p.lambda != null || p.gamma != null
@@ -92,24 +139,24 @@ export function RecommendPage() {
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>Ticker</th>
-            <th>Stock name</th>
-            <th>Current</th>
-            <th>Recommended</th>
-            <th>Change</th>
+            <th>Asset / Stock</th>
+            {hasExistingPortfolio && <th>Current (Val &amp; %)</th>}
+            <th>{hasExistingPortfolio ? 'Rebalanced' : 'Recommended'} (Val &amp; %)</th>
+            <th>Net Change (Val &amp; Shares)</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => {
-            const badge = changeBadge(row.currentPct, row.recommendedPct);
+            const action = getAction(row);
             return (
               <tr key={row.ticker}>
-                <td className={styles.ticker}>{row.ticker}</td>
-                <td>{row.name}</td>
-                <td>{row.currentPct}%</td>
-                <td>{row.recommendedPct}%</td>
+                <td>{assetLabel(row)}</td>
+                {hasExistingPortfolio && <td>{formatValPct(row.currentValue, row.currentPct)}</td>}
+                <td>{formatValPct(row.recommendedValue, row.recommendedPct)}</td>
+                <td>{formatNetChange(row)}</td>
                 <td>
-                  <span className={badge.className}>{badge.label}</span>
+                  <span className={action.className}>{action.label}</span>
                 </td>
               </tr>
             );

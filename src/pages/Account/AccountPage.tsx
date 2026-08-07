@@ -80,7 +80,12 @@ export function AccountPage() {
     try {
       await saveOnboarding({
         hasExistingPortfolio: hasExisting,
-        investmentAmount: amount.trim() !== '' && !Number.isNaN(amt) && amt > 0 ? amt : null,
+        // Existing-portfolio investors don't have a separate budget --
+        // it's derived server-side from what their holdings are worth.
+        // Force null here even if `amount` still holds a stale value from
+        // before they switched their answer to "Yes".
+        investmentAmount:
+          hasExisting !== true && amount.trim() !== '' && !Number.isNaN(amt) && amt > 0 ? amt : null,
         goal,
         // Must be included here too -- PUT /portal/profile/onboarding
         // replaces the whole onboarding doc, so omitting this would
@@ -118,14 +123,34 @@ export function AccountPage() {
 
       <form className={styles.card} onSubmit={handleSavePlan}>
         <span className={styles.cardTitle}>Your plan</span>
-        <label className={styles.label}>How much are you planning to invest?</label>
-        <div className={styles.amountField}>
-          <span className={styles.amountPrefix}>LKR</span>
-          <input
-            className={styles.amountInput} inputMode="numeric" value={amount}
-            onChange={(e) => setAmount(e.target.value)} placeholder="100,000"
-          />
+
+        <label className={styles.label}>Do you already hold S&amp;P SL20 stocks?</label>
+        <div className={styles.chips}>
+          <button type="button" className={hasExisting === true ? styles.chipOn : styles.chip} onClick={() => setHasExisting(true)}>Yes</button>
+          <button type="button" className={hasExisting === false ? styles.chipOn : styles.chip} onClick={() => setHasExisting(false)}>No</button>
         </div>
+
+        {hasExisting === true ? (
+          <>
+            <label className={styles.label}>Your current holdings</label>
+            <ExistingHoldingsEditor value={holdings} onChange={setHoldings} />
+            <p className={styles.hint}>
+              Your investable total is worked out from these holdings' current value — no separate
+              budget needed.
+            </p>
+          </>
+        ) : (
+          <>
+            <label className={styles.label}>How much are you planning to invest?</label>
+            <div className={styles.amountField}>
+              <span className={styles.amountPrefix}>LKR</span>
+              <input
+                className={styles.amountInput} inputMode="numeric" value={amount}
+                onChange={(e) => setAmount(e.target.value)} placeholder="100,000"
+              />
+            </div>
+          </>
+        )}
 
         <label className={styles.label}>Main goal</label>
         <div className={styles.chips}>
@@ -139,19 +164,6 @@ export function AccountPage() {
             </button>
           ))}
         </div>
-
-        <label className={styles.label}>Do you already hold S&amp;P SL20 stocks?</label>
-        <div className={styles.chips}>
-          <button type="button" className={hasExisting === true ? styles.chipOn : styles.chip} onClick={() => setHasExisting(true)}>Yes</button>
-          <button type="button" className={hasExisting === false ? styles.chipOn : styles.chip} onClick={() => setHasExisting(false)}>No</button>
-        </div>
-
-        {hasExisting === true && (
-          <>
-            <label className={styles.label}>Your current holdings</label>
-            <ExistingHoldingsEditor value={holdings} onChange={setHoldings} />
-          </>
-        )}
 
         <div className={styles.actions}>
           <button type="submit" className={styles.saveBtn} disabled={savingPlan}>
