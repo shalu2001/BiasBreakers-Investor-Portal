@@ -440,6 +440,14 @@ export function BehaviouralGamePage() {
         </div>
       </header>
 
+      {/* session progress within this fund */}
+      <div className={styles.progressTrack} title={`Decision ${day} of ${totalDays}`}>
+        <span
+          className={styles.progressFill}
+          style={{ width: `${totalDays ? Math.min(100, (day / totalDays) * 100) : 0}%` }}
+        />
+      </div>
+
       {/* consequence strip */}
       <div className={`${styles.consequence} ${consequenceClass}`}><span>{consequence.text}</span></div>
 

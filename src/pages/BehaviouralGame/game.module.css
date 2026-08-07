@@ -90,6 +90,19 @@
 .helpBtn:hover { background: var(--g-accent-soft); color: var(--color-accent); border-color: var(--color-accent); }
 
 /* ---------- consequence strip ---------- */
+.progressTrack {
+  height: 3px;
+  background: var(--color-border);
+  overflow: hidden;
+}
+
+.progressFill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-text));
+  transition: width 0.4s ease;
+}
+
 .consequence {
   padding: 14px 32px; border-bottom: 1px solid var(--color-border);
   font-size: 15px; font-weight: 500;
@@ -312,6 +325,12 @@
 .tourSkip:hover { color: var(--color-text-muted); }
 .tourNext { background: var(--color-accent); color: #17140a; font-weight: 700; font-size: 14px; padding: 9px 18px; border-radius: 7px; border: none; cursor: pointer; }
 .tourNext:hover { background: var(--color-accent-hover); }
+
+/* mid-size laptops / split windows: two columns, Activity spans full width */
+@media (max-width: 1180px) and (min-width: 901px) {
+  .mainGrid { grid-template-columns: 1fr 1fr; }
+  .mainGrid > section:nth-child(3) { grid-column: 1 / -1; }
+}
 
 @media (max-width: 900px) {
   .mainGrid { grid-template-columns: 1fr; }

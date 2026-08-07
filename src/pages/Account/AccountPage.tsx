@@ -197,14 +197,22 @@ export function AccountPage() {
                 </div>
               ))}
             </div>
-            <p className={styles.hint}>Measured from your five-minute game. Play again to refresh it.</p>
+            <p className={styles.hint}>
+              Derived from your behavioural profile. This updates automatically as your trading
+              activity is analysed.
+            </p>
           </>
         ) : (
-          <p className={styles.hint}>You haven't completed the game yet, so we don't have your profile.</p>
+          <p className={styles.hint}>Your behavioural profile hasn’t been generated yet.</p>
         )}
-        <button type="button" className={styles.retakeBtn} onClick={() => navigate('/behavioural-game')}>
-          {persona ? 'Retake the 5-minute game' : 'Play the 5-minute game'}
-        </button>
+        {/* DEV ONLY: replaying the game is a developer tool. For real users the
+            parameters are recalculated from live trading activity (CSE / broker
+            API), not by replaying the game. */}
+        {import.meta.env.DEV && (
+          <button type="button" className={styles.retakeBtn} onClick={() => navigate('/behavioural-game')}>
+            {persona ? 'Retake the game (dev)' : 'Play the game (dev)'}
+          </button>
+        )}
       </div>
     </div>
   );

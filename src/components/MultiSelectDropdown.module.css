@@ -19,6 +19,12 @@
 
 .chevron {
   color: var(--color-text-muted);
+  flex: none;
+  transition: transform 0.15s ease;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
 }
 
 .panel {
@@ -32,6 +38,26 @@
   padding: 8px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
   z-index: 10;
+  /* cap the height so a long stock list scrolls instead of running off-screen */
+  max-height: 320px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-dim) transparent;
+}
+
+.panel::-webkit-scrollbar {
+  width: 9px;
+}
+.panel::-webkit-scrollbar-track {
+  background: transparent;
+}
+.panel::-webkit-scrollbar-thumb {
+  background: var(--color-text-dim);
+  border-radius: 999px;
+  border: 2px solid var(--color-surface);
+}
+.panel::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
 }
 
 .option {

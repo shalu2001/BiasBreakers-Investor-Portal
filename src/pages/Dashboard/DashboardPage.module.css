@@ -4,288 +4,9 @@
   margin: 0 auto;
 }
 
-.archetypeCard {
-  /* Echoes the game's result panel: elevated surface + a soft accent glow,
-     so landing here straight after the game feels like the same product. */
-  background:
-    radial-gradient(circle at 100% 0%, var(--color-accent-soft), transparent 55%),
-    var(--color-surface2);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 24px;
+/* the investing-personality teaser (BehaviouralInsightCard, compact variant) */
+.archetypeWrap {
   margin-bottom: 32px;
-}
-
-.eyebrow {
-  color: var(--color-accent-text);
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.archetypeTitle {
-  font-size: 24px;
-  margin: 8px 0 12px;
-}
-
-.archetypeSummary {
-  color: var(--color-text-muted);
-  line-height: 1.5;
-  max-width: 70ch;
-  margin: 0 0 12px;
-}
-
-.narrative {
-  color: var(--color-text);
-  line-height: 1.6;
-  max-width: 84ch;
-  margin: 6px 0 2px;
-  font-size: 15px;
-}
-
-.caveat {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  margin: 14px 0 2px;
-  padding: 11px 14px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--color-text-muted);
-  background: var(--color-accent-soft);
-  border-radius: 10px;
-  max-width: 84ch;
-}
-
-.caveatIcon {
-  color: var(--color-accent);
-  flex: none;
-}
-
-.traitProvisional {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  color: var(--color-accent);
-  background: var(--color-accent-soft);
-  padding: 2px 8px;
-  border-radius: 999px;
-}
-
-/* trait tiles */
-.traitGrid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 14px;
-  margin: 20px 0 22px;
-}
-
-@media (max-width: 760px) {
-  .traitGrid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-}
-
-.trait {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 16px 18px;
-}
-
-.traitHead {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-height: 20px;
-  margin-bottom: 10px;
-}
-
-.traitLabel {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.traitScore {
-  font-family: var(--font-mono);
-  font-size: 30px;
-  font-weight: 700;
-  color: var(--color-text);
-  line-height: 1;
-  margin-bottom: 12px;
-}
-
-.traitScoreMax {
-  font-size: 13px;
-  color: var(--color-text-muted);
-  margin-left: 2px;
-}
-
-.traitTrack {
-  height: 6px;
-  background: var(--color-border);
-  border-radius: 999px;
-  overflow: hidden;
-}
-
-.traitFill {
-  display: block;
-  height: 100%;
-  background: var(--color-accent);
-  border-radius: 999px;
-}
-
-.traitMeaning {
-  color: var(--color-text-muted);
-  font-size: 13px;
-  line-height: 1.5;
-  margin: 12px 0 0;
-}
-
-/* strengths / worth-watching panels */
-.insightPanels {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin: 0 0 20px;
-}
-
-@media (max-width: 760px) {
-  .insightPanels {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-}
-
-.insightPanel {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-left-width: 3px;
-  border-radius: 12px;
-  padding: 16px 18px;
-}
-
-.strengthsPanel {
-  border-left-color: var(--color-success);
-}
-
-.watchPanel {
-  border-left-color: var(--color-accent);
-}
-
-.panelHead {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-
-.strengthsPanel .panelHead {
-  color: var(--color-success);
-}
-
-.watchPanel .panelHead {
-  color: var(--color-accent-text);
-}
-
-.panelList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.panelList li {
-  position: relative;
-  padding-left: 18px;
-  color: var(--color-text-muted);
-  font-size: 13.5px;
-  line-height: 1.55;
-}
-
-.panelList li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 7px;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-}
-
-.strengthsPanel .panelList li::before {
-  background: var(--color-success);
-}
-
-.watchPanel .panelList li::before {
-  background: var(--color-accent);
-}
-
-/* strategy takeaway */
-.strategyBox {
-  margin: 0 0 18px;
-  padding: 14px 16px;
-  background: var(--color-accent-soft);
-  border-radius: 10px;
-}
-
-.strategyLabel {
-  display: block;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--color-accent-text);
-  margin-bottom: 6px;
-}
-
-.strategyText {
-  margin: 0;
-  color: var(--color-text);
-  line-height: 1.55;
-}
-
-/* footer: plan + retake */
-.cardFooter {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  padding-top: 16px;
-  border-top: 1px solid var(--color-border);
-}
-
-.planLine {
-  color: var(--color-text-muted);
-  font-size: 14px;
-}
-
-.planLine b {
-  color: var(--color-text);
-  font-weight: 600;
-}
-
-.retakeLink {
-  color: var(--color-accent-text);
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.retakeLink:hover {
-  text-decoration: underline;
 }
 
 .sectionTitle {
@@ -326,15 +47,37 @@
 
 .snapshotScroll {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   overflow-x: auto;
-  padding-bottom: 12px;
+  padding-bottom: 16px;
   margin-bottom: 40px;
+  scroll-snap-type: x proximity;
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-dim) var(--color-surface);
 }
 
+/* three cards per screen, then scroll */
 .snapshotCard {
-  min-width: 340px;
-  flex: none;
+  flex: 0 0 calc((100% - 40px) / 3);
+  min-width: 300px;
+  scroll-snap-align: start;
+}
+
+/* visible carousel scrollbar (the default one is near-invisible on dark) */
+.snapshotScroll::-webkit-scrollbar {
+  height: 10px;
+}
+.snapshotScroll::-webkit-scrollbar-track {
+  background: var(--color-surface);
+  border-radius: 999px;
+}
+.snapshotScroll::-webkit-scrollbar-thumb {
+  background: var(--color-text-dim);
+  border-radius: 999px;
+}
+.snapshotScroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
 }
 
 .newsList {
@@ -344,8 +87,16 @@
 }
 
 .newsItem {
+  display: block;
   border-bottom: 1px solid var(--color-border);
   padding-bottom: 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.12s;
+}
+
+.newsItem:hover .newsHeadline {
+  color: var(--color-accent-text);
 }
 
 .newsTags {

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getPortfolio, type Holding, type PortfolioRange } from '../../api/portfolio';
 import { PORTFOLIO_FIXTURE } from '../../mocks/fixtures';
 import { HoldingCard } from '../../components/HoldingCard';
+import { EmptyState } from '../../components/ui';
 import styles from './PortfolioPage.module.css';
 
 const RANGES: PortfolioRange[] = ['1M', '3M', '6M', '1Y'];
@@ -37,11 +38,19 @@ export function PortfolioPage() {
         weight is what matters here. Hover a candle for its close.
       </p>
 
-      <div className={styles.list}>
-        {holdings.map((holding) => (
-          <HoldingCard key={holding.ticker} holding={holding} chartHeight={280} />
-        ))}
-      </div>
+      {holdings.length === 0 ? (
+        <EmptyState
+          icon="⌾"
+          title="No holdings to show yet"
+          message="Once your portfolio is built, your positions and their recent moves will appear here."
+        />
+      ) : (
+        <div className={styles.list}>
+          {holdings.map((holding) => (
+            <HoldingCard key={holding.ticker} holding={holding} chartHeight={280} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
