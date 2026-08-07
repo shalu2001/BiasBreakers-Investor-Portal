@@ -10,6 +10,7 @@ import { AllocationSlider } from './AllocationSlider';
 import { GameCandles } from './GameCandles';
 import { HelpModal } from './HelpModal';
 import { GameTour, type TourStep } from './GameTour';
+import { DevAutoplayPanel } from './DevAutoplayPanel';
 import styles from './game.module.css';
 
 // ============================================================================
@@ -261,6 +262,27 @@ export function BehaviouralGamePage() {
     setScreen('results');
   }
 
+  // DEV ONLY (start screen): take an auto-played/recovered profile, persist it
+  // exactly like a real finish, and jump straight to the dashboard.
+  async function useDevProfile(
+    profile: { alpha: number; lambda: number; gamma: number },
+    confidence: Record<string, { level?: string }> | null,
+  ) {
+    setProfile(profile);
+    try {
+      await saveParameters({
+        alpha: profile.alpha,
+        lambda: profile.lambda,
+        gamma: profile.gamma,
+        confidence: (confidence ?? null) as Record<string, unknown> | null,
+        source: 'dev_autoplay',
+      });
+    } catch {
+      /* keep the local session copy */
+    }
+    navigate('/');
+  }
+
   // ---- derived render values -------------------------------------------------
   const holdingValue = Math.max(0, equity - cash);
   const holdingPct = equity > 0 ? Math.round((holdingValue / equity) * 100) : 0;
@@ -274,14 +296,17 @@ export function BehaviouralGamePage() {
     return (
       <div className={styles.game}>
         <div className={styles.centered}>
-          <div className={styles.card}>
-            <div className={styles.mark}>◆</div>
-            <h1>Portfolio Session</h1>
-            <p className={styles.subcopy}>
-              You will run two funds through real historical market conditions. Each fund starts with{' '}
-              <span className={styles.mono}>Rs.&nbsp;1,000,000</span>. Grow it, protect it, react however you see fit.
-            </p>
-            <button type="button" className={`${styles.btn} ${styles.btnPrimary}`} onClick={startGame}>Begin Session</button>
+          <div className={styles.startStack}>
+            <div className={styles.card}>
+              <div className={styles.mark}>◆</div>
+              <h1>Portfolio Session</h1>
+              <p className={styles.subcopy}>
+                You will run two funds through real historical market conditions. Each fund starts with{' '}
+                <span className={styles.mono}>Rs.&nbsp;1,000,000</span>. Grow it, protect it, react however you see fit.
+              </p>
+              <button type="button" className={`${styles.btn} ${styles.btnPrimary}`} onClick={startGame}>Begin Session</button>
+            </div>
+            {import.meta.env.DEV && <DevAutoplayPanel onUseProfile={useDevProfile} />}
           </div>
         </div>
       </div>

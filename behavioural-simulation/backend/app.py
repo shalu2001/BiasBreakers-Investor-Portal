@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from pathlib import Path
 import pandas as pd
+import numpy as np
 import math
 import uuid
 
@@ -10,6 +11,7 @@ from game.multi_block_session import MultiBlockSession
 from estimation.final_estimator import fit_full_profile
 from estimation.estimator_v2 import fit_profile_v2
 from estimation.calibration import load_default_calibrator, features_from_fits
+from estimation.lambda_events import event_cpt_value
 from game.event_round import EventRound
 from reward.behavioral_reward_interface import BehavioralRewardModel
 
@@ -185,6 +187,115 @@ def get_log(session_id: str):
     for r in records:
         r["date"] = str(r["date"])
     return {"log": _sanitize(records)}
+
+
+# --------------------------------------------------------------------------- #
+# DEV-ONLY: skip the manual game, auto-play with a generative policy driven by a
+# chosen (alpha, lambda, gamma), then recover through the SAME production
+# pipeline. Lets devs validate parameter recovery without playing 5 minutes.
+# The recovery here is identical to /finish (see _recover, shared below).
+# --------------------------------------------------------------------------- #
+def _recover(log1, log2, event_round, starting_cash):
+    """Exactly what /finish reports: calibrated (alpha, lambda, gamma) with a
+    matched-stakes event-round lambda override + per-parameter confidence."""
+    fit = fit_full_profile(log1, log2, starting_equity=starting_cash)
+    v2 = fit_profile_v2(log1, log2, starting_equity=starting_cash)
+    if CALIBRATOR is not None:
+        cal = CALIBRATOR.calibrate(features_from_fits(fit["raw"], v2))
+        profile = {"alpha": cal["alpha"], "lambda": cal["lambda"], "gamma": cal["gamma"]}
+        source = f"calibrated ({cal['backend']})"
+    else:
+        lam_c = v2["lambda"]
+        profile = {"alpha": v2["alpha"], "lambda": lam_c if lam_c is not None else 2.25, "gamma": v2["gamma"]}
+        source = "v2_uncalibrated" if lam_c is not None else "v2_uncalibrated+lambda_prior"
+    confidence = {k: dict(v) for k, v in v2["confidence"].items()}
+    lambda_source = "free_play_calibration"
+    if event_round is not None:
+        el = event_round.estimate_lambda()
+        if el is not None and el.get("estimate") is not None and el["confidence"]["level"] != "uninformative":
+            profile["lambda"] = float(el["estimate"])
+            confidence["lambda"] = el["confidence"]
+            lambda_source = "matched_stakes_events"
+    return {"profile": profile, "profile_source": source, "lambda_source": lambda_source,
+            "confidence": confidence, "n_obs_block1": fit.get("n_obs_block1"),
+            "n_obs_block2": fit.get("n_obs_block2")}
+
+
+class DevAutoplayRequest(BaseModel):
+    # 'lam' on the wire (not 'lambda' -- a Python reserved word that needs a
+    # fragile Field(alias=...) hack). The frontend sends { alpha, lam, gamma }.
+    alpha: float = 0.88
+    lam: float = 2.25
+    gamma: float = 1.5
+    k: float = 0.85       # decision responsiveness (how sharply the bot acts on value)
+    noise: float = 0.15   # decision noise
+    seed: int | None = None
+
+
+@app.post("/session/dev/autoplay")
+def dev_autoplay(req: DevAutoplayRequest):
+    rng = np.random.default_rng(req.seed if req.seed is not None else int(np.random.randint(1, 1_000_000)))
+    sig = lambda x: 1.0 / (1.0 + np.exp(-np.clip(x, -30, 30)))
+    WC_DIV = 5000.0
+
+    def value(wc):
+        x = wc / WC_DIV
+        return x ** req.alpha if x >= 0 else -req.lam * (abs(x) ** req.alpha)
+
+    def gap_now(cs):
+        try:
+            return float(cs.get_index_return()) - float(cs.held_stock_return())
+        except Exception:
+            return 0.0
+
+    s = MultiBlockSession(_load_all_scenarios(), 1_000_000, n_per_bin=2)
+    last = 1_000_000.0
+    while True:
+        cs = s.current_session
+        E = cs.total_equity()
+        wc = E - last
+        v = value(wc)
+        if s.block == "loss_aversion":
+            tgt = sig(req.k * v + rng.normal(0, req.noise))
+            tk = sorted(s.get_market_state().keys())[0]
+        else:
+            tgt = sig(req.k * (v + req.gamma * gap_now(cs)) + rng.normal(0, req.noise))
+            tk = "DIAL"
+        s.set_allocation(tk, float(np.clip(tgt, 0.02, 0.98)))
+        last = E
+        st = s.advance()["status"]
+        if st == "all_blocks_complete":
+            break
+        if st in ("new_scenario_started", "new_block_started"):
+            last = s.current_session.total_equity()
+
+    er = EventRound(n_events=16, seed=req.seed)
+    while not er.is_complete():
+        ev = er.current()
+        commit = sig(req.k * event_cpt_value(ev["gain_pct"], ev["loss_pct"], req.lam, req.alpha)
+                     + rng.normal(0, 0.18))
+        er.commit(float(np.clip(commit, 0.02, 0.98)))
+
+    log1, log2 = s.get_block_logs()
+    r = _recover(log1, log2, er, s.starting_cash)
+    p = r["profile"]
+    chosen = {"alpha": req.alpha, "lambda": req.lam, "gamma": req.gamma}
+    recovered = {"alpha": float(p["alpha"]), "lambda": float(p["lambda"]), "gamma": float(p["gamma"])}
+    errors = {k: abs(recovered[k] - chosen[k]) for k in chosen}
+    print(f"[DEV AUTOPLAY] chosen={ {k: round(x,3) for k,x in chosen.items()} } "
+          f"recovered={ {k: round(x,3) for k,x in recovered.items()} } "
+          f"|err|={ {k: round(x,3) for k,x in errors.items()} }")
+    return _sanitize({
+        "chosen": chosen,
+        "recovered": recovered,
+        "errors": errors,
+        "profile_source": r["profile_source"],
+        "lambda_source": r["lambda_source"],
+        "confidence": r["confidence"],
+        "n_obs_block1": r["n_obs_block1"],
+        "n_obs_block2": r["n_obs_block2"],
+    })
+
 
 @app.post("/session/{session_id}/finish")
 def finish_session(session_id: str):
