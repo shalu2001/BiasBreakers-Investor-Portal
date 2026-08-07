@@ -1,30 +1,39 @@
-import { useEffect, useState } from 'react';
-import { getNews, type NewsCategory, type NewsItem } from '../../api/news';
+import { useEffect, useMemo, useState } from 'react';
+import { getNews, getTickers, type NewsCategory, type NewsItem, type TickerOption } from '../../api/news';
 import { NEWS_FIXTURE, PORTFOLIO_FIXTURE } from '../../mocks/fixtures';
 import { MultiSelectDropdown } from '../../components/MultiSelectDropdown';
+import { formatTimeAgo } from '../../utils/timeAgo';
 import styles from './NewsPage.module.css';
 
 type CategoryFilter = 'all' | NewsCategory;
 
-const TICKER_OPTIONS = PORTFOLIO_FIXTURE.map((holding) => ({
-  value: holding.ticker,
-  label: holding.name,
-  sublabel: holding.ticker,
+const FALLBACK_TICKER_OPTIONS: TickerOption[] = PORTFOLIO_FIXTURE.map((holding) => ({
+  ticker: holding.ticker,
+  name: holding.name,
 }));
 
 export function NewsPage() {
   const [news, setNews] = useState<NewsItem[]>(NEWS_FIXTURE);
+  const [tickerOptions, setTickerOptions] = useState<TickerOption[]>(FALLBACK_TICKER_OPTIONS);
   const [category, setCategory] = useState<CategoryFilter>('all');
   const [selectedTickers, setSelectedTickers] = useState<string[]>([]);
 
   useEffect(() => {
-    getNews({
-      category: category === 'all' ? undefined : category,
-      tickers: selectedTickers.length > 0 ? selectedTickers : undefined,
-    })
+    getNews()
       .then(setNews)
       .catch(() => setNews(NEWS_FIXTURE));
-  }, [category, selectedTickers]);
+  }, []);
+
+  useEffect(() => {
+    getTickers()
+      .then((options) => setTickerOptions(options.length > 0 ? options : FALLBACK_TICKER_OPTIONS))
+      .catch(() => setTickerOptions(FALLBACK_TICKER_OPTIONS));
+  }, []);
+
+  const dropdownOptions = useMemo(
+    () => tickerOptions.map((option) => ({ value: option.ticker, label: option.name, sublabel: option.ticker })),
+    [tickerOptions],
+  );
 
   const filtered = news.filter((item) => {
     const matchesCategory = category === 'all' || item.category === category;
@@ -51,7 +60,7 @@ export function NewsPage() {
           </div>
           <MultiSelectDropdown
             placeholder="All stocks"
-            options={TICKER_OPTIONS}
+            options={dropdownOptions}
             selected={selectedTickers}
             onChange={setSelectedTickers}
           />
@@ -59,8 +68,8 @@ export function NewsPage() {
       </div>
 
       <div className={styles.list}>
-        {filtered.map((item) => (
-          <div key={item.headline} className={styles.item}>
+        {filtered.map((item, index) => (
+          <div key={`${item.headline}-${index}`} className={styles.item}>
             <div className={styles.tags}>
               {item.ticker && <span className={styles.tickerTag}>{item.ticker}</span>}
               <span className={styles.categoryTag}>
@@ -68,8 +77,9 @@ export function NewsPage() {
               </span>
             </div>
             <div className={styles.headline}>{item.headline}</div>
+            {item.content && <div className={styles.content}>{item.content}</div>}
             <div className={styles.meta}>
-              {item.source} · {item.timeAgo}
+              {item.source} · {formatTimeAgo(item.publishedDate)}
             </div>
           </div>
         ))}

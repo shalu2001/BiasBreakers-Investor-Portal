@@ -178,8 +178,10 @@ class NarrativePredictionEngine:
             "covariance_window_trading_days": self.settings.covariance_window_trading_days,
             "price_trading_days_loaded": int(prices_df.shape[0]),
             "bl_use_view_confidence": self.settings.bl_use_view_confidence,
-            "alpha": self.settings.alpha,
-            "lambda": self.settings.lambda_,
+            "macro_alpha": macro_settings.alpha,
+            "macro_lambda": macro_settings.lambda_,
+            "micro_alpha": micro_settings.alpha,
+            "micro_lambda": micro_settings.lambda_,
         }
 
         return PredictionResult(

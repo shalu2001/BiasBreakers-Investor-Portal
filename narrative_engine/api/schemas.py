@@ -61,6 +61,26 @@ class PredictResponse(BaseModel):
     meta: Dict[str, Any]
 
 
+class NewsItemOut(BaseModel):
+    """A single news article for the frontend news feed."""
+
+    ticker: Optional[str] = Field(None, description="Matched SL20 ticker, if any (micro news).")
+    category: str = Field(..., description="Market classification: 'macro' or 'micro'.")
+    headline: str
+    content: str = ""
+    source: str = ""
+    published_date: Optional[str] = Field(
+        None, description="ISO 8601 publish timestamp; frontend derives relative 'time ago'."
+    )
+
+
+class TickerOption(BaseModel):
+    """A ticker dropdown option for the news filter."""
+
+    ticker: str
+    name: str
+
+
 class HealthResponse(BaseModel):
     status: str
     mongo: str
