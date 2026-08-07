@@ -28,6 +28,18 @@ export function AccountPage() {
   const [savingAccount, setSavingAccount] = useState(false);
   const [savingPlan, setSavingPlan] = useState(false);
 
+  const displayName = user?.name?.trim() ?? '';
+  const initials = displayName
+    ? displayName.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase()
+    : (user?.email?.[0] ?? '?').toUpperCase();
+  const TRAITS = persona
+    ? [
+        { label: 'Risk tolerance', score: persona.riskTolerance },
+        { label: 'Loss aversion', score: persona.lossAversion },
+        { label: 'Regret / FOMO', score: persona.regretAversion },
+      ]
+    : [];
+
   useEffect(() => {
     let cancelled = false;
     getProfile()
@@ -90,7 +102,13 @@ export function AccountPage() {
 
   return (
     <div className={styles.page}>
-      <h1 className={styles.title}>Account</h1>
+      <header className={styles.header}>
+        <div className={styles.avatar}>{initials}</div>
+        <div className={styles.headerText}>
+          <h1 className={styles.title}>{displayName || 'Your account'}</h1>
+          <span className={styles.email}>{user?.email}</span>
+        </div>
+      </header>
 
       <form className={styles.card} onSubmit={handleSaveAccount}>
         <span className={styles.cardTitle}>Your details</span>
@@ -152,9 +170,19 @@ export function AccountPage() {
         {persona ? (
           <>
             <div className={styles.archetype}>{persona.archetype}</div>
-            <div className={styles.scoreRow}><span>Risk tolerance</span><span className={styles.mono}>{persona.riskTolerance}/100</span></div>
-            <div className={styles.scoreRow}><span>Loss aversion</span><span className={styles.mono}>{persona.lossAversion}/100</span></div>
-            <div className={styles.scoreRow}><span>Regret / FOMO</span><span className={styles.mono}>{persona.regretAversion}/100</span></div>
+            <div className={styles.traits}>
+              {TRAITS.map((t) => (
+                <div key={t.label} className={styles.trait}>
+                  <div className={styles.traitHead}>
+                    <span className={styles.traitLabel}>{t.label}</span>
+                    <span className={styles.mono}>{t.score}<span className={styles.scoreMax}>/100</span></span>
+                  </div>
+                  <div className={styles.meterTrack}>
+                    <span className={styles.meterFill} style={{ width: `${t.score}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
             <p className={styles.hint}>Measured from your five-minute game. Play again to refresh it.</p>
           </>
         ) : (

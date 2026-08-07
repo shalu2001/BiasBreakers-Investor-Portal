@@ -6,7 +6,7 @@ import { getNews, type NewsItem } from '../../api/news';
 import { PERSONA_FIXTURE, PORTFOLIO_FIXTURE, NEWS_FIXTURE } from '../../mocks/fixtures';
 import { HoldingCard } from '../../components/HoldingCard';
 import { useSession } from '../../session/SessionContext';
-import { profileToPersona, buildInsight } from '../../session/profileToPersona';
+import { profileToPersona, buildInsight, type TraitConfidence } from '../../session/profileToPersona';
 import { getProfile } from '../../api/portal';
 import styles from './DashboardPage.module.css';
 
@@ -28,6 +28,7 @@ export function DashboardPage() {
   });
   const [holdings, setHoldings] = useState<Holding[]>(PORTFOLIO_FIXTURE);
   const [news, setNews] = useState<NewsItem[]>(NEWS_FIXTURE.slice(0, 3));
+  const [confidence, setConfidence] = useState<TraitConfidence>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -39,6 +40,8 @@ export function DashboardPage() {
         const saved = await getProfile();
         if (cancelled) return;
         const p = saved.parameters ?? {};
+        const conf = (p.confidence ?? {}) as { lambda?: { level?: string }; gamma?: { level?: string } };
+        setConfidence({ lambda: conf.lambda?.level, gamma: conf.gamma?.level });
         const mapped =
           p.lambda != null || p.gamma != null
             ? profileToPersona({ alpha: p.alpha ?? null, lambda: p.lambda ?? null, gamma: p.gamma ?? null })
@@ -65,7 +68,7 @@ export function DashboardPage() {
     };
   }, [profile]);
 
-  const insight = buildInsight(persona);
+  const insight = buildInsight(persona, confidence);
 
   return (
     <div className={styles.page}>
@@ -74,57 +77,70 @@ export function DashboardPage() {
         <h1 className={styles.archetypeTitle}>{persona.archetype}</h1>
         <p className={styles.narrative}>{insight.narrative}</p>
 
+        {insight.caveat && (
+          <div className={styles.caveat}>
+            <span className={styles.caveatIcon}>✦</span>
+            <span>{insight.caveat}</span>
+          </div>
+        )}
+
         <div className={styles.traitGrid}>
           {insight.traits.map((t) => (
             <div key={t.key} className={styles.trait}>
               <div className={styles.traitHead}>
                 <span className={styles.traitLabel}>{t.label}</span>
-                <span className={styles.traitScore}>
-                  {t.score}
-                  <span className={styles.traitScoreMax}>/100</span>
-                </span>
+                {!t.reliable && <span className={styles.traitProvisional}>early read</span>}
+              </div>
+              <div className={styles.traitScore}>
+                {t.score}
+                <span className={styles.traitScoreMax}>/100</span>
               </div>
               <div className={styles.traitTrack}>
-                <span className={styles.traitFill} style={{ width: `${t.score}%` }} />
+                <span
+                  className={styles.traitFill}
+                  style={{ width: `${t.score}%`, opacity: t.reliable ? 1 : 0.45 }}
+                />
               </div>
               <p className={styles.traitMeaning}>{t.meaning}</p>
             </div>
           ))}
         </div>
 
-        <div className={styles.insightCols}>
-          <div className={styles.insightCol}>
-            <span className={styles.insightColTitle}>What works in your favour</span>
-            <ul className={styles.insightList}>
+        <div className={styles.insightPanels}>
+          <div className={`${styles.insightPanel} ${styles.strengthsPanel}`}>
+            <div className={styles.panelHead}>What works for you</div>
+            <ul className={styles.panelList}>
               {insight.strengths.map((s, i) => (
-                <li key={i} className={styles.strengthItem}>{s}</li>
+                <li key={i}>{s}</li>
               ))}
             </ul>
           </div>
-          <div className={styles.insightCol}>
-            <span className={styles.insightColTitle}>What to watch</span>
-            <ul className={styles.insightList}>
+          <div className={`${styles.insightPanel} ${styles.watchPanel}`}>
+            <div className={styles.panelHead}>Worth watching</div>
+            <ul className={styles.panelList}>
               {insight.watchouts.map((w, i) => (
-                <li key={i} className={styles.watchItem}>{w}</li>
+                <li key={i}>{w}</li>
               ))}
             </ul>
           </div>
         </div>
 
-        <p className={styles.implication}>
-          <strong className={styles.implicationLead}>How we'll manage your money: </strong>
-          {insight.strategy}
-        </p>
+        <div className={styles.strategyBox}>
+          <span className={styles.strategyLabel}>How we'll manage your money</span>
+          <p className={styles.strategyText}>{insight.strategy}</p>
+        </div>
 
-        {plan.amount != null && (
-          <p className={styles.planLine}>
-            Your plan: LKR {new Intl.NumberFormat('en-LK').format(plan.amount)}
-            {plan.goal && GOAL_LABELS[plan.goal] ? ` · ${GOAL_LABELS[plan.goal]}` : ''}
-          </p>
-        )}
-        <Link to="/portfolio" className={styles.viewMoreLink}>
-          View more
-        </Link>
+        <div className={styles.cardFooter}>
+          {plan.amount != null && (
+            <span className={styles.planLine}>
+              Your plan: <b>LKR {new Intl.NumberFormat('en-LK').format(plan.amount)}</b>
+              {plan.goal && GOAL_LABELS[plan.goal] ? ` · ${GOAL_LABELS[plan.goal]}` : ''}
+            </span>
+          )}
+          <Link to="/behavioural-game" className={styles.retakeLink}>
+            Retake the game →
+          </Link>
+        </div>
       </section>
 
       <div className={styles.snapshotHeader}>

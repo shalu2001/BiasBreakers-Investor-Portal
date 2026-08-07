@@ -123,3 +123,31 @@ export async function finishSession(sessionId: string): Promise<FinishResult> {
   const { data } = await gameClient.post<FinishResult>(`/session/${sessionId}/finish`);
   return data;
 }
+
+// ---- DEV ONLY: skip the game, auto-play, and validate parameter recovery ----
+export interface DevAutoplayParams {
+  alpha: number;
+  lam: number; // lambda (reserved word on the wire -> 'lam')
+  gamma: number;
+  k?: number;
+  noise?: number;
+  seed?: number;
+}
+
+export interface DevAutoplayResult {
+  chosen: { alpha: number; lambda: number; gamma: number };
+  recovered: { alpha: number; lambda: number; gamma: number };
+  errors: { alpha: number; lambda: number; gamma: number };
+  profile_source: string;
+  lambda_source: string;
+  confidence: Partial<Record<'alpha' | 'lambda' | 'gamma', Confidence>>;
+  n_obs_block1?: number;
+  n_obs_block2?: number;
+}
+
+export async function devAutoplay(params: DevAutoplayParams): Promise<DevAutoplayResult> {
+  const { data } = await gameClient.post<DevAutoplayResult>('/session/dev/autoplay', params, {
+    timeout: 60_000, // full engine play + recovery
+  });
+  return data;
+}
