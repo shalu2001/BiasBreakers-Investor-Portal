@@ -36,9 +36,9 @@ export function DashboardPage() {
           <Link to="/portfolio" className={styles.viewFullLink}>
             View full portfolio
           </Link>
-          <button type="button" className={styles.optimizeButton}>
+          <Link to="/recommend" className={styles.optimizeButton}>
             Optimize portfolio ↻
-          </button>
+          </Link>
         </div>
       </div>
 

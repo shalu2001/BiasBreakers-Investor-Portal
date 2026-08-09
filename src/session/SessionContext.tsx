@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
+import type { ReallocationRow } from '../api/recommendation';
 
 // App-wide session that threads the onboarding answers and the behavioural
 // game result through the whole journey (Login -> Onboarding -> Game ->
@@ -21,11 +22,16 @@ export interface BehaviouralProfile {
 interface SessionState {
   onboarding: OnboardingAnswers;
   profile: BehaviouralProfile | null;
+  // Last computed reallocation, kept around so the Recommend page can show
+  // it again after the user navigates away and back without re-running the
+  // optimizer. null means "not optimized yet this session".
+  recommendation: ReallocationRow[] | null;
 }
 
 interface SessionContextValue extends SessionState {
   setOnboarding: (answers: OnboardingAnswers) => void;
   setProfile: (profile: BehaviouralProfile) => void;
+  setRecommendation: (rows: ReallocationRow[]) => void;
   reset: () => void;
 }
 
@@ -34,6 +40,7 @@ const STORAGE_KEY = 'sl20.session';
 const EMPTY: SessionState = {
   onboarding: { hasExistingPortfolio: null, investmentAmount: null, goal: null },
   profile: null,
+  recommendation: null,
 };
 
 function load(): SessionState {
@@ -75,13 +82,23 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     });
   }
 
+  function setRecommendation(recommendation: ReallocationRow[]) {
+    setState((s) => {
+      const next = { ...s, recommendation };
+      persist(next);
+      return next;
+    });
+  }
+
   function reset() {
     persist(EMPTY);
     setState(EMPTY);
   }
 
   return (
-    <SessionContext.Provider value={{ ...state, setOnboarding, setProfile, reset }}>
+    <SessionContext.Provider
+      value={{ ...state, setOnboarding, setProfile, setRecommendation, reset }}
+    >
       {children}
     </SessionContext.Provider>
   );

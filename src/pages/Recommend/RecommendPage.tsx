@@ -10,11 +10,8 @@ import {
   type ReallocationRow,
   type PastRecommendation,
 } from '../../api/recommendation';
-import {
-  PERSONA_FIXTURE,
-  RECOMMENDATION_FIXTURE,
-  PAST_RECOMMENDATIONS_FIXTURE,
-} from '../../mocks/fixtures';
+import { PERSONA_FIXTURE, PAST_RECOMMENDATIONS_FIXTURE } from '../../mocks/fixtures';
+import { LoadingState, EmptyState } from '../../components/ui';
 import styles from './RecommendPage.module.css';
 
 const lkr = new Intl.NumberFormat('en-LK');
@@ -65,11 +62,14 @@ function getAction(row: ReallocationRow) {
 }
 
 export function RecommendPage() {
-  const { profile } = useSession();
+  const { profile, recommendation, setRecommendation } = useSession();
   const [persona, setPersona] = useState<PersonaProfile>(
     () => (profile ? profileToPersona(profile) : null) ?? PERSONA_FIXTURE,
   );
-  const [rows, setRows] = useState<ReallocationRow[]>(RECOMMENDATION_FIXTURE);
+  // Seeded from the session so a previously-computed reallocation is still
+  // shown after navigating away and back, instead of being wiped and
+  // re-run on every visit. null/[] means "not optimized yet".
+  const [rows, setRows] = useState<ReallocationRow[]>(recommendation ?? []);
   const [pastRecommendations, setPastRecommendations] = useState<PastRecommendation[]>(
     PAST_RECOMMENDATIONS_FIXTURE,
   );
@@ -81,6 +81,8 @@ export function RecommendPage() {
   const [hasExistingPortfolio, setHasExistingPortfolio] = useState(false);
   const [rating, setRating] = useState<number | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [optimizing, setOptimizing] = useState(false);
+  const [optimizeError, setOptimizeError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -109,15 +111,31 @@ export function RecommendPage() {
       }
     })();
 
-    getRecommendation().then(setRows).catch(() => setRows(RECOMMENDATION_FIXTURE));
+    // Rebalancing is expensive/meaningful, so it's never triggered
+    // automatically here -- only handleOptimize (the button) calls
+    // getRecommendation(). History is just a read, safe to load eagerly.
     getPastRecommendations()
-      .then(setPastRecommendations)
-      .catch(() => setPastRecommendations(PAST_RECOMMENDATIONS_FIXTURE));
+      .then((data) => !cancelled && setPastRecommendations(data))
+      .catch(() => !cancelled && setPastRecommendations(PAST_RECOMMENDATIONS_FIXTURE));
 
     return () => {
       cancelled = true;
     };
   }, [profile]);
+
+  async function handleOptimize() {
+    setOptimizing(true);
+    setOptimizeError(false);
+    try {
+      const data = await getRecommendation();
+      setRows(data);
+      setRecommendation(data);
+    } catch {
+      setOptimizeError(true);
+    } finally {
+      setOptimizing(false);
+    }
+  }
 
   async function handleSubmitFeedback() {
     if (rating === null) return;
@@ -127,77 +145,109 @@ export function RecommendPage() {
 
   return (
     <div className={styles.page}>
-      <span className={styles.eyebrow}>
-        Reallocation, tuned to {persona.archetype.toLowerCase()}
-      </span>
-      <h1 className={styles.title}>Recommended reallocation</h1>
+      <div className={styles.titleRow}>
+        <div>
+          <span className={styles.eyebrow}>
+            Reallocation, tuned to {persona.archetype.toLowerCase()}
+          </span>
+          <h1 className={styles.title}>Recommended reallocation</h1>
+        </div>
+        {rows.length > 0 && !optimizing && (
+          <button type="button" className={styles.optimizeButton} onClick={handleOptimize}>
+            Optimize portfolio ↻
+          </button>
+        )}
+      </div>
       <p className={styles.subcopy}>
         Based on your archetype and current holdings, here's how the model would shift your
         weights. This is a suggestion — nothing changes until you approve it.
       </p>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Asset / Stock</th>
-            {hasExistingPortfolio && <th>Current (Val &amp; %)</th>}
-            <th>{hasExistingPortfolio ? 'Rebalanced' : 'Recommended'} (Val &amp; %)</th>
-            <th>Net Change (Val &amp; Shares)</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => {
-            const action = getAction(row);
-            return (
-              <tr key={row.ticker}>
-                <td>{assetLabel(row)}</td>
-                {hasExistingPortfolio && <td>{formatValPct(row.currentValue, row.currentPct)}</td>}
-                <td>{formatValPct(row.recommendedValue, row.recommendedPct)}</td>
-                <td>{formatNetChange(row)}</td>
-                <td>
-                  <span className={action.className}>{action.label}</span>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-
-      <section className={styles.reactionCard}>
-        <span className={styles.eyebrow}>Your reaction</span>
-        <h2 className={styles.reactionTitle}>How do you feel about this new allocation?</h2>
-        <p className={styles.reactionSubcopy}>
-          Your answer helps tune future recommendations — it feeds straight back into the
-          optimization loop.
-        </p>
-
-        <div className={styles.ratingRow}>
-          {[1, 2, 3, 4, 5].map((value) => (
-            <button
-              key={value}
-              type="button"
-              className={rating === value ? styles.ratingButtonActive : styles.ratingButton}
-              onClick={() => setRating(value)}
-            >
-              {value}
+      {optimizing ? (
+        <LoadingState label="Optimizing your portfolio…" />
+      ) : rows.length === 0 ? (
+        <EmptyState
+          icon="↻"
+          title="No optimization run yet"
+          message={
+            optimizeError
+              ? "Something went wrong running the optimizer. Try again."
+              : "Click optimize to generate a reallocation based on your archetype and current holdings."
+          }
+          action={
+            <button type="button" className={styles.optimizeButton} onClick={handleOptimize}>
+              Optimize portfolio ↻
             </button>
-          ))}
-        </div>
-        <div className={styles.ratingLabels}>
-          <span>Uncomfortable</span>
-          <span>Very comfortable</span>
-        </div>
+          }
+        />
+      ) : (
+        <>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Asset / Stock</th>
+                {hasExistingPortfolio && <th>Current (Val &amp; %)</th>}
+                <th>{hasExistingPortfolio ? 'Rebalanced' : 'Recommended'} (Val &amp; %)</th>
+                <th>Net Change (Val &amp; Shares)</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => {
+                const action = getAction(row);
+                return (
+                  <tr key={row.ticker}>
+                    <td>{assetLabel(row)}</td>
+                    {hasExistingPortfolio && (
+                      <td>{formatValPct(row.currentValue, row.currentPct)}</td>
+                    )}
+                    <td>{formatValPct(row.recommendedValue, row.recommendedPct)}</td>
+                    <td>{formatNetChange(row)}</td>
+                    <td>
+                      <span className={action.className}>{action.label}</span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
 
-        <button
-          type="button"
-          className={styles.submitButton}
-          disabled={rating === null}
-          onClick={handleSubmitFeedback}
-        >
-          {submitted ? 'Feedback submitted' : 'Submit feedback'}
-        </button>
-      </section>
+          <section className={styles.reactionCard}>
+            <span className={styles.eyebrow}>Your reaction</span>
+            <h2 className={styles.reactionTitle}>How do you feel about this new allocation?</h2>
+            <p className={styles.reactionSubcopy}>
+              Your answer helps tune future recommendations — it feeds straight back into the
+              optimization loop.
+            </p>
+
+            <div className={styles.ratingRow}>
+              {[1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  className={rating === value ? styles.ratingButtonActive : styles.ratingButton}
+                  onClick={() => setRating(value)}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+            <div className={styles.ratingLabels}>
+              <span>Uncomfortable</span>
+              <span>Very comfortable</span>
+            </div>
+
+            <button
+              type="button"
+              className={styles.submitButton}
+              disabled={rating === null}
+              onClick={handleSubmitFeedback}
+            >
+              {submitted ? 'Feedback submitted' : 'Submit feedback'}
+            </button>
+          </section>
+        </>
+      )}
 
       <h2 className={styles.sectionTitle}>Past recommendations</h2>
       <div className={styles.pastList}>

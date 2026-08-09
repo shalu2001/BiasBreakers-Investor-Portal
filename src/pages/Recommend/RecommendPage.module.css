@@ -14,7 +14,28 @@
 
 .title {
   font-size: 28px;
-  margin: 8px 0 12px;
+  margin: 8px 0 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.optimizeButton {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border: none;
+  border-radius: 7px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .subcopy {
