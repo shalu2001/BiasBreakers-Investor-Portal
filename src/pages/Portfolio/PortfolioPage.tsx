@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { getPortfolio, type Holding, type PortfolioRange } from '../../api/portfolio';
 import { PORTFOLIO_FIXTURE } from '../../mocks/fixtures';
 import { HoldingCard } from '../../components/HoldingCard';
+import { Carousel } from '../../components/Carousel';
 import { EmptyState } from '../../components/ui';
 import styles from './PortfolioPage.module.css';
 
@@ -45,11 +46,11 @@ export function PortfolioPage() {
           message="Once your portfolio is built, your positions and their recent moves will appear here."
         />
       ) : (
-        <div className={styles.list}>
+        <Carousel ariaLabel="Current holdings">
           {holdings.map((holding) => (
             <HoldingCard key={holding.ticker} holding={holding} chartHeight={280} />
           ))}
-        </div>
+        </Carousel>
       )}
     </div>
   );

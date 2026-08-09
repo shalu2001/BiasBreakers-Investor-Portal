@@ -1,0 +1,90 @@
+.wrap {
+  position: relative;
+}
+
+.track {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 16px;
+  scroll-snap-type: x proximity;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-text-dim) var(--color-surface);
+}
+
+.track::-webkit-scrollbar {
+  height: 10px;
+}
+.track::-webkit-scrollbar-track {
+  background: var(--color-surface);
+  border-radius: 999px;
+}
+.track::-webkit-scrollbar-thumb {
+  background: var(--color-text-dim);
+  border-radius: 999px;
+}
+.track::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* three per screen on a laptop; two, then one on smaller widths */
+.item {
+  flex: 0 0 calc((100% - 40px) / 3);
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+@media (max-width: 1024px) {
+  .item {
+    flex-basis: calc((100% - 20px) / 2);
+  }
+}
+
+@media (max-width: 680px) {
+  .item {
+    flex-basis: 100%;
+  }
+}
+
+.arrow {
+  position: absolute;
+  top: 44%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+  z-index: 3;
+  opacity: 0.92;
+}
+
+.arrow:hover {
+  background: var(--color-accent);
+  color: var(--color-bg);
+  border-color: var(--color-accent);
+  opacity: 1;
+}
+
+.arrowLeft {
+  left: -6px;
+}
+
+.arrowRight {
+  right: -6px;
+}
+
+@media (max-width: 680px) {
+  .arrow {
+    display: none; /* rely on swipe on small screens */
+  }
+}

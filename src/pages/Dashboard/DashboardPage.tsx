@@ -5,6 +5,7 @@ import { getNews, type NewsItem } from '../../api/news';
 import { formatTimeAgo } from '../../utils/timeAgo';
 import { PORTFOLIO_FIXTURE } from '../../mocks/fixtures';
 import { HoldingCard } from '../../components/HoldingCard';
+import { Carousel } from '../../components/Carousel';
 import { BehaviouralInsightCard } from '../../components/BehaviouralInsightCard';
 import { useBehaviouralProfile } from '../../session/useBehaviouralProfile';
 import styles from './DashboardPage.module.css';
@@ -41,16 +42,17 @@ export function DashboardPage() {
         </div>
       </div>
 
-      <div className={styles.snapshotScroll}>
-        {holdings.map((holding) => (
-          <div key={holding.ticker} className={styles.snapshotCard}>
+      <div className={styles.snapshotCarousel}>
+        <Carousel ariaLabel="Portfolio snapshot">
+          {holdings.map((holding) => (
             <HoldingCard
+              key={holding.ticker}
               holding={holding}
               dateRangeLabel="17 Jul – 28 Jul 2026"
               footerNote="Click a candle for detail"
             />
-          </div>
-        ))}
+          ))}
+        </Carousel>
       </div>
 
       <div className={styles.newsHeader}>
