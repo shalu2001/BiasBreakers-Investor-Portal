@@ -1,0 +1,2804 @@
+{
+  "as_of": "2026-08-09",
+  "lookback_days": 30,
+  "universe": [
+    "SUN",
+    "VONE",
+    "AEL",
+    "LFIN",
+    "NTB",
+    "SAMP",
+    "HNB",
+    "HHL",
+    "CFIN",
+    "MELS",
+    "DFCC",
+    "NDB",
+    "LIOC",
+    "COMB",
+    "JKH",
+    "PLC",
+    "HAYL",
+    "LOLC",
+    "SINS",
+    "DIAL"
+  ],
+  "predictions": [
+    {
+      "ticker": "SUN",
+      "posterior": 0.0023472482731977957,
+      "prior": 0.00471609401217724,
+      "tilt": -0.002368845738979444
+    },
+    {
+      "ticker": "VONE",
+      "posterior": 0.0031842335724882533,
+      "prior": 0.005877370291340738,
+      "tilt": -0.0026931367188524845
+    },
+    {
+      "ticker": "AEL",
+      "posterior": 0.0025298488418815817,
+      "prior": 0.005768674766003936,
+      "tilt": -0.0032388259241223545
+    },
+    {
+      "ticker": "LFIN",
+      "posterior": 0.0018283447847930595,
+      "prior": 0.005125626617694165,
+      "tilt": -0.0032972818329011057
+    },
+    {
+      "ticker": "NTB",
+      "posterior": 0.0007836406126907262,
+      "prior": 0.004162606008411583,
+      "tilt": -0.003378965395720857
+    },
+    {
+      "ticker": "SAMP",
+      "posterior": -0.00014141190259698774,
+      "prior": 0.0033103345677162567,
+      "tilt": -0.0034517464703132444
+    },
+    {
+      "ticker": "HNB",
+      "posterior": 0.00010913399898016506,
+      "prior": 0.004069604782659804,
+      "tilt": -0.003960470783679639
+    },
+    {
+      "ticker": "HHL",
+      "posterior": 0.0035324634404223032,
+      "prior": 0.0077100761286805685,
+      "tilt": -0.004177612688258265
+    },
+    {
+      "ticker": "CFIN",
+      "posterior": 0.0032705887634098775,
+      "prior": 0.007810654992629316,
+      "tilt": -0.004540066229219438
+    },
+    {
+      "ticker": "MELS",
+      "posterior": 0.002760013804633728,
+      "prior": 0.008054758042897153,
+      "tilt": -0.005294744238263425
+    },
+    {
+      "ticker": "DFCC",
+      "posterior": 0.0016586418967000681,
+      "prior": 0.007103472963767162,
+      "tilt": -0.005444831067067094
+    },
+    {
+      "ticker": "NDB",
+      "posterior": 0.0024605638957923663,
+      "prior": 0.00802071536133419,
+      "tilt": -0.005560151465541823
+    },
+    {
+      "ticker": "LIOC",
+      "posterior": 0.001681587762795823,
+      "prior": 0.007303633756370208,
+      "tilt": -0.005622045993574385
+    },
+    {
+      "ticker": "COMB",
+      "posterior": 0.0008630099623442552,
+      "prior": 0.006602766850873532,
+      "tilt": -0.005739756888529277
+    },
+    {
+      "ticker": "JKH",
+      "posterior": 0.003804429670657002,
+      "prior": 0.009843355706300487,
+      "tilt": -0.006038926035643485
+    },
+    {
+      "ticker": "PLC",
+      "posterior": 0.002767444659697132,
+      "prior": 0.009144616357450867,
+      "tilt": -0.006377171697753735
+    },
+    {
+      "ticker": "HAYL",
+      "posterior": 0.003658508800422868,
+      "prior": 0.010229327818336034,
+      "tilt": -0.006570819017913166
+    },
+    {
+      "ticker": "LOLC",
+      "posterior": 0.00022241166076861392,
+      "prior": 0.010056647617155063,
+      "tilt": -0.00983423595638645
+    },
+    {
+      "ticker": "SINS",
+      "posterior": 0.006529584401306934,
+      "prior": 0.019258733381678567,
+      "tilt": -0.012729148980371634
+    },
+    {
+      "ticker": "DIAL",
+      "posterior": 0.008429587123759148,
+      "prior": 0.02164003795008096,
+      "tilt": -0.013210450826321812
+    }
+  ],
+  "views": [
+    {
+      "view_id": "macro-macro-0-1",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is advancing regulatory reforms to bolster its digital economy and modernize its tax treaty framework in alignment with global efforts to prevent tax avoidance.",
+      "Qi": 0.0011160487933069621,
+      "Si": 0.1348238095238095,
+      "Si_normalized": 0.13401278782191606,
+      "persistence": 0.4838709677419355,
+      "attention": 21,
+      "cluster_size": 21,
+      "sentiment_std": 0.12150711484072076,
+      "diffusion_k": 4.605601526147195,
+      "diffusion_c": 0.4196012301541215,
+      "diffusion_fitted": true,
+      "confidence": 0.3024319768581125,
+      "mapped_tickers": [
+        [
+          "SINS",
+          0.0694418395974012
+        ],
+        [
+          "LIOC",
+          0.05568804050259016
+        ],
+        [
+          "SAMP",
+          0.12493535501426306
+        ],
+        [
+          "PLC",
+          0.03560552587431152
+        ],
+        [
+          "NTB",
+          0.068618671499728
+        ],
+        [
+          "NDB",
+          0.0365997249351574
+        ],
+        [
+          "LOLC",
+          0.18015849221643637
+        ],
+        [
+          "HNB",
+          0.13793055770159446
+        ],
+        [
+          "DFCC",
+          0.044411861501970136
+        ],
+        [
+          "COMB",
+          0.24660993115654778
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-1-2",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is facing significant challenges in institutional accountability and cybersecurity, reflecting broader concerns over governance amidst ongoing investigations and contentious legal reforms.",
+      "Qi": -0.0034976343345276,
+      "Si": -0.7195368421052631,
+      "Si_normalized": -0.6166223302900522,
+      "persistence": 0.3225806451612903,
+      "attention": 19,
+      "cluster_size": 19,
+      "sentiment_std": 0.1588676582983006,
+      "diffusion_k": 11.316702200428656,
+      "diffusion_c": 0.8153750081301401,
+      "diffusion_fitted": true,
+      "confidence": 0.2708731269886828,
+      "mapped_tickers": [
+        [
+          "SINS",
+          0.0694418395974012
+        ],
+        [
+          "LIOC",
+          0.05568804050259016
+        ],
+        [
+          "SAMP",
+          0.12493535501426306
+        ],
+        [
+          "PLC",
+          0.03560552587431152
+        ],
+        [
+          "NTB",
+          0.068618671499728
+        ],
+        [
+          "NDB",
+          0.0365997249351574
+        ],
+        [
+          "LOLC",
+          0.18015849221643637
+        ],
+        [
+          "HNB",
+          0.13793055770159446
+        ],
+        [
+          "DFCC",
+          0.044411861501970136
+        ],
+        [
+          "COMB",
+          0.24660993115654778
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-2-3",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka's economy is recovering, indicated by rising foreign inflows into government securities and improvements in financial sector performance alongside stabilizing inflation and increased foreign reserves.",
+      "Qi": 0.0038019792215806957,
+      "Si": 0.9064333333333333,
+      "Si_normalized": 0.7194159601432951,
+      "persistence": 0.3225806451612903,
+      "attention": 15,
+      "cluster_size": 15,
+      "sentiment_std": 0.08831965931898865,
+      "diffusion_k": 13.274353510253064,
+      "diffusion_c": 0.6501110084790629,
+      "diffusion_fitted": true,
+      "confidence": 0.24864009291300307,
+      "mapped_tickers": [
+        [
+          "PLC",
+          0.03889165644849459
+        ],
+        [
+          "LOLC",
+          0.1967858081999446
+        ],
+        [
+          "SAMP",
+          0.13646597785516854
+        ],
+        [
+          "NTB",
+          0.07495167484227283
+        ],
+        [
+          "NDB",
+          0.03997761283774514
+        ],
+        [
+          "HNB",
+          0.15066054305210844
+        ],
+        [
+          "DFCC",
+          0.04851075268119866
+        ],
+        [
+          "COMB",
+          0.2693702307103705
+        ],
+        [
+          "CFIN",
+          0.04438574337269674
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-3-4",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is enhancing its export competitiveness by implementing targeted initiatives to support small and medium enterprises in accessing international markets.",
+      "Qi": 0.004056810858657972,
+      "Si": 0.8063153846153845,
+      "Si_normalized": 0.6675526276642286,
+      "persistence": 0.2903225806451613,
+      "attention": 13,
+      "cluster_size": 13,
+      "sentiment_std": 0.04590975840885859,
+      "diffusion_k": 4.909706494384003,
+      "diffusion_c": 0.46779251419037476,
+      "diffusion_fitted": true,
+      "confidence": 0.2340221347299026,
+      "mapped_tickers": [
+        [
+          "SINS",
+          0.047478680042442184
+        ],
+        [
+          "LIOC",
+          0.03807495124757594
+        ],
+        [
+          "VONE",
+          0.05488102642457607
+        ],
+        [
+          "SUN",
+          0.031188980678038193
+        ],
+        [
+          "SAMP",
+          0.08542063086319954
+        ],
+        [
+          "PLC",
+          0.024344161683075554
+        ],
+        [
+          "NTB",
+          0.04691586467123139
+        ],
+        [
+          "NDB",
+          0.025023914111612384
+        ],
+        [
+          "MELS",
+          0.11505051513811738
+        ],
+        [
+          "LOLC",
+          0.12317771905906
+        ],
+        [
+          "LFIN",
+          0.046714806713811265
+        ],
+        [
+          "HNB",
+          0.09430569315497647
+        ],
+        [
+          "DFCC",
+          0.03036521749087144
+        ],
+        [
+          "COMB",
+          0.16861180643475657
+        ],
+        [
+          "CFIN",
+          0.027783175409857187
+        ],
+        [
+          "AEL",
+          0.0406628568767984
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-4-5",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The Sri Lankan government is prioritizing infrastructure development to enhance connectivity and stimulate local economic growth.",
+      "Qi": 0.0029474697554496398,
+      "Si": 0.5112846153846153,
+      "Si_normalized": 0.47094550451617,
+      "persistence": 0.22580645161290322,
+      "attention": 13,
+      "cluster_size": 13,
+      "sentiment_std": 0.17780174285791916,
+      "diffusion_k": 4.107565530672409,
+      "diffusion_c": 0.383065777573719,
+      "diffusion_fitted": true,
+      "confidence": 0.20167127061975568,
+      "mapped_tickers": [
+        [
+          "AEL",
+          0.0521975287997388
+        ],
+        [
+          "VONE",
+          0.0704489103172326
+        ],
+        [
+          "JKH",
+          0.2441780388019603
+        ],
+        [
+          "HAYL",
+          0.12307519684316366
+        ],
+        [
+          "HHL",
+          0.06403084042055525
+        ],
+        [
+          "LIOC",
+          0.04887552220729445
+        ],
+        [
+          "NDB",
+          0.03212234894072009
+        ],
+        [
+          "SAMP",
+          0.10965156366368854
+        ],
+        [
+          "DFCC",
+          0.038978798742359516
+        ],
+        [
+          "COMB",
+          0.21644125126328678
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-5-6",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The Sri Lankan stock market is experiencing a recovery phase marked by upward movements in the All Share Price Index, driven by renewed interest in banking and investment sectors amid recent policy rate announcements.",
+      "Qi": 0.0025729754109512252,
+      "Si": 0.4999538461538462,
+      "Si_normalized": 0.4620808588981712,
+      "persistence": 0.2903225806451613,
+      "attention": 13,
+      "cluster_size": 13,
+      "sentiment_std": 0.4152665050031302,
+      "diffusion_k": 5.132694207788117,
+      "diffusion_c": 0.6166171701273482,
+      "diffusion_fitted": true,
+      "confidence": 0.14342519688602468,
+      "mapped_tickers": [
+        [
+          "SAMP",
+          0.14886289246992554
+        ],
+        [
+          "NTB",
+          0.08176047457284608
+        ],
+        [
+          "NDB",
+          0.043609280310038634
+        ],
+        [
+          "HNB",
+          0.16434692787406113
+        ],
+        [
+          "DFCC",
+          0.052917592161179985
+        ],
+        [
+          "COMB",
+          0.2938405038316163
+        ],
+        [
+          "LOLC",
+          0.21466232878033234
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-6-7",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is leveraging artificial intelligence and digital platforms to enhance its tourism sector and transition towards a $15 billion digital economy.",
+      "Qi": 0.0008540551410834177,
+      "Si": 0.18302727272727273,
+      "Si_normalized": 0.1810105492246483,
+      "persistence": 0.22580645161290322,
+      "attention": 11,
+      "cluster_size": 11,
+      "sentiment_std": 0.0868909671098743,
+      "diffusion_k": 8.448707516559354,
+      "diffusion_c": 0.8031034131450843,
+      "diffusion_fitted": true,
+      "confidence": 0.19694508552532122,
+      "mapped_tickers": [
+        [
+          "SINS",
+          0.06094856287818782
+        ],
+        [
+          "LIOC",
+          0.0488769603140267
+        ],
+        [
+          "VONE",
+          0.07045098319640875
+        ],
+        [
+          "DIAL",
+          0.27919980887422663
+        ],
+        [
+          "JKH",
+          0.24418522346343513
+        ],
+        [
+          "HNB",
+          0.12106057842992042
+        ],
+        [
+          "HAYL",
+          0.1230788181910523
+        ],
+        [
+          "AEL",
+          0.05219906465274217
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-7-8",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka's economy is in a gradual recovery phase bolstered by improved fiscal management and credit growth, yet it confronts challenges from structural vulnerabilities and rising interest rates.",
+      "Qi": 0.0031938915822961925,
+      "Si": 0.74495,
+      "Si_normalized": 0.6321265253070336,
+      "persistence": 0.25806451612903225,
+      "attention": 10,
+      "cluster_size": 10,
+      "sentiment_std": 0.2592472728882601,
+      "diffusion_k": 4.75097014080975,
+      "diffusion_c": 0.6137812658898579,
+      "diffusion_fitted": true,
+      "confidence": 0.14815054542234798,
+      "mapped_tickers": [
+        [
+          "PLC",
+          0.03287869062781129
+        ],
+        [
+          "SAMP",
+          0.11536722980837466
+        ],
+        [
+          "NTB",
+          0.0633635374322243
+        ],
+        [
+          "NDB",
+          0.033796749343174795
+        ],
+        [
+          "HNB",
+          0.12736719999027082
+        ],
+        [
+          "DFCC",
+          0.04101059649232645
+        ],
+        [
+          "COMB",
+          0.22772340621689408
+        ],
+        [
+          "LOLC",
+          0.1663611246879722
+        ],
+        [
+          "LFIN",
+          0.06309199296639569
+        ],
+        [
+          "VONE",
+          0.07412111013068204
+        ],
+        [
+          "AEL",
+          0.05491836230387371
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-8-9",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka's Treasury bond sales reflect steady demand for government debt amid prevailing interest rates.",
+      "Qi": 0.0006728550529422932,
+      "Si": 0.10815999999999999,
+      "Si_normalized": 0.1077401913514203,
+      "persistence": 0.2903225806451613,
+      "attention": 10,
+      "cluster_size": 10,
+      "sentiment_std": 0.11426725865268668,
+      "diffusion_k": 3.4761635435414937,
+      "diffusion_c": 0.2792819430466792,
+      "diffusion_fitted": true,
+      "confidence": 0.17714654826946266,
+      "mapped_tickers": [
+        [
+          "PLC",
+          0.03774992044669989
+        ],
+        [
+          "SAMP",
+          0.13245976844766472
+        ],
+        [
+          "NTB",
+          0.07275133077424469
+        ],
+        [
+          "NDB",
+          0.03880399659172303
+        ],
+        [
+          "HNB",
+          0.14623762611411847
+        ],
+        [
+          "DFCC",
+          0.04708663044347311
+        ],
+        [
+          "COMB",
+          0.26146237287404833
+        ],
+        [
+          "LOLC",
+          0.19100879939185508
+        ],
+        [
+          "LFIN",
+          0.07243955491617263
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-9-10",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka's foreign exchange reserves are under pressure due to high import demand and declining tourism revenues, creating challenges for the central bank's currency management strategies.",
+      "Qi": -0.00394883150792636,
+      "Si": -0.9589777777777777,
+      "Si_normalized": -0.7438205561415897,
+      "persistence": 0.1935483870967742,
+      "attention": 9,
+      "cluster_size": 9,
+      "sentiment_std": 0.008066636057487073,
+      "diffusion_k": 4.202751190878819,
+      "diffusion_c": 0.3985680734906077,
+      "diffusion_fitted": true,
+      "confidence": 0.18219184235678812,
+      "mapped_tickers": [
+        [
+          "SAMP",
+          0.1296982319707699
+        ],
+        [
+          "NTB",
+          0.07123460266857012
+        ],
+        [
+          "NDB",
+          0.03799500641083135
+        ],
+        [
+          "HNB",
+          0.14318884727703177
+        ],
+        [
+          "DFCC",
+          0.04610496296007347
+        ],
+        [
+          "COMB",
+          0.2560113752731244
+        ],
+        [
+          "LOLC",
+          0.18702662598848768
+        ],
+        [
+          "LFIN",
+          0.07092932674942119
+        ],
+        [
+          "LIOC",
+          0.05781102070169013
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-11-12",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The slight strengthening of the Sri Lankan rupee against the US dollar alongside steady bond yields indicates stable market liquidity.",
+      "Qi": -0.00320319807497576,
+      "Si": -0.9497374999999999,
+      "Si_normalized": -0.7396641889222666,
+      "persistence": 0.22580645161290322,
+      "attention": 8,
+      "cluster_size": 8,
+      "sentiment_std": 0.008889310645376288,
+      "diffusion_k": 5.743149194371256,
+      "diffusion_c": 0.7083028333923843,
+      "diffusion_fitted": true,
+      "confidence": 0.16518511489243728,
+      "mapped_tickers": [
+        [
+          "COMB",
+          0.2938405038316163
+        ],
+        [
+          "SAMP",
+          0.14886289246992554
+        ],
+        [
+          "NTB",
+          0.08176047457284608
+        ],
+        [
+          "NDB",
+          0.043609280310038634
+        ],
+        [
+          "HNB",
+          0.16434692787406113
+        ],
+        [
+          "DFCC",
+          0.052917592161179985
+        ],
+        [
+          "LOLC",
+          0.21466232878033234
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-12-13",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The Sri Lankan government's focus on regional industrialization and infrastructure development signifies a strategic move to bolster economic capacity and opportunities leading up to the 2027 budget.",
+      "Qi": 0.0021830221445047226,
+      "Si": 0.4841625,
+      "Si_normalized": 0.4495710177987482,
+      "persistence": 0.1935483870967742,
+      "attention": 8,
+      "cluster_size": 8,
+      "sentiment_std": 0.12918452826770707,
+      "diffusion_k": 4.290926799483131,
+      "diffusion_c": 0.4765230318113977,
+      "diffusion_fitted": true,
+      "confidence": 0.14513591195538214,
+      "mapped_tickers": [
+        [
+          "VONE",
+          0.12718004945801387
+        ],
+        [
+          "JKH",
+          0.4408098707496663
+        ],
+        [
+          "AEL",
+          0.09423118490326791
+        ],
+        [
+          "HAYL",
+          0.2221852623565636
+        ],
+        [
+          "HHL",
+          0.1155936325324883
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-14-15",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is enhancing its renewable energy infrastructure and battery storage capabilities to support its energy transition in response to growing demand for sustainable solutions.",
+      "Qi": 0.002730532258332619,
+      "Si": 0.6088,
+      "Si_normalized": 0.5432818365027607,
+      "persistence": 0.1935483870967742,
+      "attention": 8,
+      "cluster_size": 8,
+      "sentiment_std": 0.13518322750992448,
+      "diffusion_k": 4.074106829408336,
+      "diffusion_c": 0.4204410775043862,
+      "diffusion_fitted": true,
+      "confidence": 0.14413612874834592,
+      "mapped_tickers": [
+        [
+          "LIOC",
+          0.09180965130691064
+        ],
+        [
+          "AEL",
+          0.09804983561835429
+        ],
+        [
+          "JKH",
+          0.45867337241191664
+        ],
+        [
+          "HAYL",
+          0.2311891596528834
+        ],
+        [
+          "HHL",
+          0.12027798100993496
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-15-16",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is actively enhancing the growth and integration of its SME sector within local and global markets to support ongoing economic reforms.",
+      "Qi": 0.0018953586480709621,
+      "Si": 0.4062,
+      "Si_normalized": 0.38524138763599775,
+      "persistence": 0.1935483870967742,
+      "attention": 8,
+      "cluster_size": 8,
+      "sentiment_std": 0.13956025580372086,
+      "diffusion_k": 5.571168008447275,
+      "diffusion_c": 0.39101178420567234,
+      "diffusion_fitted": true,
+      "confidence": 0.14340662403271318,
+      "mapped_tickers": [
+        [
+          "COMB",
+          0.23546519346649675
+        ],
+        [
+          "SAMP",
+          0.11928930599540385
+        ],
+        [
+          "NTB",
+          0.0655176727243835
+        ],
+        [
+          "NDB",
+          0.03494571882105887
+        ],
+        [
+          "HNB",
+          0.1316972325560191
+        ],
+        [
+          "LOLC",
+          0.17201681224040685
+        ],
+        [
+          "LFIN",
+          0.06523689671087089
+        ],
+        [
+          "DFCC",
+          0.0424048111595728
+        ],
+        [
+          "VONE",
+          0.07664096469841834
+        ],
+        [
+          "AEL",
+          0.056785391627369085
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-17-18",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The Sri Lankan government is enhancing its regulatory framework to promote competition in telecommunications and improve trade practices, reflecting a broader push for economic modernization and ethical governance.",
+      "Qi": 0.0011070894888670771,
+      "Si": 0.21411249999999998,
+      "Si_normalized": 0.21089947052972235,
+      "persistence": 0.25806451612903225,
+      "attention": 8,
+      "cluster_size": 8,
+      "sentiment_std": 0.11647014035258137,
+      "diffusion_k": 4.796542242369941,
+      "diffusion_c": 0.38129133107059515,
+      "diffusion_fitted": true,
+      "confidence": 0.1472549766079031,
+      "mapped_tickers": [
+        [
+          "DIAL",
+          0.20615424293862608
+        ],
+        [
+          "JKH",
+          0.18030033789378663
+        ],
+        [
+          "HNB",
+          0.0893881410469556
+        ],
+        [
+          "SAMP",
+          0.08096638860786191
+        ],
+        [
+          "NDB",
+          0.023719046955943752
+        ],
+        [
+          "COMB",
+          0.1598195764385478
+        ],
+        [
+          "LOLC",
+          0.11675464075110824
+        ],
+        [
+          "VONE",
+          0.05201926592893963
+        ],
+        [
+          "HAYL",
+          0.09087835943823037
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-18-19",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The Sri Lankan stock market is experiencing a downward trend amid escalating regional tensions and declining investor sentiment.",
+      "Qi": -0.0033756907895360075,
+      "Si": -0.9582428571428573,
+      "Si_normalized": -0.7434920648155982,
+      "persistence": 0.16129032258064516,
+      "attention": 7,
+      "cluster_size": 7,
+      "sentiment_std": 0.004673284908577148,
+      "diffusion_k": 5.272695690972217,
+      "diffusion_c": 0.41248166783025886,
+      "diffusion_fitted": true,
+      "confidence": 0.14824014905616936,
+      "mapped_tickers": [
+        [
+          "SINS",
+          0.07014832804903212
+        ],
+        [
+          "SUN",
+          0.04608078502102793
+        ],
+        [
+          "SAMP",
+          0.12620642424327136
+        ],
+        [
+          "PLC",
+          0.03596776991897229
+        ],
+        [
+          "NTB",
+          0.06931678519115486
+        ],
+        [
+          "NDB",
+          0.03697208377745577
+        ],
+        [
+          "LOLC",
+          0.1819913914447989
+        ],
+        [
+          "HNB",
+          0.1393338377228057
+        ],
+        [
+          "DFCC",
+          0.04486369957896354
+        ],
+        [
+          "COMB",
+          0.24911889505251744
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-19-20",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is emerging as a growing hub for international trade and technology, driven by transformative leadership in its logistics and innovation sectors amidst evolving lifestyle and entertainment dynamics.",
+      "Qi": 0.003037299092010263,
+      "Si": 0.7771285714285714,
+      "Si_normalized": 0.651055490574633,
+      "persistence": 0.22580645161290322,
+      "attention": 7,
+      "cluster_size": 7,
+      "sentiment_std": 0.03071950121831475,
+      "diffusion_k": 5.579614798645418,
+      "diffusion_c": 0.42003685781494593,
+      "diffusion_fitted": true,
+      "confidence": 0.14436092535046374,
+      "mapped_tickers": [
+        [
+          "SINS",
+          0.07372152861322318
+        ],
+        [
+          "LIOC",
+          0.05912008516951317
+        ],
+        [
+          "VONE",
+          0.08521536732414876
+        ],
+        [
+          "JKH",
+          0.29535902223755883
+        ],
+        [
+          "HAYL",
+          0.14887239646795
+        ],
+        [
+          "DIAL",
+          0.33771160018760615
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-20-21",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is strategically enhancing its export capabilities and attracting foreign direct investment to bolster economic growth in key sectors like renewable energy, agribusiness, and high-value manufacturing.",
+      "Qi": 0.003146571912688432,
+      "Si": 0.8823,
+      "Si_normalized": 0.7075696843090573,
+      "persistence": 0.22580645161290322,
+      "attention": 7,
+      "cluster_size": 7,
+      "sentiment_std": 0.019781737609652555,
+      "diffusion_k": 5.443546473263237,
+      "diffusion_c": 0.50666972675054,
+      "diffusion_fitted": true,
+      "confidence": 0.14598995397303047,
+      "mapped_tickers": [
+        [
+          "LIOC",
+          0.08444118318849785
+        ],
+        [
+          "SUN",
+          0.06916973875480442
+        ],
+        [
+          "VONE",
+          0.12171305947989779
+        ],
+        [
+          "JKH",
+          0.4218611193070223
+        ],
+        [
+          "HAYL",
+          0.21263435710243855
+        ],
+        [
+          "AEL",
+          0.09018054216733912
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-22-23",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka's construction sector shows growth amid ongoing project execution, despite facing challenges such as skilled labor shortages and material supply constraints.",
+      "Qi": 0.0025796367128021287,
+      "Si": 0.7691833333333333,
+      "Si_normalized": 0.6464543223246343,
+      "persistence": 0.12903225806451613,
+      "attention": 6,
+      "cluster_size": 6,
+      "sentiment_std": 0.0686797499671887,
+      "diffusion_k": 5.749703349274422,
+      "diffusion_c": 0.4828659878070887,
+      "diffusion_fitted": true,
+      "confidence": 0.12147655435210582,
+      "mapped_tickers": [
+        [
+          "AEL",
+          0.09423118490326791
+        ],
+        [
+          "JKH",
+          0.4408098707496663
+        ],
+        [
+          "HAYL",
+          0.2221852623565636
+        ],
+        [
+          "HHL",
+          0.1155936325324883
+        ],
+        [
+          "VONE",
+          0.12718004945801387
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-23-24",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Rising food and energy price shocks in the Asia-Pacific region are prompting governments and institutions to enhance crisis response measures and pursue trade reforms to bolster economic stability and competitiveness.",
+      "Qi": 0.0024848469956085454,
+      "Si": 0.69265,
+      "Si_normalized": 0.5996817095191572,
+      "persistence": 0.1935483870967742,
+      "attention": 6,
+      "cluster_size": 6,
+      "sentiment_std": 0.052268912047857545,
+      "diffusion_k": 7.0645666039720565,
+      "diffusion_c": 0.4163633469049197,
+      "diffusion_fitted": true,
+      "confidence": 0.12361709842854031,
+      "mapped_tickers": [
+        [
+          "LIOC",
+          0.08093964755495298
+        ],
+        [
+          "SUN",
+          0.06630146647500613
+        ],
+        [
+          "MELS",
+          0.24457413184180676
+        ],
+        [
+          "HAYL",
+          0.20381701525340212
+        ],
+        [
+          "JKH",
+          0.404367738874832
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-24-25",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is implementing legal reforms and alternative dispute resolution mechanisms to enhance judicial efficiency and safeguard cultural and economic assets amid systemic challenges.",
+      "Qi": 0.0019964118665937074,
+      "Si": 0.5978,
+      "Si_normalized": 0.5354822466457764,
+      "persistence": 0.12903225806451613,
+      "attention": 6,
+      "cluster_size": 6,
+      "sentiment_std": 0.0891987854924793,
+      "diffusion_k": 6.584780559619158,
+      "diffusion_c": 0.7218031477148759,
+      "diffusion_fitted": true,
+      "confidence": 0.11880015841402444,
+      "mapped_tickers": [
+        [
+          "SAMP",
+          0.09905273153680019
+        ],
+        [
+          "NTB",
+          0.05440306985719524
+        ],
+        [
+          "NDB",
+          0.029017428476582955
+        ],
+        [
+          "HNB",
+          0.10935574242517192
+        ],
+        [
+          "COMB",
+          0.1955202136526493
+        ],
+        [
+          "LOLC",
+          0.142835394845215
+        ],
+        [
+          "LFIN",
+          0.05416992547885919
+        ],
+        [
+          "DFCC",
+          0.03521113934403901
+        ],
+        [
+          "PLC",
+          0.028229195772903008
+        ],
+        [
+          "DIAL",
+          0.25220515861058423
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-26-27",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is navigating regulatory challenges in its automotive logistics and healthcare sectors amidst rising scrutiny over financial practices and potential illegal investment schemes.",
+      "Qi": -0.0011230146273496263,
+      "Si": -0.30335,
+      "Si_normalized": -0.29437532092785196,
+      "persistence": 0.16129032258064516,
+      "attention": 6,
+      "cluster_size": 6,
+      "sentiment_std": 0.1380775959379363,
+      "diffusion_k": 7.039338548924692,
+      "diffusion_c": 0.5752692146359297,
+      "diffusion_fitted": true,
+      "confidence": 0.1124246613993996,
+      "mapped_tickers": [
+        [
+          "LOLC",
+          0.19850224328433
+        ],
+        [
+          "SAMP",
+          0.13765628214773
+        ],
+        [
+          "NTB",
+          0.07560542973196492
+        ],
+        [
+          "NDB",
+          0.04032631164835735
+        ],
+        [
+          "HNB",
+          0.15197465733856375
+        ],
+        [
+          "COMB",
+          0.271719772676377
+        ],
+        [
+          "DFCC",
+          0.04893388054104591
+        ],
+        [
+          "LFIN",
+          0.0752814226316311
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-27-28",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The Sri Lankan rupee is stabilizing against the US dollar amid steady bond yields, reflecting a cautious economic environment.",
+      "Qi": -0.0027057946683698656,
+      "Si": -0.6769,
+      "Si_normalized": -0.5895003747056922,
+      "persistence": 0.16129032258064516,
+      "attention": 6,
+      "cluster_size": 6,
+      "sentiment_std": 0.11769718206765473,
+      "diffusion_k": 7.599278591397626,
+      "diffusion_c": 0.25161815505456536,
+      "diffusion_fitted": true,
+      "confidence": 0.11508297625204504,
+      "mapped_tickers": [
+        [
+          "SAMP",
+          0.14886289246992554
+        ],
+        [
+          "NTB",
+          0.08176047457284608
+        ],
+        [
+          "NDB",
+          0.043609280310038634
+        ],
+        [
+          "HNB",
+          0.16434692787406113
+        ],
+        [
+          "COMB",
+          0.2938405038316163
+        ],
+        [
+          "DFCC",
+          0.052917592161179985
+        ],
+        [
+          "LOLC",
+          0.21466232878033234
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-28-29",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka's currency exhibits stability against the US dollar while bond yields remain largely unchanged.",
+      "Qi": -0.0029119102220854834,
+      "Si": -0.8890666666666668,
+      "Si_normalized": -0.7109324346388085,
+      "persistence": 0.1935483870967742,
+      "attention": 6,
+      "cluster_size": 6,
+      "sentiment_std": 0.021751066385096808,
+      "diffusion_k": 5.049071696154919,
+      "diffusion_c": 0.5306584397311422,
+      "diffusion_fitted": true,
+      "confidence": 0.12759768699324825,
+      "mapped_tickers": [
+        [
+          "PLC",
+          0.03774992044669989
+        ],
+        [
+          "SAMP",
+          0.13245976844766472
+        ],
+        [
+          "NTB",
+          0.07275133077424469
+        ],
+        [
+          "NDB",
+          0.03880399659172303
+        ],
+        [
+          "HNB",
+          0.14623762611411847
+        ],
+        [
+          "DFCC",
+          0.04708663044347311
+        ],
+        [
+          "COMB",
+          0.26146237287404833
+        ],
+        [
+          "LOLC",
+          0.19100879939185508
+        ],
+        [
+          "LFIN",
+          0.07243955491617263
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-30-31",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The U.S. is experiencing a decline in effective tariff rates driven by changing trade policies and import compositions, while Sri Lanka's electricity tariffs are set to remain stable amid limited cost increases.",
+      "Qi": -0.00221691961275081,
+      "Si": -0.781,
+      "Si_normalized": -0.6532803053346253,
+      "persistence": 0.0967741935483871,
+      "attention": 5,
+      "cluster_size": 5,
+      "sentiment_std": 0.0870413005417543,
+      "diffusion_k": 9.738559695358655,
+      "diffusion_c": 0.6598342501895592,
+      "diffusion_fitted": true,
+      "confidence": 0.10143985549536062,
+      "mapped_tickers": [
+        [
+          "LIOC",
+          0.07823062981552831
+        ],
+        [
+          "SINS",
+          0.09755198420028649
+        ],
+        [
+          "MELS",
+          0.2363883331414355
+        ],
+        [
+          "HAYL",
+          0.19699534099860405
+        ],
+        [
+          "JKH",
+          0.39083371184414567
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-31-32",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Economic support from the Asian Development Bank aims to enhance Sri Lanka's resilience against rising costs and uncertainty stemming from the Middle East conflict, promoting trade and investment reforms.",
+      "Qi": 0.002287652232033387,
+      "Si": 0.82208,
+      "Si_normalized": 0.6762003895825438,
+      "persistence": 0.06451612903225806,
+      "attention": 5,
+      "cluster_size": 5,
+      "sentiment_std": 0.019152691716831854,
+      "diffusion_k": 49.999999999999986,
+      "diffusion_c": 0.6929104885179417,
+      "diffusion_fitted": true,
+      "confidence": 0.10898303425368534,
+      "mapped_tickers": [
+        [
+          "NDB",
+          0.035785591075179646
+        ],
+        [
+          "SAMP",
+          0.12215626028047319
+        ],
+        [
+          "NTB",
+          0.06709229981268408
+        ],
+        [
+          "HNB",
+          0.13486239427825092
+        ],
+        [
+          "DFCC",
+          0.04342395243168463
+        ],
+        [
+          "COMB",
+          0.24112427530757527
+        ],
+        [
+          "LOLC",
+          0.1761509995662649
+        ],
+        [
+          "LFIN",
+          0.0668047757341344
+        ],
+        [
+          "LIOC",
+          0.05444930115552417
+        ],
+        [
+          "AEL",
+          0.05815015035822882
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-32-33",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is fostering stronger bilateral trade and investment ties with key partners like Belarus and India, supported by improved policy stability and competitive export tariffs.",
+      "Qi": 0.0032542149144352546,
+      "Si": 0.91426,
+      "Si_normalized": 0.7231706446019609,
+      "persistence": 0.16129032258064516,
+      "attention": 5,
+      "cluster_size": 5,
+      "sentiment_std": 0.018286454002895147,
+      "diffusion_k": 7.25423831851733,
+      "diffusion_c": 0.19260842976415224,
+      "diffusion_fitted": true,
+      "confidence": 0.10907928288856719,
+      "mapped_tickers": [
+        [
+          "LIOC",
+          0.0506036443274247
+        ],
+        [
+          "SAMP",
+          0.11352858193615642
+        ],
+        [
+          "NDB",
+          0.033258118734024025
+        ],
+        [
+          "HNB",
+          0.12533730439824278
+        ],
+        [
+          "COMB",
+          0.22409409868311303
+        ],
+        [
+          "JKH",
+          0.2528115930034684
+        ],
+        [
+          "VONE",
+          0.07293981608683095
+        ],
+        [
+          "HAYL",
+          0.12742684283073968
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-33-34",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka faces a contraction in foreign reserves while simultaneously attracting increased foreign investments in rupee bonds, indicating a complex balance between currency stabilization and economic pressures.",
+      "Qi": -0.0016224596603070889,
+      "Si": -0.40052000000000004,
+      "Si_normalized": -0.3803938064944762,
+      "persistence": 0.16129032258064516,
+      "attention": 5,
+      "cluster_size": 5,
+      "sentiment_std": 0.2223757127026241,
+      "diffusion_k": 4.44531341004895,
+      "diffusion_c": 0.30029992277457634,
+      "diffusion_fitted": true,
+      "confidence": 0.08640269858859731,
+      "mapped_tickers": [
+        [
+          "SAMP",
+          0.13245976844766472
+        ],
+        [
+          "NTB",
+          0.07275133077424469
+        ],
+        [
+          "NDB",
+          0.03880399659172303
+        ],
+        [
+          "HNB",
+          0.14623762611411847
+        ],
+        [
+          "COMB",
+          0.26146237287404833
+        ],
+        [
+          "DFCC",
+          0.04708663044347311
+        ],
+        [
+          "LOLC",
+          0.19100879939185508
+        ],
+        [
+          "LFIN",
+          0.07243955491617263
+        ],
+        [
+          "PLC",
+          0.03774992044669989
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-34-35",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The Sri Lankan stock market exhibits volatility driven by mixed investor sentiment and pressures from banking sector performance amidst fluctuating share prices.",
+      "Qi": -0.0029939051049017434,
+      "Si": -0.9029,
+      "Si_normalized": -0.7177069994628553,
+      "persistence": 0.16129032258064516,
+      "attention": 5,
+      "cluster_size": 5,
+      "sentiment_std": 0.0344097660555837,
+      "diffusion_k": 12.337884219323215,
+      "diffusion_c": 0.22499360814959904,
+      "diffusion_fitted": true,
+      "confidence": 0.10728780377160181,
+      "mapped_tickers": [
+        [
+          "SAMP",
+          0.14886289246992554
+        ],
+        [
+          "NTB",
+          0.08176047457284608
+        ],
+        [
+          "NDB",
+          0.043609280310038634
+        ],
+        [
+          "HNB",
+          0.16434692787406113
+        ],
+        [
+          "DFCC",
+          0.052917592161179985
+        ],
+        [
+          "COMB",
+          0.2938405038316163
+        ],
+        [
+          "LOLC",
+          0.21466232878033234
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-35-36",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is positioned to enhance its economic relationship with India and leverage its pharmaceutical manufacturing sector as key drivers of future growth amidst a shifting global economic landscape.",
+      "Qi": 0.0015420488860314937,
+      "Si": 0.4873200000000001,
+      "Si_normalized": 0.452086763015486,
+      "persistence": 0.0967741935483871,
+      "attention": 5,
+      "cluster_size": 5,
+      "sentiment_std": 0.12733937961212158,
+      "diffusion_k": 6.526042272707448,
+      "diffusion_c": 0.7852651334610434,
+      "diffusion_fitted": true,
+      "confidence": 0.09696229115420871,
+      "mapped_tickers": [
+        [
+          "LIOC",
+          0.04191934892488659
+        ],
+        [
+          "COMB",
+          0.18563640701297004
+        ],
+        [
+          "SAMP",
+          0.09404548431999292
+        ],
+        [
+          "NTB",
+          0.05165292237613353
+        ],
+        [
+          "NDB",
+          0.02755055890394232
+        ],
+        [
+          "HNB",
+          0.1038276643156157
+        ],
+        [
+          "LOLC",
+          0.1356148758125364
+        ],
+        [
+          "JKH",
+          0.20942557636358564
+        ],
+        [
+          "HAYL",
+          0.10555860863411269
+        ],
+        [
+          "AEL",
+          0.044768553336224114
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-36-37",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The ongoing Middle East conflict is negatively affecting global energy markets, contributing to a projected slowdown in growth for developing Asia and the Pacific in 2026, while trade deficits in impacted economies continue to widen.",
+      "Qi": -0.003420674406707088,
+      "Si": -0.9299999999999999,
+      "Si_normalized": -0.7305938960959437,
+      "persistence": 0.12903225806451613,
+      "attention": 5,
+      "cluster_size": 5,
+      "sentiment_std": 0.024307694255111905,
+      "diffusion_k": 1.5730873536729575,
+      "diffusion_c": 0.08895050087036459,
+      "diffusion_fitted": true,
+      "confidence": 0.10841025619387645,
+      "mapped_tickers": [
+        [
+          "LIOC",
+          0.1045897994733377
+        ],
+        [
+          "SUN",
+          0.08567441659170867
+        ],
+        [
+          "MELS",
+          0.31603744491638697
+        ],
+        [
+          "HNB",
+          0.25905255852168857
+        ],
+        [
+          "SAMP",
+          0.23464578049687815
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-37-38",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is advancing its economic resilience by emphasizing sustainable innovation and digital transformation through collaborations in AI, corporate governance, and sustainable trade initiatives.",
+      "Qi": 0.0014309799235967119,
+      "Si": 0.34550000000000003,
+      "Si_normalized": 0.33237868959694067,
+      "persistence": 0.12903225806451613,
+      "attention": 5,
+      "cluster_size": 5,
+      "sentiment_std": 0.06154494292791244,
+      "diffusion_k": 2.3551073849743633,
+      "diffusion_c": 0.3620342764789901,
+      "diffusion_fitted": true,
+      "confidence": 0.10427278411912083,
+      "mapped_tickers": [
+        [
+          "SINS",
+          0.03118908888292618
+        ],
+        [
+          "LIOC",
+          0.025011711311522886
+        ],
+        [
+          "VONE",
+          0.0360517438482327
+        ],
+        [
+          "SAMP",
+          0.056113431250539844
+        ],
+        [
+          "PLC",
+          0.015991856172813564
+        ],
+        [
+          "NTB",
+          0.030819371388217425
+        ],
+        [
+          "NDB",
+          0.016438390467639542
+        ],
+        [
+          "MELS",
+          0.07557751688676922
+        ],
+        [
+          "LOLC",
+          0.08091633602060685
+        ],
+        [
+          "LFIN",
+          0.030687294959407897
+        ],
+        [
+          "JKH",
+          0.12495642684339392
+        ],
+        [
+          "HNB",
+          0.06195009303854335
+        ],
+        [
+          "HHL",
+          0.03276734085501185
+        ],
+        [
+          "HAYL",
+          0.06298288292438207
+        ],
+        [
+          "DIAL",
+          0.14287437215670032
+        ],
+        [
+          "DFCC",
+          0.01994713135296883
+        ],
+        [
+          "COMB",
+          0.11076231716853487
+        ],
+        [
+          "CFIN",
+          0.018250969204142865
+        ],
+        [
+          "AEL",
+          0.026711725267645762
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-39-40",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The Sri Lankan rupee demonstrates stability against the US dollar while bond yields exhibit a mixed trend amid fluctuating foreign exchange rates.",
+      "Qi": -0.00038583147828789936,
+      "Si": -0.10815999999999999,
+      "Si_normalized": -0.1077401913514203,
+      "persistence": 0.12903225806451613,
+      "attention": 5,
+      "cluster_size": 5,
+      "sentiment_std": 0.05382711584322534,
+      "diffusion_k": 5.06595454324099,
+      "diffusion_c": 0.6148466934493062,
+      "diffusion_fitted": true,
+      "confidence": 0.10513032046186385,
+      "mapped_tickers": [
+        [
+          "SAMP",
+          0.14886289246992554
+        ],
+        [
+          "NTB",
+          0.08176047457284608
+        ],
+        [
+          "NDB",
+          0.043609280310038634
+        ],
+        [
+          "HNB",
+          0.16434692787406113
+        ],
+        [
+          "COMB",
+          0.2938405038316163
+        ],
+        [
+          "DFCC",
+          0.052917592161179985
+        ],
+        [
+          "LOLC",
+          0.21466232878033234
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-40-41",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka experiences rising inflation at 7.3%, which coincides with a slight improvement in consumer sentiment and an increase in tea prices, indicating a complex economic landscape.",
+      "Qi": 0.000505407862944163,
+      "Si": 0.167875,
+      "Si_normalized": 0.16631555830356282,
+      "persistence": 0.0967741935483871,
+      "attention": 4,
+      "cluster_size": 4,
+      "sentiment_std": 0.15316122836736454,
+      "diffusion_k": 23.48696412246623,
+      "diffusion_c": 0.833719426613056,
+      "diffusion_fitted": true,
+      "confidence": 0.07698534287569413,
+      "mapped_tickers": [
+        [
+          "SUN",
+          0.13455524358041887
+        ],
+        [
+          "MELS",
+          0.4963499848958769
+        ],
+        [
+          "LIOC",
+          0.16426264110124184
+        ],
+        [
+          "SINS",
+          0.20483213042246243
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-41-42",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The growing emphasis on data privacy and protection is shaping industry collaborations and influencing regulatory and technological advancements across sectors.",
+      "Qi": 0.002010718973281689,
+      "Si": 0.6243,
+      "Si_normalized": 0.5541148407843737,
+      "persistence": 0.12903225806451613,
+      "attention": 4,
+      "cluster_size": 4,
+      "sentiment_std": 0.06756467272177079,
+      "diffusion_k": 4.863529616368084,
+      "diffusion_c": 0.34330747651349414,
+      "diffusion_fitted": true,
+      "confidence": 0.08476684793438448,
+      "mapped_tickers": [
+        [
+          "SINS",
+          0.05661700613443269
+        ],
+        [
+          "DIAL",
+          0.25935734240949054
+        ],
+        [
+          "LOLC",
+          0.1468860058737535
+        ],
+        [
+          "HNB",
+          0.11245691757004013
+        ],
+        [
+          "NDB",
+          0.029840321961313723
+        ],
+        [
+          "SAMP",
+          0.1018617277747748
+        ],
+        [
+          "COMB",
+          0.20106489208884404
+        ],
+        [
+          "DFCC",
+          0.03620967776309774
+        ],
+        [
+          "LFIN",
+          0.05570610842425276
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-42-43",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka's initiatives to lower entertainment taxes and export tariffs are designed to enhance local cultural industries and improve export competitiveness.",
+      "Qi": 0.00205138779722267,
+      "Si": 0.8186,
+      "Si_normalized": 0.6743071615685418,
+      "persistence": 0.06451612903225806,
+      "attention": 4,
+      "cluster_size": 4,
+      "sentiment_std": 0.174550264966857,
+      "diffusion_k": 18.617676238544703,
+      "diffusion_c": 0.41411288026832616,
+      "diffusion_fitted": true,
+      "confidence": 0.07504088500301301,
+      "mapped_tickers": [
+        [
+          "SINS",
+          0.07739816403338501
+        ],
+        [
+          "LIOC",
+          0.06206851832419722
+        ],
+        [
+          "VONE",
+          0.08946522274277162
+        ],
+        [
+          "SUN",
+          0.05084323827863322
+        ],
+        [
+          "MELS",
+          0.1875515206999301
+        ],
+        [
+          "JKH",
+          0.31008914874538324
+        ],
+        [
+          "HAYL",
+          0.1562969512246763
+        ],
+        [
+          "AEL",
+          0.06628723595102318
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-43-44",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka's business sector is enhancing competitiveness and innovation in ICT and SMEs through national initiatives aimed at addressing growth challenges and leveraging technological advancements.",
+      "Qi": 0.0007833947652009394,
+      "Si": 0.22820000000000001,
+      "Si_normalized": 0.22431961879297793,
+      "persistence": 0.0967741935483871,
+      "attention": 4,
+      "cluster_size": 4,
+      "sentiment_std": 0.08588768829116314,
+      "diffusion_k": 3.250068931930496,
+      "diffusion_c": 0.5224542038893457,
+      "diffusion_fitted": true,
+      "confidence": 0.0831011192462579,
+      "mapped_tickers": [
+        [
+          "DIAL",
+          0.3589316711564087
+        ],
+        [
+          "SINS",
+          0.07835381269298874
+        ],
+        [
+          "JKH",
+          0.3139178736648577
+        ],
+        [
+          "HAYL",
+          0.15822677700030563
+        ],
+        [
+          "VONE",
+          0.09056986548543929
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-44-45",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka's capital markets are witnessing volatility influenced by global uncertainty and shifting investor sentiment, resulting in fluctuating trading performance on the Colombo Stock Exchange.",
+      "Qi": -0.0017330335478225195,
+      "Si": -0.61025,
+      "Si_normalized": -0.544303056339166,
+      "persistence": 0.0967741935483871,
+      "attention": 4,
+      "cluster_size": 4,
+      "sentiment_std": 0.09430367172067058,
+      "diffusion_k": 6.7487577128432585,
+      "diffusion_c": 0.49394313984036364,
+      "diffusion_fitted": true,
+      "confidence": 0.08233602984357541,
+      "mapped_tickers": [
+        [
+          "SINS",
+          0.030562907855530817
+        ],
+        [
+          "PLC",
+          0.015670788860913564
+        ],
+        [
+          "LIOC",
+          0.02450955303608383
+        ],
+        [
+          "VONE",
+          0.03532793565726502
+        ],
+        [
+          "SUN",
+          0.020076925932201648
+        ],
+        [
+          "SAMP",
+          0.05498684604752106
+        ],
+        [
+          "NTB",
+          0.030200613151579167
+        ],
+        [
+          "NDB",
+          0.016108358119776133
+        ],
+        [
+          "MELS",
+          0.07406015267809384
+        ],
+        [
+          "LOLC",
+          0.07929178473561599
+        ],
+        [
+          "LFIN",
+          0.030071188411448235
+        ],
+        [
+          "JKH",
+          0.12244768591690652
+        ],
+        [
+          "HNB",
+          0.060706325609115507
+        ],
+        [
+          "HHL",
+          0.03210947337967057
+        ],
+        [
+          "HAYL",
+          0.06171838024891272
+        ],
+        [
+          "DIAL",
+          0.14000589396930044
+        ],
+        [
+          "DFCC",
+          0.019546654274235378
+        ],
+        [
+          "COMB",
+          0.10853855033066315
+        ],
+        [
+          "CFIN",
+          0.017884545847240394
+        ],
+        [
+          "AEL",
+          0.026175435937925914
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-45-46",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka’s Treasury bill yields are trending downward across various maturities, indicating a potential easing in borrowing costs.",
+      "Qi": -0.0024538843614646225,
+      "Si": -0.961725,
+      "Si_normalized": -0.7450453196056342,
+      "persistence": 0.12903225806451613,
+      "attention": 4,
+      "cluster_size": 4,
+      "sentiment_std": 0.0008104782538723525,
+      "diffusion_k": 5.747622089526932,
+      "diffusion_c": 0.4881963309297244,
+      "diffusion_fitted": true,
+      "confidence": 0.09083541106782979,
+      "mapped_tickers": [
+        [
+          "PLC",
+          0.03619072560811621
+        ],
+        [
+          "SAMP",
+          0.12698874798352378
+        ],
+        [
+          "NTB",
+          0.06974646352946583
+        ],
+        [
+          "NDB",
+          0.03720126497040322
+        ],
+        [
+          "LOLC",
+          0.18311951298775933
+        ],
+        [
+          "LFIN",
+          0.06944756503121198
+        ],
+        [
+          "HNB",
+          0.14019753519085942
+        ],
+        [
+          "DFCC",
+          0.04514179902965807
+        ],
+        [
+          "COMB",
+          0.25066312409563946
+        ],
+        [
+          "CFIN",
+          0.0413032615733627
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-47-48",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The Sri Lankan currency shows stability against the US dollar while bond yields experience slight increases, reflecting steady market conditions amid ongoing fiscal dynamics.",
+      "Qi": 0.0012543248857037883,
+      "Si": 0.372125,
+      "Si_normalized": 0.35584902851655004,
+      "persistence": 0.0967741935483871,
+      "attention": 4,
+      "cluster_size": 4,
+      "sentiment_std": 0.28239507232775857,
+      "diffusion_k": 6.169132609179285,
+      "diffusion_c": 0.3068476683970978,
+      "diffusion_fitted": true,
+      "confidence": 0.0652368116065674,
+      "mapped_tickers": [
+        [
+          "SAMP",
+          0.14886289246992554
+        ],
+        [
+          "NTB",
+          0.08176047457284608
+        ],
+        [
+          "NDB",
+          0.043609280310038634
+        ],
+        [
+          "HNB",
+          0.16434692787406113
+        ],
+        [
+          "COMB",
+          0.2938405038316163
+        ],
+        [
+          "DFCC",
+          0.052917592161179985
+        ],
+        [
+          "LOLC",
+          0.21466232878033234
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-48-49",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is advancing its economic resilience and sustainability through initiatives in digital payments, innovative business recognition, and large-scale energy storage projects.",
+      "Qi": 0.0005958660923050226,
+      "Si": 0.15845,
+      "Si_normalized": 0.15713714634636258,
+      "persistence": 0.12903225806451613,
+      "attention": 4,
+      "cluster_size": 4,
+      "sentiment_std": 0.046258972102717545,
+      "diffusion_k": 5.1901208417400895,
+      "diffusion_c": 0.2629359131234805,
+      "diffusion_fitted": true,
+      "confidence": 0.08670372980884386,
+      "mapped_tickers": [
+        [
+          "LIOC",
+          0.048374899577316104
+        ],
+        [
+          "SAMP",
+          0.10852842366019695
+        ],
+        [
+          "NDB",
+          0.031793325861650346
+        ],
+        [
+          "HNB",
+          0.11981705258865215
+        ],
+        [
+          "DIAL",
+          0.2763318878572025
+        ],
+        [
+          "AEL",
+          0.051662879491333136
+        ],
+        [
+          "JKH",
+          0.24167696983231254
+        ],
+        [
+          "HAYL",
+          0.12181456113133628
+        ]
+      ]
+    },
+    {
+      "view_id": "micro-LOLC Holdings PLC-0-1",
+      "view_type": "micro",
+      "company": "LOLC Holdings PLC",
+      "topic_name": "Melstacorp's share price has declined by 27 percent over the week, reflecting challenges in the market environment.",
+      "Qi": -0.0029615407197758413,
+      "Si": -0.9081714285714286,
+      "Si_normalized": -0.7202534399460718,
+      "persistence": 0.16129032258064516,
+      "attention": 7,
+      "cluster_size": 7,
+      "sentiment_std": 0.09129992511788067,
+      "diffusion_k": 7.865417239009993,
+      "diffusion_c": 0.33003439808551854,
+      "diffusion_fitted": true,
+      "confidence": 0.48930004032114116,
+      "mapped_tickers": null
+    },
+    {
+      "view_id": "micro-LOLC Holdings PLC-1-2",
+      "view_type": "micro",
+      "company": "LOLC Holdings PLC",
+      "topic_name": "LOLC Microfinance Bank Pakistan has inaugurated its new Head Office in Islamabad, signaling its growing presence in the region.",
+      "Qi": 0.0027384804199957415,
+      "Si": 0.7877400000000001,
+      "Si_normalized": 0.6571268457900854,
+      "persistence": 0.16129032258064516,
+      "attention": 5,
+      "cluster_size": 5,
+      "sentiment_std": 0.022832836004316247,
+      "diffusion_k": 2.729337053165939,
+      "diffusion_c": 0.345792459313375,
+      "diffusion_fitted": true,
+      "confidence": 0.44416689272531074,
+      "mapped_tickers": null
+    }
+  ],
+  "meta": {
+    "window_start": "2026-07-10",
+    "window_end": "2026-08-09",
+    "news_article_count": 447,
+    "macro_view_count": 49,
+    "micro_view_count": 2,
+    "total_view_count": 43,
+    "universe_size": 20,
+    "macro_overrides_enabled": true,
+    "macro_overrides_applied": [
+      "macro-macro-0-1",
+      "macro-macro-1-2",
+      "macro-macro-11-12",
+      "macro-macro-12-13",
+      "macro-macro-14-15",
+      "macro-macro-15-16",
+      "macro-macro-17-18",
+      "macro-macro-18-19",
+      "macro-macro-19-20",
+      "macro-macro-2-3",
+      "macro-macro-20-21",
+      "macro-macro-22-23",
+      "macro-macro-23-24",
+      "macro-macro-24-25",
+      "macro-macro-26-27",
+      "macro-macro-27-28",
+      "macro-macro-28-29",
+      "macro-macro-3-4",
+      "macro-macro-30-31",
+      "macro-macro-31-32",
+      "macro-macro-32-33",
+      "macro-macro-33-34",
+      "macro-macro-34-35",
+      "macro-macro-35-36",
+      "macro-macro-36-37",
+      "macro-macro-37-38",
+      "macro-macro-39-40",
+      "macro-macro-4-5",
+      "macro-macro-40-41",
+      "macro-macro-41-42",
+      "macro-macro-42-43",
+      "macro-macro-43-44",
+      "macro-macro-44-45",
+      "macro-macro-45-46",
+      "macro-macro-47-48",
+      "macro-macro-48-49",
+      "macro-macro-5-6",
+      "macro-macro-6-7",
+      "macro-macro-7-8",
+      "macro-macro-8-9",
+      "macro-macro-9-10"
+    ],
+    "macro_override_audit": {
+      "macro-macro-0-1": {
+        "view_kind": "absolute",
+        "rationale": "The narrative indicates a positive outlook for sectors involved in financial services and digital economy reforms, which includes banks and financial institutions. All selected tickers are related to these sectors and are expected to benefit from the regulatory reforms in Sri Lanka.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_6339e52f56",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:00.196184+00:00"
+      },
+      "macro-macro-1-2": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative highlights challenges in governance and accountability in Sri Lanka, which could impact various sectors, particularly financials and consumer sectors. The selected tickers are all materially related to these sectors and are expected to be affected by the ongoing issues.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_9afcdcbeed",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:03.338178+00:00"
+      },
+      "macro-macro-2-3": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates a recovery in Sri Lanka's economy, particularly in the financial sector, which is directly supported by the performance of banks and financial services companies. All selected tickers are from the financial sector and are expected to benefit from the improving economic conditions.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_6339e52f56",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:06.098139+00:00"
+      },
+      "macro-macro-3-4": {
+        "view_kind": "absolute",
+        "rationale": "The narrative focuses on enhancing export competitiveness and supporting small and medium enterprises, which relates to various sectors including consumer discretionary, financials, and industrials. All selected tickers are involved in sectors that could benefit from these initiatives.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_72f05258df",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:09.818405+00:00"
+      },
+      "macro-macro-4-5": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative emphasizes infrastructure development, which directly benefits companies in construction, engineering, and financial services sectors that support such projects.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_e7eb9f2bc2",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:13.255495+00:00"
+      },
+      "macro-macro-5-6": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates a recovery in the Sri Lankan stock market, particularly in the banking and investment sectors, which directly relates to the financial institutions listed.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_c400bf5046",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:15.489495+00:00"
+      },
+      "macro-macro-6-7": {
+        "view_kind": "absolute",
+        "rationale": "The narrative emphasizes the enhancement of the tourism sector and the transition to a digital economy in Sri Lanka, which connects to various sectors including consumer discretionary, energy, telecommunications, and industrials. All selected tickers are involved in sectors that can benefit from advancements in tourism and digital platforms.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_d6d3876e6e",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:18.382231+00:00"
+      },
+      "macro-macro-7-8": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates a recovery in Sri Lanka's economy, which is likely to benefit financial institutions and companies involved in industrial sectors. The selected tickers represent banks and financial services that are expected to thrive in a recovering economic environment.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_788bf556eb",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:21.666947+00:00"
+      },
+      "macro-macro-8-9": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates steady demand for government debt, which typically benefits financial institutions involved in lending and financing, particularly banks and finance companies. All selected tickers are from the financial sector, which is expected to perform well under these conditions.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_e7eb9f2bc2",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:25.615967+00:00"
+      },
+      "macro-macro-9-10": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates challenges for Sri Lanka's economy, particularly affecting financial institutions and energy sectors due to foreign exchange pressures. All selected tickers are from the financial and energy sectors, which are expected to be impacted by the declining tourism revenues and high import demand.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_b1b99e3b92",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:28.622876+00:00"
+      },
+      "macro-macro-11-12": {
+        "view_kind": "absolute",
+        "rationale": "The strengthening of the Sri Lankan rupee and stable bond yields suggest a favorable environment for banks and financial institutions, which are likely to benefit from improved market liquidity.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_c881474fd1",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:31.263265+00:00"
+      },
+      "macro-macro-12-13": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative emphasizes the Sri Lankan government's focus on industrialization and infrastructure development, which aligns with companies in the industrials sector, particularly those involved in construction and engineering, as well as industrial conglomerates.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_9afcdcbeed",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:34.098601+00:00"
+      },
+      "macro-macro-14-15": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative emphasizes the enhancement of renewable energy infrastructure and battery storage capabilities in Sri Lanka, which directly relates to companies in the energy and industrial sectors that are involved in these areas.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_72f05258df",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:37.200535+00:00"
+      },
+      "macro-macro-15-16": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative emphasizes the growth and integration of the SME sector in Sri Lanka, which is closely tied to financial institutions and industrial companies that support SMEs. All selected tickers are involved in financial services or industrial sectors that would benefit from enhanced SME growth.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_18fc98c6d2",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:39.789130+00:00"
+      },
+      "macro-macro-17-18": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates a positive outlook for the telecommunications sector and broader economic modernization in Sri Lanka, which supports companies in communication services, financials, and industrials that are likely to benefit from enhanced competition and regulatory improvements.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_e7eb9f2bc2",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:43.154421+00:00"
+      },
+      "macro-macro-18-19": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates a downward trend in the Sri Lankan stock market due to regional tensions and declining investor sentiment, which is likely to affect consumer and financial sectors negatively. The selected tickers are all from sectors that are expected to be impacted by this trend.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_25b7d0bd77",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:46.847070+00:00"
+      },
+      "macro-macro-19-20": {
+        "view_kind": "absolute",
+        "rationale": "The narrative highlights Sri Lanka's growth in logistics and technology, which aligns with companies in industrials, consumer discretionary, and communication services sectors that are likely to benefit from this trend.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_66ee548660",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:51.193624+00:00"
+      },
+      "macro-macro-20-21": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative highlights Sri Lanka's focus on enhancing export capabilities and attracting foreign investment in sectors like renewable energy, agribusiness, and high-value manufacturing. The selected tickers are involved in energy, agriculture, and industrial sectors, aligning with the narrative's themes.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_c73dd82b09",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:54.661260+00:00"
+      },
+      "macro-macro-22-23": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative highlights growth in Sri Lanka's construction sector, which directly relates to companies involved in construction and industrial conglomerates. All selected tickers are materially connected to the construction industry and are expected to benefit from the ongoing project execution.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_98f538dc1a",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:57.235800+00:00"
+      },
+      "macro-macro-23-24": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative highlights rising food and energy price shocks, which directly impacts companies in the energy and consumer staples sectors. LIOC is involved in energy distribution, SUN and MELS are in food products, and HAYL and JKH are industrials that may benefit from increased demand for food and energy-related products.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_d6d3876e6e",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:58:59.648172+00:00"
+      },
+      "macro-macro-24-25": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative discusses legal reforms and dispute resolution in Sri Lanka, which can enhance judicial efficiency and economic stability. Financial institutions are likely to benefit from a more stable economic environment, hence the inclusion of multiple banks and financial services companies.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_788bf556eb",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:02.472348+00:00"
+      },
+      "macro-macro-26-27": {
+        "view_kind": "absolute",
+        "rationale": "The narrative highlights regulatory challenges in financial practices, which directly impacts financial institutions. All selected tickers are financial companies that may be affected by these challenges, thus warranting inclusion in the basket.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_c881474fd1",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:05.210063+00:00"
+      },
+      "macro-macro-27-28": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates a stabilizing currency and steady bond yields, which suggests a cautious economic environment. Financial institutions like banks are likely to benefit from stability in the currency and bond markets, hence the inclusion of multiple banks in the allocations.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_3cb74a061c",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:07.927228+00:00"
+      },
+      "macro-macro-28-29": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates stability in Sri Lanka's currency and unchanged bond yields, which suggests a favorable environment for financial institutions. All selected tickers are financial companies that would likely benefit from this stability.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_4147058500",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:11.117455+00:00"
+      },
+      "macro-macro-30-31": {
+        "view_kind": "absolute",
+        "rationale": "The narrative discusses changes in tariff rates and stable electricity tariffs, which can impact energy and consumer sectors. Companies in energy (LIOC), consumer discretionary (SINS), consumer staples (MELS), and industrials (HAYL, JKH) are included due to their relevance to trade and tariff dynamics.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_6ec6bfb92d",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:13.488394+00:00"
+      },
+      "macro-macro-31-32": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative emphasizes economic support and resilience in Sri Lanka, which is likely to benefit financial institutions and companies involved in trade and investment reforms. All selected tickers are from sectors that would be positively impacted by such economic support.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_25b7d0bd77",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:16.993770+00:00"
+      },
+      "macro-macro-32-33": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative highlights Sri Lanka's efforts to strengthen trade and investment ties, which positively impacts sectors like energy, financials, and industrials. The selected tickers are all connected to these sectors and are expected to benefit from improved policy stability and competitive export tariffs.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_c400bf5046",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:24.730173+00:00"
+      },
+      "macro-macro-33-34": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates a complex balance between currency stabilization and economic pressures in Sri Lanka, which suggests a focus on financial institutions that may benefit from increased foreign investments and currency management.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_2b114d87de",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:29.325085+00:00"
+      },
+      "macro-macro-34-35": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates volatility in the Sri Lankan stock market driven by mixed investor sentiment and pressures from the banking sector. All selected tickers are banks or financial institutions that are directly impacted by these conditions, thus warranting inclusion with a positive weight.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_c73dd82b09",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:32.663900+00:00"
+      },
+      "macro-macro-35-36": {
+        "view_kind": "absolute",
+        "rationale": "The narrative emphasizes Sri Lanka's economic relationship with India and its pharmaceutical manufacturing sector, which connects to various financial and industrial companies that could benefit from enhanced economic ties and growth opportunities.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_830d456649",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:36.728926+00:00"
+      },
+      "macro-macro-36-37": {
+        "view_kind": "absolute",
+        "rationale": "The ongoing Middle East conflict is negatively affecting global energy markets, which directly impacts companies in the energy sector like Lanka IOC Ltd. Additionally, companies in consumer staples and financials may be affected by the projected slowdown in growth for developing Asia and the Pacific, leading to wider trade deficits.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_9709ac0e8b",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:39.112806+00:00"
+      },
+      "macro-macro-37-38": {
+        "view_kind": "absolute",
+        "rationale": "The narrative emphasizes economic resilience through sustainable innovation and digital transformation, which aligns with various sectors including technology, finance, and industrials represented by the selected tickers.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_18fc98c6d2",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:45.298004+00:00"
+      },
+      "macro-macro-39-40": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates stability in the Sri Lankan rupee and mixed bond yields, which suggests a favorable environment for banks and financial institutions. All selected tickers are financial institutions that would likely benefit from this stability.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_788bf556eb",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:48.825868+00:00"
+      },
+      "macro-macro-40-41": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates rising inflation and an increase in tea prices, which suggests a positive impact on consumer staples and agricultural products. Companies like Sunshine Holdings and Melstacorp are directly involved in food and beverage sectors, while Lanka IOC is relevant due to energy costs affecting inflation. Singer Sri Lanka, as a consumer discretionary company, may also benefit from improved consumer sentiment.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_6339e52f56",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:54.561638+00:00"
+      },
+      "macro-macro-41-42": {
+        "view_kind": "absolute",
+        "rationale": "The narrative emphasizes data privacy and protection, which is relevant to financial services and technology sectors. Companies in banking and telecommunications are included due to their roles in data management and compliance with privacy regulations.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_ab0a2ab924",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T15:59:57.227378+00:00"
+      },
+      "macro-macro-42-43": {
+        "view_kind": "absolute",
+        "rationale": "The narrative discusses initiatives to enhance local cultural industries and improve export competitiveness, which relates to companies in consumer discretionary, energy, and industrial sectors that may benefit from such economic policies.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_98f538dc1a",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T16:00:00.441983+00:00"
+      },
+      "macro-macro-43-44": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative emphasizes enhancing competitiveness and innovation in ICT and SMEs, which aligns with companies in the technology and industrial sectors, as well as those involved in consumer electronics and telecommunications.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_d6d3876e6e",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T16:00:02.525383+00:00"
+      },
+      "macro-macro-44-45": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates volatility in Sri Lanka's capital markets, which affects various sectors including financials, consumer discretionary, and industrials. All included tickers are materially connected to the Sri Lankan market and are expected to be influenced by the described volatility.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_788bf556eb",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T16:00:07.568752+00:00"
+      },
+      "macro-macro-45-46": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates a potential easing in borrowing costs, which would benefit financial institutions involved in consumer finance and banking sectors.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_830d456649",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T16:00:10.703052+00:00"
+      },
+      "macro-macro-47-48": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates stability in the Sri Lankan currency and slight increases in bond yields, suggesting a stable financial environment. Financial institutions like banks are likely to benefit from this stability, hence the inclusion of multiple banks in the allocations.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_c400bf5046",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T16:00:13.695155+00:00"
+      },
+      "macro-macro-48-49": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative emphasizes economic resilience and sustainability initiatives in Sri Lanka, which are supported by sectors such as energy, financial services, and telecommunications. The selected tickers are involved in these sectors and are expected to benefit from the advancements mentioned.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_fabbcdf5d9",
+        "candidate_count": 20,
+        "timestamp": "2026-08-09T16:00:16.604423+00:00"
+      }
+    },
+    "covariance_window_trading_days": 30,
+    "price_trading_days_loaded": 30,
+    "bl_use_view_confidence": true,
+    "macro_alpha": 0.16747222060949643,
+    "macro_lambda": 0.744442959371803,
+    "micro_alpha": 0.10285630801219799,
+    "micro_lambda": 1.3541701726546824
+  }
+}
