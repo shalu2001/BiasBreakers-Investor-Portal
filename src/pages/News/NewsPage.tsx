@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getNews, getTickers, type NewsCategory, type NewsItem, type TickerOption } from '../../api/news';
-import { NEWS_FIXTURE, PORTFOLIO_FIXTURE } from '../../mocks/fixtures';
+import { PORTFOLIO_FIXTURE } from '../../mocks/fixtures';
 import { MultiSelectDropdown } from '../../components/MultiSelectDropdown';
 import { EmptyState } from '../../components/ui';
 import { formatTimeAgo } from '../../utils/timeAgo';
@@ -35,14 +35,22 @@ function windowedPages(current: number, total: number): (number | 'gap')[] {
 }
 
 export function NewsPage() {
-  const [news, setNews] = useState<NewsItem[]>(NEWS_FIXTURE);
+  const [news, setNews] = useState<NewsItem[]>([]);
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
   const [tickerOptions, setTickerOptions] = useState<TickerOption[]>(FALLBACK_TICKER_OPTIONS);
   const [category, setCategory] = useState<CategoryFilter>('all');
   const [selectedTickers, setSelectedTickers] = useState<string[]>([]);
   const [page, setPage] = useState(1);
 
+  // Fetch the news window exactly once, on initial mount. No mock fallback:
+  // the feed always reflects the endpoint (loading/error states cover the rest).
   useEffect(() => {
-    getNews().then(setNews).catch(() => setNews(NEWS_FIXTURE));
+    getNews()
+      .then((items) => {
+        setNews(items);
+        setStatus('ready');
+      })
+      .catch(() => setStatus('error'));
   }, []);
 
   useEffect(() => {
@@ -132,11 +140,23 @@ export function NewsPage() {
         ))}
         {paged.length === 0 && (
           <div className={styles.empty}>
-            <EmptyState
-              icon="◷"
-              title="No stories match these filters"
-              message="Try switching category or clearing the stock filter."
-            />
+            {status === 'loading' ? (
+              <EmptyState icon="◷" title="Loading market news…" message="Fetching the latest stories." />
+            ) : status === 'error' ? (
+              <EmptyState
+                icon="⚠"
+                title="Couldn’t load market news"
+                message="The news service is unavailable right now. Please try again shortly."
+              />
+            ) : news.length === 0 ? (
+              <EmptyState icon="◷" title="No stories available" message="There’s no news for the current window." />
+            ) : (
+              <EmptyState
+                icon="◷"
+                title="No stories match these filters"
+                message="Try switching category or clearing the stock filter."
+              />
+            )}
           </div>
         )}
       </div>

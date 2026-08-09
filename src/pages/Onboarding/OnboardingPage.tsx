@@ -24,8 +24,10 @@ export function OnboardingPage() {
 
   // The holdings step only exists when they said "yes" -- computed from
   // current state so it also disappears cleanly if they go back and change
-  // their answer to "no".
-  const steps = hasExisting ? ['existing', 'holdings', 'amount', 'goal'] : ['existing', 'amount', 'goal'];
+  // their answer to "no". No separate "amount" step for existing-portfolio
+  // investors either: their budget is derived from what their entered
+  // holdings are currently worth (shares x current price), not asked for.
+  const steps = hasExisting ? ['existing', 'holdings', 'goal'] : ['existing', 'amount', 'goal'];
   const totalSteps = steps.length;
   const current = steps[step - 1];
 
@@ -97,8 +99,9 @@ export function OnboardingPage() {
         <>
           <h1 className={styles.question}>Which stocks do you currently hold?</h1>
           <p className={styles.subcopy}>
-            This helps us show your real starting point instead of an estimate. Optional — skip if
-            you're not sure yet.
+            This helps us show your real starting point instead of an estimate — and we'll work out
+            your investable total from what you enter, so there's no separate budget question.
+            Optional — skip if you're not sure yet.
           </p>
           <ExistingHoldingsEditor value={holdings} onChange={setHoldings} />
         </>

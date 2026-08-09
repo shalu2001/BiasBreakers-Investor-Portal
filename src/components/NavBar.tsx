@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../session/AuthContext';
+import { BrandLockup } from './BrandLockup';
 import styles from './NavBar.module.css';
 
 const links = [
@@ -21,7 +22,7 @@ export function NavBar() {
 
   return (
     <header className={styles.header}>
-      <span className={styles.brand}>SL20 Invest</span>
+      <BrandLockup className={styles.brand} size={20} />
       <div className={styles.right}>
         <nav className={styles.nav}>
           {links.map((link) => (

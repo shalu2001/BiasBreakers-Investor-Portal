@@ -23,7 +23,7 @@ from collections import OrderedDict
 from contextlib import asynccontextmanager
 from datetime import datetime
 from pathlib import Path
-from threading import Lock
+from threading import Lock, Thread
 from typing import Any, Optional, Tuple
 
 import pandas as pd
@@ -56,23 +56,59 @@ _CACHE_DIR = Path(__file__).resolve().parent.parent / "cache"
 
 
 class _TTLCache:
-    """Single-value, thread-safe cache that recomputes after ``ttl`` seconds."""
+    """Thread-safe single-value cache with stale-while-revalidate semantics.
 
-    def __init__(self, ttl_seconds: float):
+    Once warmed, ``get`` never blocks on a reload: a fresh value is returned
+    immediately, and a stale one is returned while a single background thread
+    refreshes it. Only the very first (cold) load, before any value exists,
+    blocks the caller -- and ``warm`` runs that at startup so requests don't.
+    """
+
+    def __init__(self, ttl_seconds: float, loader):
         self._ttl = ttl_seconds
+        self._loader = loader
         self._value: Any = None
         self._expires_at = 0.0
+        self._refreshing = False
         self._lock = Lock()
 
-    def get_or_load(self, loader):
+    def _reload(self) -> Any:
+        value = self._loader()
         with self._lock:
-            now = time.monotonic()
-            if self._value is not None and now < self._expires_at:
-                return self._value
-            value = loader()
             self._value = value
-            self._expires_at = now + self._ttl
-            return value
+            self._expires_at = time.monotonic() + self._ttl
+            self._refreshing = False
+        return value
+
+    def get(self) -> Any:
+        with self._lock:
+            value = self._value
+            fresh = value is not None and time.monotonic() < self._expires_at
+            if fresh:
+                return value
+            if value is not None:
+                # Stale: serve it now, refresh in the background (once).
+                if not self._refreshing:
+                    self._refreshing = True
+                    Thread(target=self._safe_reload, daemon=True).start()
+                return value
+        # Cold: no value yet -- block this caller to populate it.
+        return self._reload()
+
+    def _safe_reload(self) -> None:
+        try:
+            self._reload()
+        except Exception:  # pragma: no cover - background refresh guard
+            logger.exception("Background cache refresh failed; keeping stale value")
+            with self._lock:
+                self._refreshing = False
+
+    def warm(self) -> None:
+        """Populate the cache eagerly (e.g. at startup) so the first request is fast."""
+        try:
+            self._reload()
+        except Exception:  # pragma: no cover - startup guard
+            logger.exception("Cache warm failed; will load lazily on first request")
 
 
 def _write_response_cache(request: PredictRequest, response: PredictResponse) -> None:
@@ -117,9 +153,13 @@ async def lifespan(app: FastAPI):
     app.state.settings = get_settings()
     app.state.engine = NarrativePredictionEngine(app.state.settings)
     app.state.cache = _ResultCache()
-    app.state.news_cache = _TTLCache(_FEED_CACHE_TTL_SECONDS)
-    app.state.ticker_cache = _TTLCache(_FEED_CACHE_TTL_SECONDS)
+    app.state.news_cache = _TTLCache(_FEED_CACHE_TTL_SECONDS, _load_news_feed)
+    app.state.ticker_cache = _TTLCache(_FEED_CACHE_TTL_SECONDS, _load_ticker_options)
     logger.info("Narrative prediction engine ready.")
+    # Warm the news/ticker caches off the event loop so the first request is fast.
+    await run_in_threadpool(app.state.news_cache.warm)
+    await run_in_threadpool(app.state.ticker_cache.warm)
+    logger.info("News and ticker caches warmed.")
     yield
 
 
@@ -233,7 +273,7 @@ def _load_ticker_options() -> list[TickerOption]:
 async def news() -> list[NewsItemOut]:
     cache: _TTLCache = app.state.news_cache
     try:
-        return await run_in_threadpool(cache.get_or_load, _load_news_feed)
+        return await run_in_threadpool(cache.get)
     except Exception as exc:  # pragma: no cover - runtime guard
         logger.exception("News load failed")
         raise HTTPException(status_code=500, detail=f"News load failed: {exc}") from exc
@@ -243,7 +283,7 @@ async def news() -> list[NewsItemOut]:
 async def tickers() -> list[TickerOption]:
     cache: _TTLCache = app.state.ticker_cache
     try:
-        return await run_in_threadpool(cache.get_or_load, _load_ticker_options)
+        return await run_in_threadpool(cache.get)
     except Exception as exc:  # pragma: no cover - runtime guard
         logger.exception("Ticker load failed")
         raise HTTPException(status_code=500, detail=f"Ticker load failed: {exc}") from exc

@@ -27,8 +27,9 @@ interface NewsItemResponse {
 }
 
 // Backend returns the full news window; filtering by category/ticker happens client-side.
+// A generous timeout covers a cold, uncached window load on the backend.
 export async function getNews(): Promise<NewsItem[]> {
-  const { data } = await apiClient.get<NewsItemResponse[]>('/news');
+  const { data } = await apiClient.get<NewsItemResponse[]>('/news', { timeout: 60_000 });
   return data.map((item) => ({
     ticker: item.ticker ?? undefined,
     category: item.category,

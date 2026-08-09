@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { getPortfolio, type Holding } from '../../api/portfolio';
 import { getNews, type NewsItem } from '../../api/news';
 import { formatTimeAgo } from '../../utils/timeAgo';
-import { PORTFOLIO_FIXTURE, NEWS_FIXTURE } from '../../mocks/fixtures';
+import { PORTFOLIO_FIXTURE } from '../../mocks/fixtures';
 import { HoldingCard } from '../../components/HoldingCard';
 import { Carousel } from '../../components/Carousel';
 import { BehaviouralInsightCard } from '../../components/BehaviouralInsightCard';
@@ -13,12 +13,12 @@ import styles from './DashboardPage.module.css';
 export function DashboardPage() {
   const { persona, confidence } = useBehaviouralProfile();
   const [holdings, setHoldings] = useState<Holding[]>(PORTFOLIO_FIXTURE);
-  const [news, setNews] = useState<NewsItem[]>(NEWS_FIXTURE.slice(0, 3));
+  const [news, setNews] = useState<NewsItem[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     getPortfolio().then((h) => !cancelled && setHoldings(h)).catch(() => !cancelled && setHoldings(PORTFOLIO_FIXTURE));
-    getNews().then((n) => !cancelled && setNews(n.slice(0, 3))).catch(() => !cancelled && setNews(NEWS_FIXTURE.slice(0, 3)));
+    getNews().then((n) => !cancelled && setNews(n.slice(0, 3))).catch(() => undefined);
     return () => {
       cancelled = true;
     };

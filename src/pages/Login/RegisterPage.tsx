@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../session/AuthContext';
 import { authErrorMessage } from '../../api/portal';
+import { BrandLockup } from '../../components/BrandLockup';
 import styles from './LoginPage.module.css';
 
 export function RegisterPage() {
@@ -34,7 +35,7 @@ export function RegisterPage() {
   return (
     <div className={styles.split}>
       <div className={styles.brandSide}>
-        <span className={styles.brand}>SL20 Invest</span>
+        <BrandLockup className={styles.brand} size={22} />
         <h1 className={styles.headline}>Understand your risk. Own your allocation.</h1>
         <p className={styles.subcopy}>
           Create an account, play a five-minute game, and get a portfolio tuned to how you

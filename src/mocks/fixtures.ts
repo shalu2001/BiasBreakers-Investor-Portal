@@ -31,12 +31,12 @@ export const PORTFOLIO_FIXTURE: Holding[] = HOLDING_BASE.map((holding) => ({
 }));
 
 export const RECOMMENDATION_FIXTURE: ReallocationRow[] = [
-  { ticker: 'JKH.N0000', name: 'John Keells Holdings', currentPct: 22, recommendedPct: 18 },
-  { ticker: 'COMB.N0000', name: 'Commercial Bank', currentPct: 18, recommendedPct: 22 },
-  { ticker: 'LOLC.N0000', name: 'LOLC Holdings', currentPct: 16, recommendedPct: 16 },
-  { ticker: 'DIAL.N0000', name: 'Dialog Axiata', currentPct: 14, recommendedPct: 10 },
-  { ticker: 'HHL.N0000', name: 'Hemas Holdings', currentPct: 15, recommendedPct: 14 },
-  { ticker: 'SAMP.N0000', name: 'Sampath Bank', currentPct: 15, recommendedPct: 20 },
+  { ticker: 'JKH.N0000', name: 'John Keells Holdings', currentPct: 22, recommendedPct: 18, currentValue: null, recommendedValue: null, currentQty: null, recommendedQty: null },
+  { ticker: 'COMB.N0000', name: 'Commercial Bank', currentPct: 18, recommendedPct: 22, currentValue: null, recommendedValue: null, currentQty: null, recommendedQty: null },
+  { ticker: 'LOLC.N0000', name: 'LOLC Holdings', currentPct: 16, recommendedPct: 16, currentValue: null, recommendedValue: null, currentQty: null, recommendedQty: null },
+  { ticker: 'DIAL.N0000', name: 'Dialog Axiata', currentPct: 14, recommendedPct: 10, currentValue: null, recommendedValue: null, currentQty: null, recommendedQty: null },
+  { ticker: 'HHL.N0000', name: 'Hemas Holdings', currentPct: 15, recommendedPct: 14, currentValue: null, recommendedValue: null, currentQty: null, recommendedQty: null },
+  { ticker: 'SAMP.N0000', name: 'Sampath Bank', currentPct: 15, recommendedPct: 20, currentValue: null, recommendedValue: null, currentQty: null, recommendedQty: null },
 ];
 
 export const PAST_RECOMMENDATIONS_FIXTURE: PastRecommendation[] = [

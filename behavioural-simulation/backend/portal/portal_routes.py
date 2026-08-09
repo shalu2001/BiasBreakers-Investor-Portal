@@ -43,7 +43,11 @@ class AccountReq(BaseModel):
 
 class ExistingHolding(BaseModel):
     ticker: str
-    weightPct: float = Field(ge=0, le=100)
+    # Real share count, not a self-reported percentage -- value/% are
+    # derived server-side from this plus the current price (see
+    # server/main.py's _run_recommendation), so the investor just reports a
+    # fact they can read off their statement instead of doing math.
+    shares: float = Field(ge=0)
 
 
 class OnboardingReq(BaseModel):
