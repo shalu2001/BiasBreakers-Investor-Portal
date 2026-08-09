@@ -16,7 +16,7 @@ class PredictRequest(BaseModel):
         default=None, ge=1, le=365, description="Override the news lookback window in days (default 30)."
     )
     use_macro_overrides: Optional[bool] = Field(
-        default=None, description="Override whether LLM macro-to-ticker basket mapping is applied (default true)."
+        default=True, description="Override whether LLM macro-to-ticker basket mapping is applied (default true)."
     )
 
 
