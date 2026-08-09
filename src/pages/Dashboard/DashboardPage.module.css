@@ -45,39 +45,8 @@
   cursor: pointer;
 }
 
-.snapshotScroll {
-  display: flex;
-  gap: 20px;
-  overflow-x: auto;
-  padding-bottom: 16px;
+.snapshotCarousel {
   margin-bottom: 40px;
-  scroll-snap-type: x proximity;
-  /* Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-text-dim) var(--color-surface);
-}
-
-/* three cards per screen, then scroll */
-.snapshotCard {
-  flex: 0 0 calc((100% - 40px) / 3);
-  min-width: 300px;
-  scroll-snap-align: start;
-}
-
-/* visible carousel scrollbar (the default one is near-invisible on dark) */
-.snapshotScroll::-webkit-scrollbar {
-  height: 10px;
-}
-.snapshotScroll::-webkit-scrollbar-track {
-  background: var(--color-surface);
-  border-radius: 999px;
-}
-.snapshotScroll::-webkit-scrollbar-thumb {
-  background: var(--color-text-dim);
-  border-radius: 999px;
-}
-.snapshotScroll::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-muted);
 }
 
 .newsList {
