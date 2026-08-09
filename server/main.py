@@ -2,6 +2,7 @@
 Investor Portal frontend. Endpoint paths/shapes match what src/api/*.ts
 already expects (built ahead of this backend existing)."""
 import datetime as dt
+import glob
 import json
 import os
 import sys
@@ -96,6 +97,7 @@ def load_model_and_data():
     print(f"Ready. {len(tickers)} tickers, data through {processed['date'].max()}.")
 
     state["bl_returns"] = _fetch_bl_returns(tickers)
+    state["bl_returns_date"] = dt.date.today()
     state["ticker_names"] = _fetch_ticker_names()
 
 
@@ -142,32 +144,67 @@ def _fetch_ticker_names() -> dict:
     return names
 
 
-# Static snapshot the narrative/BL team drops here manually (same shape
-# NarrativePredictionEngine.predict() itself returns:
-# {"predictions": [{"ticker", "posterior", "prior", "tilt"}, ...]}) --
-# not a live in-process call to their engine. That was tried first and
-# reliably timed out in practice (Cosmos/OpenAI latency during their
-# pipeline run), so this reads whatever they most recently exported instead.
-# No live-refresh here yet -- read once at RL startup, same as the old
-# live-call timing; re-upload the file and restart RL to pick up a refresh.
+# narrative_engine's own on-disk prediction cache -- every successful
+# POST /predict on the narrative service writes here (see
+# narrative_engine/api/app.py's _write_response_cache), one file per
+# (as_of date, lookback_days, macro mode). Reading straight from here keeps
+# RL in sync with whatever narrative has actually computed, instead of the
+# older bl_predictions.json below, which had to be manually re-exported and
+# dropped in by hand.
+NARRATIVE_CACHE_DIR = os.path.normpath(
+    os.path.join(os.path.dirname(__file__), '..', 'narrative_engine', 'cache')
+)
+
+# Manually-dropped fallback snapshot (same {"predictions": [...]} shape) from
+# before the cache directory existed -- kept as a last resort for a fresh
+# checkout where narrative has never run yet.
 BL_PREDICTIONS_PATH = os.path.normpath(
     os.path.join(os.path.dirname(__file__), '..', 'narrative_engine', 'bl_predictions.json')
 )
 
 
+def _latest_bl_cache_path() -> str | None:
+    """Freshest narrative_engine/cache/prediction_<date>_<lookback>d_<mode>.json
+    at or before today, for the lookback/macro settings narrative is
+    currently configured with. Dated at-or-before-today (not "closest
+    overall") so this never picks up a stray future-dated file and always
+    reflects what narrative actually knew as of today -- there's no
+    guarantee today's own file has landed yet (the pipeline runs on its own
+    schedule), so this falls back to the most recent earlier day rather than
+    requiring an exact match."""
+    settings = get_narrative_settings()
+    macro = "macro" if settings.use_macro_overrides else "nomacro"
+    pattern = os.path.join(NARRATIVE_CACHE_DIR, f"prediction_*_{settings.lookback_days}d_{macro}.json")
+    today_str = dt.date.today().isoformat()
+
+    dated_paths = []
+    for path in glob.glob(pattern):
+        name = os.path.basename(path)
+        date_part = name[len("prediction_"):len("prediction_") + 10]  # YYYY-MM-DD
+        if date_part <= today_str:
+            dated_paths.append((date_part, path))
+
+    if not dated_paths:
+        return None
+    dated_paths.sort(key=lambda pair: pair[0])
+    return dated_paths[-1][1]
+
+
 def _fetch_bl_returns(tickers) -> dict:
-    """Black-Litterman posterior returns from BL_PREDICTIONS_PATH. RL's own
-    tickers are already the same short form narrative uses ('JKH', not a
-    '.N0000'-suffixed variant -- confirmed via GET /universe against the
-    live data), so this is a direct ticker-string match, no format
-    conversion needed. CASH is excluded -- narrative never has a BL view on
-    cash itself. Any failure (file missing, malformed JSON, missing
-    coverage) degrades to an empty dict, which downstream
-    (apply_live_bl_returns) treats as all-zero/neutral, same as the
-    disabled placeholder's semantics -- never blocks startup."""
+    """Black-Litterman posterior returns for today, sourced from narrative's
+    prediction cache (falling back to the static BL_PREDICTIONS_PATH export
+    if the cache has nothing yet). RL's own tickers are already the same
+    short form narrative uses ('JKH', not a '.N0000'-suffixed variant --
+    confirmed via GET /universe against the live data), so this is a direct
+    ticker-string match, no format conversion needed. CASH is excluded --
+    narrative never has a BL view on cash itself. Any failure (no cache file,
+    malformed JSON, missing coverage) degrades to an empty dict, which
+    downstream (apply_live_bl_returns) treats as all-zero/neutral rather than
+    blocking a request."""
     real_tickers = [t for t in tickers if t != "CASH"]
+    source_path = _latest_bl_cache_path() or BL_PREDICTIONS_PATH
     try:
-        with open(BL_PREDICTIONS_PATH, 'r') as f:
+        with open(source_path, 'r') as f:
             data = json.load(f)
         bl_by_ticker = {
             p["ticker"]: p["posterior"]
@@ -175,16 +212,28 @@ def _fetch_bl_returns(tickers) -> dict:
             if p.get("posterior") is not None
         }
     except FileNotFoundError:
-        print(f"No BL predictions file at {BL_PREDICTIONS_PATH} yet, falling back to zeros.")
+        print(f"No BL predictions found at {source_path} yet, falling back to zeros.")
         bl_by_ticker = {}
     except Exception as e:
-        print(f"Failed to read BL predictions from {BL_PREDICTIONS_PATH}, falling back to zeros: {e}")
+        print(f"Failed to read BL predictions from {source_path}, falling back to zeros: {e}")
         bl_by_ticker = {}
 
     bl_returns = {t: bl_by_ticker.get(t, 0.0) for t in real_tickers}
     n_real = sum(1 for t in real_tickers if t in bl_by_ticker)
-    print(f"BL returns: {n_real}/{len(real_tickers)} tickers have real coverage from {BL_PREDICTIONS_PATH}.")
+    print(f"BL returns: {n_real}/{len(real_tickers)} tickers have real coverage from {source_path}.")
     return bl_returns
+
+
+def _current_bl_returns(tickers) -> dict:
+    """Re-resolves the BL cache file whenever the calendar day has rolled
+    over since the last fetch, so a long-running RL process picks up each
+    new day's narrative snapshot without needing a restart. A no-op state
+    check on every other request in the same day."""
+    today = dt.date.today()
+    if state.get("bl_returns_date") != today:
+        state["bl_returns"] = _fetch_bl_returns(tickers)
+        state["bl_returns_date"] = today
+    return state["bl_returns"]
 
 
 def _get_profile_doc(uid: str) -> dict:
@@ -272,7 +321,7 @@ def _value(pct: float, investment_amount: float | None) -> float | None:
 def _run_recommendation(uid: str):
     tickers = state["tickers"]
     today_df, latest_date = latest_day_frame(state["processed"])
-    today_df = apply_live_bl_returns(today_df, state["bl_returns"], tickers)
+    today_df = apply_live_bl_returns(today_df, _current_bl_returns(tickers), tickers)
     stock_dim = len(tickers)
 
     doc = _get_profile_doc(uid)
