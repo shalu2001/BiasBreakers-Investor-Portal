@@ -235,6 +235,12 @@ def _load_news_feed() -> list[NewsItemOut]:
     if news_df.empty:
         return []
 
+    # Newest first. The repository returns rows grouped by source collection,
+    # so without this the latest stories are scattered through the list rather
+    # than at the top.
+    if "published_date" in news_df.columns:
+        news_df = news_df.sort_values("published_date", ascending=False, na_position="last")
+
     items: list[NewsItemOut] = []
     for row in news_df.to_dict("records"):
         published = row.get("published_date")
