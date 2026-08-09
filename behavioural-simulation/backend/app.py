@@ -106,6 +106,7 @@ def create_session(starting_cash: float = 1_000_000):
         "round_label": _round_label(session),
         "day": session.current_session.get_day_number(),
         "total_days": session.current_session.get_total_days(),
+        "total_checkpoints": session.current_session.num_checkpoints(),
         "market_state": _sanitize(session.get_market_state()),
         "cash": session.current_session.cash,
         "fixed_ticker": session.get_tradable_ticker(),
@@ -128,7 +129,7 @@ def get_state(session_id: str):
     }
 
 @app.get("/session/{session_id}/history/{ticker}")
-def get_history(session_id: str, ticker: str, lookback: int = 15):
+def get_history(session_id: str, ticker: str, lookback: int = 120):
     session = _get_session(session_id)
     return {"history": session.current_session.get_recent_history(ticker, lookback)}
 
@@ -151,6 +152,7 @@ def advance(session_id: str):
         result["round_label"] = _round_label(session)
         result["day"] = session.current_session.get_day_number()
         result["total_days"] = session.current_session.get_total_days()
+        result["total_checkpoints"] = session.current_session.num_checkpoints()
         result["benchmark"] = _benchmark(session)
     # After the two free-play blocks, launch the matched-stakes event round
     # (which cleanly identifies loss aversion) instead of finishing.

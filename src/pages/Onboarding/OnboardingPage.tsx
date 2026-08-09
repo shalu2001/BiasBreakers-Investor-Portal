@@ -5,13 +5,6 @@ import { useSession } from '../../session/SessionContext';
 import { ExistingHoldingsEditor } from '../../components/ExistingHoldingsEditor';
 import styles from './OnboardingPage.module.css';
 
-const GOALS = [
-  { key: 'grow', title: 'Grow my wealth', sub: 'Long-term capital growth.' },
-  { key: 'income', title: 'Steady income', sub: 'Prioritise stability over big swings.' },
-  { key: 'learn', title: 'Learn & experiment', sub: 'Get comfortable with investing.' },
-  { key: 'beat', title: 'Beat the market', sub: 'Chase above-index returns.' },
-];
-
 export function OnboardingPage() {
   const navigate = useNavigate();
   const { setOnboarding } = useSession();
@@ -20,14 +13,13 @@ export function OnboardingPage() {
   const [hasExisting, setHasExisting] = useState<boolean | null>(null);
   const [holdings, setHoldings] = useState<ExistingHolding[]>([]);
   const [amount, setAmount] = useState('');
-  const [goal, setGoal] = useState<string | null>(null);
 
   // The holdings step only exists when they said "yes" -- computed from
   // current state so it also disappears cleanly if they go back and change
   // their answer to "no". No separate "amount" step for existing-portfolio
   // investors either: their budget is derived from what their entered
   // holdings are currently worth (shares x current price), not asked for.
-  const steps = hasExisting ? ['existing', 'holdings', 'goal'] : ['existing', 'amount', 'goal'];
+  const steps = hasExisting ? ['existing', 'holdings'] : ['existing', 'amount'];
   const totalSteps = steps.length;
   const current = steps[step - 1];
 
@@ -37,14 +29,13 @@ export function OnboardingPage() {
   const canProceed =
     current === 'existing' ? hasExisting !== null
     : current === 'holdings' ? true // optional -- always skippable
-    : current === 'amount' ? amountValid
-    : goal !== null;
+    : amountValid; // 'amount'
 
   async function handleFinish() {
     const answers = {
       hasExistingPortfolio: hasExisting,
       investmentAmount: amountValid ? amountNum : null,
-      goal,
+      goal: null,
       existingHoldings: hasExisting ? holdings : null,
     };
     setOnboarding(answers);
@@ -123,28 +114,6 @@ export function OnboardingPage() {
               onChange={(e) => setAmount(e.target.value)}
               autoFocus
             />
-          </div>
-        </>
-      )}
-
-      {current === 'goal' && (
-        <>
-          <h1 className={styles.question}>What's your main goal?</h1>
-          <p className={styles.subcopy}>
-            This shapes how your recommendations balance growth against comfort.
-          </p>
-          <div className={styles.options}>
-            {GOALS.map((g) => (
-              <button
-                key={g.key}
-                type="button"
-                className={goal === g.key ? styles.optionSelected : styles.option}
-                onClick={() => setGoal(g.key)}
-              >
-                <strong>{g.title}</strong>
-                <span>{g.sub}</span>
-              </button>
-            ))}
           </div>
         </>
       )}

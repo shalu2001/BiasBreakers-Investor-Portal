@@ -33,7 +33,7 @@ export function GameCandles({ history }: { history: HistoryBar[] }) {
   }));
   return (
     <div className={styles.chartWrap}>
-      <CandlestickChart candles={candles} height={160} />
+      <CandlestickChart candles={candles} height={160} hideYear />
     </div>
   );
 }

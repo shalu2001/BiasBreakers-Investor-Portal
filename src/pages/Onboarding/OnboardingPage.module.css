@@ -1,8 +1,10 @@
 .page {
   min-height: 100vh;
-  padding: 32px 20px;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
 }
 
 .eyebrow {
@@ -109,6 +111,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  width: 100%;
+  max-width: 560px;
 }
 
 .backButton {
