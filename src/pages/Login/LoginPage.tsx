@@ -16,6 +16,10 @@ export function LoginPage() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
     setBusy(true);
     try {
       await login(email.trim(), password);
@@ -48,11 +52,14 @@ export function LoginPage() {
           />
           <label className={styles.label} htmlFor="password">Password</label>
           <input
-            id="password" type="password" value={password}
+            id="password" type="password" placeholder="Enter your password" value={password}
             onChange={(e) => setPassword(e.target.value)} className={styles.input} required
           />
+          {password.length > 0 && password.length < 6 && (
+            <p className={styles.pwHint}>Password must be at least 6 characters.</p>
+          )}
 
-          {error && <p style={{ color: 'var(--color-danger, #c0392b)', fontSize: 13, margin: '4px 0 0' }}>{error}</p>}
+          {error && <p className={styles.error}>{error}</p>}
 
           <button type="submit" className={styles.submitButton} disabled={busy}>
             {busy ? 'Signing in…' : 'Sign in →'}
