@@ -1,0 +1,17 @@
+.lockup {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.mark {
+  display: block;
+  width: auto;
+}
+
+.word {
+  font-size: inherit;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}

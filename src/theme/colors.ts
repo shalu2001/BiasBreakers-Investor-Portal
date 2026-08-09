@@ -1,5 +1,5 @@
 // Single source of truth for the app's color palette (matches the approved
-// "SL20 Invest" mockup). Change a value here and every page picks it up —
+// Cognivest mockup). Change a value here and every page picks it up —
 // components should never hardcode hex codes, only reference these tokens
 // (either `colors.primary` in JS/inline styles, or `var(--color-primary)` in CSS).
 export const colors = {
