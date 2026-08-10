@@ -16,14 +16,21 @@ import type { BehaviouralProfile } from './SessionContext';
 // The tercile boundaries (p33 / p67) are the archetype band cut-offs, so bands and
 // scores stay consistent.
 
-// (value, percentile) anchors from the recovered distribution; piecewise-linear.
+// (value, percentile) anchors from the RECOVERED distribution; piecewise-linear.
+// From the JOINT pooled estimator's rescaled lambda/gamma (experiments/
+// joint_estimator.py -> joint_estimator.json), so the tercile band boundaries
+// (p33 / p67) match its recovered spread and the archetype split stays balanced.
+// Scale-robust build (per-session wealth-change normalisation + gentler-player
+// training). lambda terciles 1.89 / 2.94; gamma terciles 1.70 / 2.58.
 const LAM_ANCHORS: ReadonlyArray<readonly [number, number]> = [
-  [1.13, 0], [1.34, 10], [1.61, 20], [1.97, 30], [2.0, 33],
-  [2.27, 50], [2.53, 67], [2.95, 80], [3.58, 90], [4.12, 95], [6.13, 100],
+  [1.075, 0], [1.531, 10], [1.722, 20], [1.847, 30], [1.892, 33], [2.042, 40],
+  [2.263, 50], [2.841, 60], [2.936, 67], [2.982, 70], [3.245, 80], [3.735, 90], [4.207, 100],
 ];
+// gamma now from the dedicated inertia-robust regret estimator (regret_gamma.json);
+// terciles 2.02 / 2.41.
 const GAM_ANCHORS: ReadonlyArray<readonly [number, number]> = [
-  [0.26, 0], [0.52, 10], [0.89, 20], [1.4, 30], [1.62, 33],
-  [2.6, 50], [3.01, 67], [3.36, 80], [3.51, 90], [3.59, 95], [3.78, 100],
+  [0.184, 0], [1.366, 10], [1.746, 20], [1.952, 30], [2.024, 33], [2.136, 40],
+  [2.293, 50], [2.368, 60], [2.412, 67], [2.461, 70], [2.627, 80], [2.901, 90], [2.937, 100],
 ];
 
 function percentileScore(value: number, anchors: ReadonlyArray<readonly [number, number]>): number {

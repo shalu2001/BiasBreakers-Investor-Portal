@@ -12,6 +12,9 @@ from estimation.final_estimator import fit_full_profile
 from estimation.estimator_v2 import fit_profile_v2
 from estimation.calibration import load_default_calibrator, features_from_fits
 from estimation.lambda_events import event_cpt_value
+from estimation.alpha_features import estimate_alpha
+from estimation.joint_profile import recover_lambda_gamma
+from estimation.regret_gamma import estimate_gamma
 from game.event_round import EventRound
 from reward.behavioral_reward_interface import BehavioralRewardModel
 
@@ -211,13 +214,26 @@ def _recover(log1, log2, event_round, starting_cash):
         profile = {"alpha": v2["alpha"], "lambda": lam_c if lam_c is not None else 2.25, "gamma": v2["gamma"]}
         source = "v2_uncalibrated" if lam_c is not None else "v2_uncalibrated+lambda_prior"
     confidence = {k: dict(v) for k, v in v2["confidence"].items()}
+    # Joint pooled estimator: recovers lambda AND gamma from ALL decision data
+    # (Fund A + Fund B + matched-stakes events) in one likelihood, then rescaled
+    # to the CPT scale. Supersedes the piecewise calibration + the separate
+    # event-lambda override (r ~ 0.95/0.93 vs 0.84/0.79); Fund A now feeds lambda.
     lambda_source = "free_play_calibration"
-    if event_round is not None:
-        el = event_round.estimate_lambda()
-        if el is not None and el.get("estimate") is not None and el["confidence"]["level"] != "uninformative":
-            profile["lambda"] = float(el["estimate"])
-            confidence["lambda"] = el["confidence"]
-            lambda_source = "matched_stakes_events"
+    if event_round is not None and getattr(event_round, "records", None):
+        jr = recover_lambda_gamma(log1, log2, event_round.records)
+        profile["lambda"] = jr["lambda"]
+        confidence["lambda"] = jr["confidence"]["lambda"]
+        lambda_source = "joint_pooled"
+    # Gamma from the DEDICATED regret estimator (inertia-robust, works on allocation
+    # changes) -- the joint gamma collapsed to 0 on sticky real play. See regret_gamma.py.
+    g_est = estimate_gamma(log2)
+    profile["gamma"] = g_est["gamma"]
+    confidence["gamma"] = g_est["confidence"]
+    # Alpha from the loss-block curvature (scale-free features), replacing the
+    # calibrator's alpha which was effectively constant / not identifiable.
+    a_est = estimate_alpha(log1)
+    profile["alpha"] = a_est["alpha"]
+    confidence["alpha"] = a_est["confidence"]
     return {"profile": profile, "profile_source": source, "lambda_source": lambda_source,
             "confidence": confidence, "n_obs_block1": fit.get("n_obs_block1"),
             "n_obs_block2": fit.get("n_obs_block2")}
@@ -343,22 +359,39 @@ def finish_session(session_id: str):
         profile_source = "v2_uncalibrated" if lam_computed is not None else "v2_uncalibrated+lambda_prior"
 
     confidence = {k: dict(v) for k, v in v2["confidence"].items()}
-    free_play_lambda = profile["lambda"]   # before any event-round override
+    free_play_lambda = profile["lambda"]   # before the joint-estimator override
 
-    # Matched-stakes event round: cleanly identifies lambda regardless of the
-    # player's free-play style. When available and confident, it OVERRIDES the
-    # free-play lambda (alpha and gamma still come from the calibration).
+    # Joint pooled estimator: recovers lambda AND gamma in ONE likelihood over all
+    # decision data -- Fund A (loss-aversion block) + Fund B (regret block) + the
+    # matched-stakes events -- then rescaled to the CPT scale. This supersedes both
+    # the piecewise free-play calibration and the separate event-lambda override:
+    # Fund A now contributes to lambda, and recovery rises to r ~ 0.95 (lambda) /
+    # 0.93 (gamma) vs 0.84 / 0.79 for the piecewise pipeline (experiments/
+    # joint_estimator.py). alpha still comes from the scale-free loss-block features.
     er = EVENT_ROUNDS.pop(session_id, None)
     event_lambda = None
     lambda_source = "free_play_calibration"
     if er is not None:
-        el = er.estimate_lambda()
+        el = er.estimate_lambda()   # kept as a diagnostic only
         if el is not None and el.get("estimate") is not None:
             event_lambda = float(el["estimate"])
-            if el["confidence"]["level"] != "uninformative":
-                profile["lambda"] = event_lambda
-                confidence["lambda"] = el["confidence"]
-                lambda_source = "matched_stakes_events"
+        if getattr(er, "records", None):
+            jr = recover_lambda_gamma(log1, log2, er.records)
+            profile["lambda"] = jr["lambda"]
+            confidence["lambda"] = jr["confidence"]["lambda"]
+            lambda_source = "joint_pooled"
+    # Gamma: dedicated inertia-robust regret estimator (not the joint's floored gamma)
+    g_est = estimate_gamma(log2)
+    profile["gamma"] = g_est["gamma"]
+    confidence["gamma"] = g_est["confidence"]
+
+    # Diminishing sensitivity (alpha): recovered from the loss-block curvature via
+    # scale-free features (the free MLE can't identify it). Overrides the
+    # calibrator's alpha and flows into the reward model below.
+    alpha_source = "loss_block_features"
+    a_est = estimate_alpha(log1)
+    profile["alpha"] = a_est["alpha"]
+    confidence["alpha"] = a_est["confidence"]
 
     _conf_levels = {k: v["level"] for k, v in confidence.items()}
     print("FINAL profile:", {k: round(v, 3) for k, v in profile.items()},

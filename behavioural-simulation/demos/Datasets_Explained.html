@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Datasets — In Plain English</title>
+<title>The Datasets in Plain English</title>
 <style>
   :root{--bg:#0B0E14;--surface:#151922;--surface2:#1C212C;--border:#262C39;--text:#E8E6E1;
     --muted:#7C8394;--dim:#4E5566;--accent:#D4A73C;--gain:#3FB68B;--loss:#E0605A;--navy:#5B8DEF}
@@ -47,10 +47,10 @@
 </head>
 <body>
 <div class="wrap">
-  <h1><span class="mark">◆</span> The Datasets — in plain English</h1>
+  <h1><span class="mark">◆</span> The Datasets in plain English</h1>
   <p class="sub">To test our system, we invented <strong>5 pretend investors</strong>, gave each a personality, and let them
   trade the real stock market for <strong>6 years</strong>. That produced a handful of datasets. They look like intimidating
-  financial spreadsheets — so here is what each one actually is, in everyday words, with a real row translated.</p>
+  financial spreadsheets, so here is what each one actually is, in everyday words, with a real row translated.</p>
 
   <div class="flow">
     <span class="chip"><b>5 investors</b> (a personality each)</span><span class="arw">→</span>
@@ -61,12 +61,34 @@
     <span class="chip">⑤ Satisfaction scores</span>
   </div>
 
+  <!-- 0: the engine that makes the trades -->
+  <div class="card" style="border-color:var(--accent)">
+    <span class="num">◆</span><h2>First: how each pretend investor decides to trade</h2>
+    <div class="what">Before any of these datasets can exist, the five investors have to actually trade. Each one is given a fixed <em>temperament</em> made of three numbers, and every day that temperament reacts to what happened to their money. That reaction is what produces every buy, sell and hold you see below.</div>
+    <div class="analogy"><b>Think of it as:</b> giving each investor a personality dial, then letting the dial decide how they feel about each day's gain, loss, and how the market did, and turning that feeling into an action.</div>
+    <div class="datablock">
+      <div class="label">The rule, in four steps</div>
+      <div class="plain">
+        <b>1.</b> Each investor has three hidden numbers: <span class="hl">loss aversion</span> (how much losses sting), <span class="hl">sensitivity</span> (how fast big swings stop mattering), and <span class="hl">regret</span> (how much falling behind the market bothers them).<br><br>
+        <b>2.</b> Each day they look at two things: how much their money <span class="hl">changed</span>, and how they did <span class="hl">versus the market</span>.<br><br>
+        <b>3.</b> They "feel" that through a prospect-theory value: gains feel good, losses feel worse (much worse if they are loss-averse), and lagging the market adds regret.<br><br>
+        <b>4.</b> That feeling becomes the odds of <span class="up">buy</span>, <span class="down">sell</span>, or hold. One action is drawn at random from those odds, and the day is recorded. Repeat every day for six years on the real market.
+      </div>
+      <div class="label" style="margin-top:16px">Under the hood</div>
+      <div class="raw"><div class="mono" style="font-size:13px;color:var(--text);white-space:normal;line-height:1.7">
+        feeling = value(money&nbsp;change) &minus; regret &times; (market&nbsp;gap)<br>
+        higher feeling &rarr; more likely to buy or hold &nbsp;&middot;&nbsp; a sharp loss &rarr; more likely to sell &nbsp;&middot;&nbsp; the more loss-averse the investor, the sooner they sell.
+      </div></div>
+      <div class="what" style="margin-left:0;margin-top:12px">Because <em>we</em> set those three numbers ourselves, we always know the true personality behind every trade. That is the whole point: it is what lets us later check whether the system can read the personality back out from behaviour alone.</div>
+    </div>
+  </div>
+
   <!-- 1 -->
   <div class="card">
     <span class="num">1</span><h2>The Receipt Book</h2><span class="tag">5,954 trades</span>
     <div class="fname mono">transaction_ledger.csv</div>
-    <div class="what">Every single time an investor bought or sold, we wrote down a receipt: who, when, buy or sell, which company, the price, how many shares, and how much cash was left. It only records <em>actions</em> — if they did nothing that day, there's no receipt.</div>
-    <div class="analogy"><b>Think of it as:</b> a bank statement of trades — one line for every purchase or sale, with a running cash balance, exactly like the transaction history in a banking app.</div>
+    <div class="what">Every single time an investor bought or sold, we wrote down a receipt: who, when, buy or sell, which company, the price, how many shares, and how much cash was left. It only records <em>actions</em>. If they did nothing that day, there's no receipt.</div>
+    <div class="analogy"><b>Think of it as:</b> a bank statement of trades: one line for every purchase or sale, with a running cash balance, exactly like the transaction history in a banking app.</div>
     <div class="datablock">
       <div class="label">What it really looks like</div>
       <div class="raw"><table>
@@ -75,7 +97,7 @@
       </table></div>
       <div class="arrow">↓</div>
       <div class="plain">On this day, <span class="hl">Investor&nbsp;1</span> <span class="up">bought</span> <span class="hl">2,345 shares</span>
-      of a bank (Commercial Bank) at <span class="hl">Rs.&nbsp;63.96</span> each — spending about Rs.&nbsp;150,000 and leaving
+      of a bank (Commercial Bank) at <span class="hl">Rs.&nbsp;63.96</span> each, spending about Rs.&nbsp;150,000 and leaving
       <span class="hl">Rs.&nbsp;848,516</span> in cash.</div>
     </div>
   </div>
@@ -84,8 +106,8 @@
   <div class="card">
     <span class="num">2</span><h2>The Daily Photo Album</h2><span class="tag">7,915 daily snapshots</span>
     <div class="fname mono">portfolio_snapshots.csv</div>
-    <div class="what">At the end of <em>every single day</em> — whether they traded or not — we took a snapshot of each investor's finances: how much cash they held, how much their shares were worth, and the two added together (their total wealth).</div>
-    <div class="analogy"><b>Think of it as:</b> checking your net worth every evening and writing it in a notebook — a photo of "what I own and what it's worth" for each day.</div>
+    <div class="what">At the end of <em>every single day</em>, whether they traded or not, we took a snapshot of each investor's finances: how much cash they held, how much their shares were worth, and the two added together (their total wealth).</div>
+    <div class="analogy"><b>Think of it as:</b> checking your net worth every evening and writing it in a notebook: a photo of "what I own and what it's worth" for each day.</div>
     <div class="datablock">
       <div class="label">What it really looks like</div>
       <div class="raw"><table>
@@ -104,7 +126,7 @@
     <span class="num">3</span><h2>The Decision Diary</h2><span class="tag">7,915 decisions · the important one</span>
     <div class="fname mono">behavioral_validation_log.csv</div>
     <div class="what">This is the one our system actually reads. For every day it records three things: what the investor <em>did</em>, how much their money <em>changed</em> since their last move, and whether they were <em>ahead of or behind the market</em>. Those last two are what reveal the personality.</div>
-    <div class="analogy"><b>Think of it as:</b> a daily diary entry — "here's what I did, here's how much richer or poorer I got, and here's whether I beat everyone else or fell behind."</div>
+    <div class="analogy"><b>Think of it as:</b> a daily diary entry: "here's what I did, here's how much richer or poorer I got, and here's whether I beat everyone else or fell behind."</div>
     <div class="datablock">
       <div class="label">What it really looks like</div>
       <div class="raw"><table>
@@ -123,7 +145,7 @@
     <span class="num">4</span><h2>The Recovered Personalities</h2><span class="tag">the answer-key check</span>
     <div class="fname mono">recovered_parameters.csv</div>
     <div class="what">After reading the diary, our system reports the three personality numbers it dug out for each investor. Because we secretly set the true numbers ourselves, we can put them side by side and check.</div>
-    <div class="analogy"><b>Think of it as:</b> marking an exam against the answer key — our system's guess next to the truth we already knew.</div>
+    <div class="analogy"><b>Think of it as:</b> marking an exam against the answer key: our system's guess next to the truth we already knew.</div>
     <div class="datablock">
       <div class="label">What it really looks like</div>
       <div class="raw"><table>
@@ -133,7 +155,7 @@
       </table></div>
       <div class="arrow">↓</div>
       <div class="plain">We had secretly made Investor&nbsp;1 <span class="hl">moderately loss-averse (2.25)</span>. Reading only their trades,
-      the system reconstructed <span class="hl">2.01</span> — and the other two numbers match just as closely.
+      the system reconstructed <span class="hl">2.01</span>, and the other two numbers match just as closely.
       <span class="up">The personality was recovered from behaviour alone.</span></div>
     </div>
   </div>
@@ -143,7 +165,7 @@
     <span class="num">5</span><h2>The Satisfaction Scores</h2><span class="tag">the final output</span>
     <div class="fname mono">behavioral_utility.csv</div>
     <div class="what">Finally, using each investor's personality, we score every day with a single number: how <em>satisfied</em> that particular person would feel about what happened to their money that day. This score is what the portfolio system uses to build something the person can live with.</div>
-    <div class="analogy"><b>Think of it as:</b> a daily mood rating for their money — positive means "happy with today," negative means "unhappy," and a very loss-averse person's bad days score far more negative than a calm person's.</div>
+    <div class="analogy"><b>Think of it as:</b> a daily mood rating for their money: positive means "happy with today," negative means "unhappy," and a very loss-averse person's bad days score far more negative than a calm person's.</div>
     <div class="datablock">
       <div class="label">What it really looks like</div>
       <div class="raw"><table>
@@ -151,7 +173,7 @@
         <tr><td>INV_01</td><td>2020-01-03</td><td>0</td><td>-0.02</td><td>+0.01</td></tr>
       </table></div>
       <div class="arrow">↓</div>
-      <div class="plain">A quiet day — money barely moved and they slightly beat the market — so <span class="hl">Investor&nbsp;1</span>'s
+      <div class="plain">A quiet day: money barely moved and they slightly beat the market, so <span class="hl">Investor&nbsp;1</span>'s
       satisfaction is a tiny <span class="up">positive</span>. On a day they lost a lot, this number would swing sharply
       negative, <em>and more so the more loss-averse they are.</em></div>
     </div>
