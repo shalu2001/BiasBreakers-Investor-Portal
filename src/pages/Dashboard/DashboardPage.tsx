@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPortfolio, type Holding } from '../../api/portfolio';
-import { getNews, type NewsItem } from '../../api/news';
-import { formatTimeAgo } from '../../utils/timeAgo';
+import { getNarratives, type NarrativeItem } from '../../api/narratives';
 import { PORTFOLIO_FIXTURE } from '../../mocks/fixtures';
 import { HoldingCard } from '../../components/HoldingCard';
 import { Carousel } from '../../components/Carousel';
@@ -13,12 +12,19 @@ import styles from './DashboardPage.module.css';
 export function DashboardPage() {
   const { persona, confidence } = useBehaviouralProfile();
   const [holdings, setHoldings] = useState<Holding[]>(PORTFOLIO_FIXTURE);
-  const [news, setNews] = useState<NewsItem[]>([]);
+  const [narratives, setNarratives] = useState<NarrativeItem[]>([]);
+  const [narrativeStatus, setNarrativeStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 
   useEffect(() => {
     let cancelled = false;
     getPortfolio().then((h) => !cancelled && setHoldings(h)).catch(() => !cancelled && setHoldings(PORTFOLIO_FIXTURE));
-    getNews().then((n) => !cancelled && setNews(n.slice(0, 3))).catch(() => undefined);
+    getNarratives()
+      .then((res) => {
+        if (cancelled) return;
+        setNarratives(res.narratives);
+        setNarrativeStatus('ready');
+      })
+      .catch(() => !cancelled && setNarrativeStatus('error'));
     return () => {
       cancelled = true;
     };
@@ -56,31 +62,39 @@ export function DashboardPage() {
       </div>
 
       <div className={styles.newsHeader}>
-        <h2 className={styles.sectionTitle}>Market news</h2>
+        <h2 className={styles.sectionTitle}>Latest narratives</h2>
         <Link to="/news" className={styles.viewFullLink}>
           View all news
         </Link>
       </div>
 
-      <div className={styles.newsList}>
-        {news.map((item) => (
-          <Link
-            key={item.headline}
-            to="/news/article"
-            state={{ article: item }}
-            className={styles.newsItem}
-          >
+      <div className={styles.narrativeList}>
+        {narrativeStatus === 'loading' && (
+          <p className={styles.narrativeMessage}>Loading latest narratives…</p>
+        )}
+        {narrativeStatus === 'error' && (
+          <p className={styles.narrativeMessage}>Couldn’t load narratives right now.</p>
+        )}
+        {narrativeStatus === 'ready' && narratives.length === 0 && (
+          <p className={styles.narrativeMessage}>No narratives available yet.</p>
+        )}
+        {narratives.map((n) => (
+          <div key={n.id} className={styles.narrativeItem}>
             <div className={styles.newsTags}>
-              {item.ticker && <span className={styles.tickerTag}>{item.ticker}</span>}
-              <span className={styles.categoryTag}>
-                {item.category === 'macro' ? 'Macro' : 'Micro'}
-              </span>
+              <span className={styles.categoryTag}>{n.type === 'macro' ? 'Macro' : 'Micro'}</span>
             </div>
-            <div className={styles.newsHeadline}>{item.headline}</div>
-            <div className={styles.newsMeta}>
-              {item.source} · {formatTimeAgo(item.publishedDate)}
-            </div>
-          </Link>
+            <p className={styles.narrativeTitle}>{n.title}</p>
+            {n.stocks.length > 0 && (
+              <div className={styles.stockChips}>
+                {n.stocks.map((s) => (
+                  <span key={`${n.id}-${s.ticker}-${s.name}`} className={styles.stockChip}>
+                    {s.ticker && <span className={styles.stockTicker}>{s.ticker}</span>}
+                    <span className={styles.stockName}>{s.name}</span>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         ))}
       </div>
     </div>
