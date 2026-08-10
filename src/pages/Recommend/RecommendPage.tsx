@@ -5,12 +5,10 @@ import { profileToPersona } from '../../session/profileToPersona';
 import { useSession } from '../../session/SessionContext';
 import {
   getRecommendation,
-  getPastRecommendations,
   submitRecommendationFeedback,
   type ReallocationRow,
-  type PastRecommendation,
 } from '../../api/recommendation';
-import { PERSONA_FIXTURE, PAST_RECOMMENDATIONS_FIXTURE } from '../../mocks/fixtures';
+import { PERSONA_FIXTURE } from '../../mocks/fixtures';
 import { LoadingState, EmptyState } from '../../components/ui';
 import styles from './RecommendPage.module.css';
 
@@ -70,9 +68,6 @@ export function RecommendPage() {
   // shown after navigating away and back, instead of being wiped and
   // re-run on every visit. null/[] means "not optimized yet".
   const [rows, setRows] = useState<ReallocationRow[]>(recommendation ?? []);
-  const [pastRecommendations, setPastRecommendations] = useState<PastRecommendation[]>(
-    PAST_RECOMMENDATIONS_FIXTURE,
-  );
   // Drives whether the table shows a "Current" column at all (pointless
   // when it's always 0) and whether the second column reads "Recommended"
   // (a fresh initial allocation) or "Rebalanced" (moving from a real
@@ -110,13 +105,6 @@ export function RecommendPage() {
         }
       }
     })();
-
-    // Rebalancing is expensive/meaningful, so it's never triggered
-    // automatically here -- only handleOptimize (the button) calls
-    // getRecommendation(). History is just a read, safe to load eagerly.
-    getPastRecommendations()
-      .then((data) => !cancelled && setPastRecommendations(data))
-      .catch(() => !cancelled && setPastRecommendations(PAST_RECOMMENDATIONS_FIXTURE));
 
     return () => {
       cancelled = true;
@@ -248,20 +236,6 @@ export function RecommendPage() {
           </section>
         </>
       )}
-
-      <h2 className={styles.sectionTitle}>Past recommendations</h2>
-      <div className={styles.pastList}>
-        {pastRecommendations.map((item) => (
-          <div key={item.date} className={styles.pastItem}>
-            <div className={styles.pastDate}>{item.date.toUpperCase()}</div>
-            <p className={styles.pastDescription}>{item.description}</p>
-            <div className={styles.pastFooter}>
-              <span>{item.rating != null ? `Rated ${item.rating}/5` : 'Not yet rated'}</span>
-              <a href="#">View →</a>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

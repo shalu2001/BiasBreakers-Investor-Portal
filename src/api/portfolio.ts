@@ -25,3 +25,23 @@ export async function getPortfolio(range: PortfolioRange = '3M'): Promise<Holdin
   });
   return data;
 }
+
+export interface TickerCandles {
+  ticker: string;
+  name: string;
+  changePct: number;
+  candles: Candle[];
+}
+
+// Chart data only, for an explicit ticker list -- doesn't recompute a
+// recommendation server-side, so it never drifts from whatever allocation
+// the investor already approved via getRecommendation().
+export async function getPortfolioCandles(
+  tickers: string[],
+  range: PortfolioRange = '3M',
+): Promise<TickerCandles[]> {
+  const { data } = await apiClient.get<TickerCandles[]>('/portfolio/candles', {
+    params: { tickers: tickers.join(','), range },
+  });
+  return data;
+}

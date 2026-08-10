@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import { AppLayout } from './components/AppLayout';
 import { RequireAuth } from './components/RequireAuth';
+import { RequirePortfolio } from './components/RequirePortfolio';
 // Login / Register stay eager so the first screen paints instantly.
 import { LoginPage } from './pages/Login/LoginPage';
 import { RegisterPage } from './pages/Login/RegisterPage';
@@ -64,7 +65,14 @@ function App() {
         >
           <Route path="/" element={<DashboardPage />} />
           <Route path="/behavioural-profile" element={<BehaviouralProfilePage />} />
-          <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route
+            path="/portfolio"
+            element={
+              <RequirePortfolio>
+                <PortfolioPage />
+              </RequirePortfolio>
+            }
+          />
           <Route path="/recommend" element={<RecommendPage />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/news/article" element={<NewsArticlePage />} />
