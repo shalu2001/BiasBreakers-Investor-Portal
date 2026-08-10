@@ -14,8 +14,15 @@ const links = [
 
 export function NavBar() {
   const { logout } = useAuth();
-  const { reset } = useSession();
+  const { reset, recommendation } = useSession();
   const navigate = useNavigate();
+
+  // Same gate as RequirePortfolio -- no point linking to a page that would
+  // just bounce back to /recommend.
+  const hasSelectedStocks = (recommendation ?? []).some(
+    (row) => row.ticker !== 'CASH' && row.recommendedPct > 0,
+  );
+  const visibleLinks = links.filter((link) => link.to !== '/portfolio' || hasSelectedStocks);
 
   function handleLogout() {
     logout();
@@ -33,7 +40,7 @@ export function NavBar() {
       <BrandLockup className={styles.brand} size={20} />
       <div className={styles.right}>
         <nav className={styles.nav}>
-          {links.map((link) => (
+          {visibleLinks.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}

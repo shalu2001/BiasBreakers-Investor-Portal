@@ -552,6 +552,39 @@ def get_portfolio_holdings(range: str = "3M", uid: str = Depends(get_current_use
     return result
 
 
+@app.get("/portfolio/candles")
+def get_portfolio_candles(tickers: str, range: str = "3M", uid: str = Depends(get_current_user_id)):
+    """Real OHLC candles for an explicit, caller-supplied set of tickers --
+    the ones the investor's last approved recommendation actually selected
+    (see GET /recommendation/current), not a fresh recomputation. Unlike
+    /portfolio/holdings, this never calls _run_recommendation(): the
+    Portfolio page should render exactly the allocation the investor already
+    saw and approved on /recommend, not silently re-run the optimizer (and
+    re-upsert a new saved recommendation, possibly with different weights if
+    a day boundary or narrative refresh happened in between) just to draw a
+    chart. `uid` is required only to keep this behind auth like every other
+    investor-specific endpoint -- the response itself doesn't depend on it.
+    Unknown/CASH tickers are silently skipped rather than erroring, since
+    the caller-supplied list already comes from the investor's own saved
+    recommendation."""
+    processed = state["processed"]
+    latest_date = processed["date"].max()
+    requested = [t.strip() for t in tickers.split(",") if t.strip()]
+
+    result = []
+    for ticker in requested:
+        if ticker == "CASH" or ticker not in state["tickers"]:
+            continue
+        candles = _candles_for_range(processed, ticker, latest_date, range)
+        result.append({
+            "ticker": ticker,
+            "name": state["ticker_names"].get(ticker, ticker),
+            "changePct": _change_pct(candles),
+            "candles": candles,
+        })
+    return result
+
+
 @app.get("/universe")
 def get_universe():
     """The real tracked ticker universe (name-mapped, CASH excluded -- it's
