@@ -17,7 +17,9 @@ parameters. For high-throughput use, front this with an async job queue.
 
 from __future__ import annotations
 
+import json
 import logging
+import re
 import time
 from collections import OrderedDict
 from contextlib import asynccontextmanager
@@ -33,6 +35,9 @@ from fastapi.concurrency import run_in_threadpool
 
 from narrative_engine.api.schemas import (
     HealthResponse,
+    NarrativeItem,
+    NarrativesResponse,
+    NarrativeStock,
     NewsItemOut,
     PredictRequest,
     PredictResponse,
@@ -155,11 +160,14 @@ async def lifespan(app: FastAPI):
     app.state.cache = _ResultCache()
     app.state.news_cache = _TTLCache(_FEED_CACHE_TTL_SECONDS, _load_news_feed)
     app.state.ticker_cache = _TTLCache(_FEED_CACHE_TTL_SECONDS, _load_ticker_options)
+    app.state.narrative_cache = _TTLCache(_FEED_CACHE_TTL_SECONDS, _load_narratives)
     logger.info("Narrative prediction engine ready.")
-    # Warm the news/ticker caches off the event loop so the first request is fast.
-    await run_in_threadpool(app.state.news_cache.warm)
+    # Warm the feed caches off the event loop so the first request is fast.
+    # Ticker cache first: narratives resolves tickers -> company names through it.
     await run_in_threadpool(app.state.ticker_cache.warm)
-    logger.info("News and ticker caches warmed.")
+    await run_in_threadpool(app.state.news_cache.warm)
+    await run_in_threadpool(app.state.narrative_cache.warm)
+    logger.info("News, ticker, and narrative caches warmed.")
     yield
 
 
@@ -275,6 +283,98 @@ def _load_ticker_options() -> list[TickerOption]:
     return options
 
 
+_CACHE_FILE_RE = re.compile(r"^prediction_(\d{4}-\d{2}-\d{2})_.*\.json$")
+
+# Two narratives whose normalized topic text is at least this similar are treated
+# as the same story. The engine can emit several near-identical topic clusters
+# (e.g. multiple "rupee stable vs USD, bond yields steady" views); we keep only
+# the highest-confidence one so the feed doesn't read as duplicates.
+_NARRATIVE_DEDUP_THRESHOLD = 0.6
+
+
+def _normalize_topic(text: str) -> str:
+    return " ".join(re.sub(r"[^a-z0-9 ]", " ", str(text).lower()).split())
+
+
+def _is_duplicate_topic(candidate: str, representatives: list[str]) -> bool:
+    from difflib import SequenceMatcher
+
+    return any(
+        SequenceMatcher(None, candidate, rep).ratio() >= _NARRATIVE_DEDUP_THRESHOLD
+        for rep in representatives
+    )
+
+
+def _latest_prediction_file() -> Optional[Path]:
+    """Return the newest prediction cache file, chosen by the date in its name.
+
+    Ties (same date, e.g. _macro vs _nomacro) break on most-recently-written.
+    """
+    candidates = []
+    for path in _CACHE_DIR.glob("prediction_*.json"):
+        match = _CACHE_FILE_RE.match(path.name)
+        if match:
+            candidates.append((match.group(1), path.stat().st_mtime, path))
+    if not candidates:
+        return None
+    return max(candidates, key=lambda item: (item[0], item[1]))[2]
+
+
+def _load_narratives() -> NarrativesResponse:
+    """Read the latest prediction cache file and shape its narratives + affected stocks.
+
+    Ranked by the view's confidence (descending); confidence itself is not exposed.
+    """
+    path = _latest_prediction_file()
+    if path is None:
+        return NarrativesResponse(as_of="", narratives=[])
+
+    data = json.loads(path.read_text(encoding="utf-8"))
+    ticker_options = app.state.ticker_cache.get()
+    ticker_names = {opt.ticker: opt.name for opt in ticker_options}
+    # For micro views whose "company" is a name, not a ticker.
+    name_to_ticker = {" ".join(opt.name.lower().split()): opt.ticker for opt in ticker_options}
+
+    def stock(ticker: str) -> NarrativeStock:
+        ticker = str(ticker).strip()
+        return NarrativeStock(ticker=ticker, name=ticker_names.get(ticker, ticker))
+
+    def stock_from_company(company: str) -> NarrativeStock:
+        key = " ".join(str(company).lower().split())
+        ticker = name_to_ticker.get(key)
+        if ticker:
+            return NarrativeStock(ticker=ticker, name=ticker_names.get(ticker, ticker))
+        return NarrativeStock(ticker="", name=str(company).strip())
+
+    views = data.get("views", [])
+    # Rank by confidence desc; missing confidence sorts last.
+    views_sorted = sorted(views, key=lambda v: (v.get("confidence") is None, -(v.get("confidence") or 0.0)))
+
+    narratives: list[NarrativeItem] = []
+    for view in views_sorted:
+        mapped = view.get("mapped_tickers")
+        if mapped:
+            # [[ticker, weight], ...] -- keep all, ordered by influence weight.
+            ranked = sorted(mapped, key=lambda pair: -(pair[1] or 0.0))
+            stocks = [stock(pair[0]) for pair in ranked]
+        elif view.get("company"):
+            # Micro view: the affected stock is the company itself.
+            stocks = [stock_from_company(view["company"])]
+        else:
+            stocks = []
+        narratives.append(
+            NarrativeItem(
+                id=str(view.get("view_id", "")),
+                type=str(view.get("view_type", "")),
+                title=str(view.get("topic_name", "")).strip(),
+                stocks=stocks,
+            )
+        )
+
+    as_of = str(data.get("as_of") or (_CACHE_FILE_RE.match(path.name) or [None, ""])[1] or "")
+    return NarrativesResponse(as_of=as_of, narratives=narratives)
+
+
 @app.get("/news", response_model=list[NewsItemOut])
 async def news() -> list[NewsItemOut]:
     cache: _TTLCache = app.state.news_cache
@@ -293,3 +393,13 @@ async def tickers() -> list[TickerOption]:
     except Exception as exc:  # pragma: no cover - runtime guard
         logger.exception("Ticker load failed")
         raise HTTPException(status_code=500, detail=f"Ticker load failed: {exc}") from exc
+
+
+@app.get("/narratives", response_model=NarrativesResponse)
+async def narratives() -> NarrativesResponse:
+    cache: _TTLCache = app.state.narrative_cache
+    try:
+        return await run_in_threadpool(cache.get)
+    except Exception as exc:  # pragma: no cover - runtime guard
+        logger.exception("Narratives load failed")
+        raise HTTPException(status_code=500, detail=f"Narratives load failed: {exc}") from exc

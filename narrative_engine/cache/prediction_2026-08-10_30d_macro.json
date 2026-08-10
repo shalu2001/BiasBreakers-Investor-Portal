@@ -1,0 +1,381 @@
+{
+  "as_of": "2026-08-10",
+  "lookback_days": 30,
+  "universe": [
+    "SUN",
+    "HNB",
+    "SAMP",
+    "VONE",
+    "NTB",
+    "LFIN",
+    "AEL",
+    "HHL",
+    "LIOC",
+    "NDB",
+    "CFIN",
+    "COMB",
+    "PLC",
+    "MELS",
+    "JKH",
+    "DFCC",
+    "HAYL",
+    "SINS",
+    "DIAL",
+    "LOLC"
+  ],
+  "predictions": [
+    {
+      "ticker": "SUN",
+      "posterior": 0.003552662015694876,
+      "prior": 0.00471609401217724,
+      "tilt": -0.001163431996482364
+    },
+    {
+      "ticker": "HNB",
+      "posterior": 0.0023204548408612704,
+      "prior": 0.004069604782659804,
+      "tilt": -0.0017491499417985339
+    },
+    {
+      "ticker": "SAMP",
+      "posterior": 0.0013923185417377116,
+      "prior": 0.0033103345677162567,
+      "tilt": -0.001918016025978545
+    },
+    {
+      "ticker": "VONE",
+      "posterior": 0.0038944863259657,
+      "prior": 0.0058773702913407395,
+      "tilt": -0.0019828839653750394
+    },
+    {
+      "ticker": "NTB",
+      "posterior": 0.00214541549398232,
+      "prior": 0.004162606008411584,
+      "tilt": -0.0020171905144292642
+    },
+    {
+      "ticker": "LFIN",
+      "posterior": 0.0030862895441472063,
+      "prior": 0.005125626617694165,
+      "tilt": -0.002039337073546959
+    },
+    {
+      "ticker": "AEL",
+      "posterior": 0.0034562952783713783,
+      "prior": 0.005768674766003936,
+      "tilt": -0.002312379487632558
+    },
+    {
+      "ticker": "HHL",
+      "posterior": 0.00511420510916343,
+      "prior": 0.0077100761286805685,
+      "tilt": -0.0025958710195171384
+    },
+    {
+      "ticker": "LIOC",
+      "posterior": 0.004652565724389214,
+      "prior": 0.007303633756370206,
+      "tilt": -0.002651068031980992
+    },
+    {
+      "ticker": "NDB",
+      "posterior": 0.005119091828925984,
+      "prior": 0.00802071536133419,
+      "tilt": -0.002901623532408205
+    },
+    {
+      "ticker": "CFIN",
+      "posterior": 0.004905279867087347,
+      "prior": 0.007810654992629316,
+      "tilt": -0.002905375125541969
+    },
+    {
+      "ticker": "COMB",
+      "posterior": 0.003581470332374089,
+      "prior": 0.006602766850873533,
+      "tilt": -0.0030212965184994436
+    },
+    {
+      "ticker": "PLC",
+      "posterior": 0.005992682263080448,
+      "prior": 0.009144616357450867,
+      "tilt": -0.003151934094370419
+    },
+    {
+      "ticker": "MELS",
+      "posterior": 0.004893714283324541,
+      "prior": 0.008054758042897153,
+      "tilt": -0.003161043759572612
+    },
+    {
+      "ticker": "JKH",
+      "posterior": 0.006527331938684657,
+      "prior": 0.009843355706300485,
+      "tilt": -0.003316023767615828
+    },
+    {
+      "ticker": "DFCC",
+      "posterior": 0.0036992531934998455,
+      "prior": 0.007103472963767163,
+      "tilt": -0.0034042197702673174
+    },
+    {
+      "ticker": "HAYL",
+      "posterior": 0.0065656355135289375,
+      "prior": 0.010229327818336034,
+      "tilt": -0.0036636923048070967
+    },
+    {
+      "ticker": "SINS",
+      "posterior": 0.01203466833177879,
+      "prior": 0.019258733381678567,
+      "tilt": -0.007224065049899777
+    },
+    {
+      "ticker": "DIAL",
+      "posterior": 0.013671084279216447,
+      "prior": 0.021640037950080956,
+      "tilt": -0.007968953670864509
+    },
+    {
+      "ticker": "LOLC",
+      "posterior": 0.0019174291626415998,
+      "prior": 0.010056647617155063,
+      "tilt": -0.008139218454513463
+    }
+  ],
+  "views": [
+    {
+      "view_id": "macro-macro-0-1",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "Sri Lanka is strategically enhancing its international trade relations and digital economy initiatives to drive substantial export growth and investment opportunities.",
+      "Qi": 0.0032032857662686377,
+      "Si": 0.25950218340611353,
+      "Si_normalized": 0.2538298490352481,
+      "persistence": 0.8387096774193549,
+      "attention": 229,
+      "cluster_size": 229,
+      "sentiment_std": 0.44052618115549314,
+      "diffusion_k": 4.732953621231006,
+      "diffusion_c": 0.5046990014009787,
+      "diffusion_fitted": true,
+      "confidence": 0.4762806859308255,
+      "mapped_tickers": [
+        [
+          "SINS",
+          0.030562907855530817
+        ],
+        [
+          "LIOC",
+          0.02450955303608383
+        ],
+        [
+          "VONE",
+          0.03532793565726502
+        ],
+        [
+          "SUN",
+          0.020076925932201648
+        ],
+        [
+          "SAMP",
+          0.05498684604752106
+        ],
+        [
+          "PLC",
+          0.015670788860913564
+        ],
+        [
+          "NTB",
+          0.030200613151579167
+        ],
+        [
+          "NDB",
+          0.016108358119776133
+        ],
+        [
+          "MELS",
+          0.07406015267809384
+        ],
+        [
+          "LOLC",
+          0.07929178473561599
+        ],
+        [
+          "LFIN",
+          0.030071188411448235
+        ],
+        [
+          "JKH",
+          0.12244768591690652
+        ],
+        [
+          "HNB",
+          0.060706325609115507
+        ],
+        [
+          "HHL",
+          0.03210947337967057
+        ],
+        [
+          "HAYL",
+          0.06171838024891272
+        ],
+        [
+          "DIAL",
+          0.14000589396930044
+        ],
+        [
+          "DFCC",
+          0.019546654274235378
+        ],
+        [
+          "COMB",
+          0.10853855033066315
+        ],
+        [
+          "CFIN",
+          0.017884545847240394
+        ],
+        [
+          "AEL",
+          0.026175435937925914
+        ]
+      ]
+    },
+    {
+      "view_id": "macro-macro-1-2",
+      "view_type": "macro",
+      "company": null,
+      "topic_name": "The Sri Lankan economy faces pressure from currency depreciation and inflation challenges, necessitating interventions to stabilize the rupee amid heightened foreign exchange demand.",
+      "Qi": -0.0018385051302021666,
+      "Si": -0.15500993377483444,
+      "Si_normalized": -0.15378022113629514,
+      "persistence": 0.8709677419354839,
+      "attention": 151,
+      "cluster_size": 151,
+      "sentiment_std": 0.7403956375479233,
+      "diffusion_k": 5.277557246493624,
+      "diffusion_c": 0.48497998424313166,
+      "diffusion_fitted": true,
+      "confidence": 0.20523695670295072,
+      "mapped_tickers": [
+        [
+          "SAMP",
+          0.13245976844766472
+        ],
+        [
+          "NTB",
+          0.07275133077424469
+        ],
+        [
+          "NDB",
+          0.03880399659172303
+        ],
+        [
+          "HNB",
+          0.14623762611411847
+        ],
+        [
+          "COMB",
+          0.26146237287404833
+        ],
+        [
+          "DFCC",
+          0.04708663044347311
+        ],
+        [
+          "LOLC",
+          0.19100879939185508
+        ],
+        [
+          "PLC",
+          0.03774992044669989
+        ],
+        [
+          "LFIN",
+          0.07243955491617263
+        ]
+      ]
+    },
+    {
+      "view_id": "micro-LOLC Holdings PLC-0-1",
+      "view_type": "micro",
+      "company": "LOLC Holdings PLC",
+      "topic_name": "LOLC Holdings shares experienced a decline of 69 percent, negatively impacting its competitive position on the Colombo Stock Exchange.",
+      "Qi": -0.002371943239150602,
+      "Si": -0.9081714285714286,
+      "Si_normalized": -0.7202534399460719,
+      "persistence": 0.16129032258064516,
+      "attention": 7,
+      "cluster_size": 7,
+      "sentiment_std": 0.09129992511788067,
+      "diffusion_k": 7.724436077760025,
+      "diffusion_c": 0.2961749601454728,
+      "diffusion_fitted": true,
+      "confidence": 0.48930004032114116,
+      "mapped_tickers": null
+    },
+    {
+      "view_id": "micro-LOLC Holdings PLC-1-2",
+      "view_type": "micro",
+      "company": "LOLC Holdings PLC",
+      "topic_name": "LOLC Microfinance Bank Pakistan has inaugurated its new head office in Islamabad, marking a significant expansion of its operations in the region.",
+      "Qi": 0.002161449628099698,
+      "Si": 0.7877400000000001,
+      "Si_normalized": 0.6571268457900854,
+      "persistence": 0.16129032258064516,
+      "attention": 5,
+      "cluster_size": 5,
+      "sentiment_std": 0.022832836004316247,
+      "diffusion_k": 2.5800924961987586,
+      "diffusion_c": 0.28667358229084094,
+      "diffusion_fitted": true,
+      "confidence": 0.44416689272531074,
+      "mapped_tickers": null
+    }
+  ],
+  "meta": {
+    "window_start": "2026-07-11",
+    "window_end": "2026-08-10",
+    "news_article_count": 429,
+    "macro_view_count": 2,
+    "micro_view_count": 2,
+    "total_view_count": 4,
+    "universe_size": 20,
+    "macro_overrides_enabled": true,
+    "macro_overrides_applied": [
+      "macro-macro-0-1",
+      "macro-macro-1-2"
+    ],
+    "macro_override_audit": {
+      "macro-macro-0-1": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates a positive outlook for sectors involved in trade and digital economy initiatives, which includes a wide range of companies in consumer discretionary, energy, financials, and industrials sectors that are likely to benefit from enhanced international trade relations and export growth.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_830d456649",
+        "candidate_count": 20,
+        "timestamp": "2026-08-10T01:19:44.554506+00:00"
+      },
+      "macro-macro-1-2": {
+        "view_kind": "absolute",
+        "rationale": "The macro narrative indicates economic pressure in Sri Lanka, particularly affecting the financial sector due to currency depreciation and inflation. Financial institutions are likely to be involved in stabilizing the economy, hence the inclusion of multiple banks and financial services companies.",
+        "model": "gpt-4o-mini",
+        "seed": 42,
+        "system_fingerprint": "fp_ab0a2ab924",
+        "candidate_count": 20,
+        "timestamp": "2026-08-10T01:19:47.106947+00:00"
+      }
+    },
+    "covariance_window_trading_days": 30,
+    "price_trading_days_loaded": 30,
+    "bl_use_view_confidence": true,
+    "macro_alpha": 0.16747222060949643,
+    "macro_lambda": 0.744442959371803,
+    "micro_alpha": 0.10285630801219799,
+    "micro_lambda": 1.3541701726546824
+  }
+}
