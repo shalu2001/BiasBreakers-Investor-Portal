@@ -97,7 +97,7 @@ def play_and_recover(a, lam, g, tau, k, noise, seed):
     el = er.estimate_lambda()
     if el and el.get("estimate") is not None and el["confidence"]["level"] != "uninformative":
         lam_hat = float(el["estimate"])
-    return lam_hat, gam_hat
+    return cal['alpha'], lam_hat, gam_hat
 
 
 def band(v, p33, p67):
@@ -120,13 +120,14 @@ def run(n=120, base_seed=90000):
         lam = rng.uniform(1.1, 4.2)      # spans all three risk bands
         g = rng.uniform(0.0, 4.0)        # spans all three style bands
         tau = rng.uniform(0.4, 1.0); k = rng.uniform(0.6, 1.0); noise = rng.uniform(0.10, 0.20)
-        lam_hat, gam_hat = play_and_recover(a, lam, g, tau, k, noise, base_seed + i)
-        rows.append((lam, g, lam_hat, gam_hat))
-    df = pd.DataFrame(rows, columns=["lam", "gam", "lam_hat", "gam_hat"])
+        alpha_hat, lam_hat, gam_hat = play_and_recover(a, lam, g, tau, k, noise, base_seed + i)
+        rows.append((a, lam, g, alpha_hat, lam_hat, gam_hat))
+    df = pd.DataFrame(rows, columns=["a","lam","gam","a_hat","lam_hat","gam_hat"])
 
     # 1. recovery quality
-    rl = pearsonr(df.lam, df.lam_hat)[0]; rg = pearsonr(df.gam, df.gam_hat)[0]
+    ra = pearsonr(df.a, df.a_hat)[0]; rl = pearsonr(df.lam, df.lam_hat)[0]; rg = pearsonr(df.gam, df.gam_hat)[0]
     print("1. RECOVERY QUALITY")
+    print(f"   alpha  : r={ra:.3f}   MAE={np.mean(np.abs(df.a-df.a_hat)):.3f}   recovered range {df.a_hat.min():.2f}-{df.a_hat.max():.2f} (mean {df.a_hat.mean():.2f})")
     print(f"   lambda : r={rl:.3f}   MAE={np.mean(np.abs(df.lam-df.lam_hat)):.3f}")
     print(f"   gamma  : r={rg:.3f}   MAE={np.mean(np.abs(df.gam-df.gam_hat)):.3f}\n")
 

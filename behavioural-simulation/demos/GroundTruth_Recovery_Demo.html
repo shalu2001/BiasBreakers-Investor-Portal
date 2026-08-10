@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ground-Truth Recovery — Live Demonstration</title>
+<title>Ground-Truth Parameter Recovery</title>
 <style>
   :root{
     --bg:#0B0E14; --surface:#151922; --surface2:#1C212C; --border:#262C39;
@@ -83,43 +83,40 @@
 <body>
 <div class="wrap">
 
-  <h1><span class="mark">◆</span> Ground-Truth Recovery <span style="color:var(--dim);font-weight:400">— live demonstration</span></h1>
-  <p class="sub">You can't check a real person's hidden psychology against a "true answer" — there isn't one. So we invent
-  investors whose psychology <em>we choose</em>, hide those numbers inside years of trading, and prove the system can pull
-  them back out. <strong style="color:var(--text)">Set a hidden personality below and watch it get recovered from behaviour alone.</strong></p>
+  <h1><span class="mark">◆</span> Ground-Truth Parameter Recovery <span style="color:var(--dim);font-weight:400">· interactive validation</span></h1>
+  <p class="sub">A recovered parameter can only be trusted if it can be checked against a known truth, which real investors do not provide. We therefore construct synthetic investors with pre-set behavioural parameters, embed those parameters in years of simulated trading, and test whether the estimator recovers them from behaviour alone. <strong style="color:var(--text)">Define a profile below and observe the recovery.</strong></p>
 
   <!-- ===== SECTION 1: interactive ===== -->
   <div class="card">
-    <div class="kicker">Try it yourself</div>
-    <h2>The Recovery Machine</h2>
-    <p class="lead">These three numbers <em>are</em> the hidden personality. The machine never sees them — it only sees the
-    trades they produce. If it hands your numbers back, the measurement is real.</p>
+    <div class="kicker">Interactive validation</div>
+    <h2>Single-investor recovery</h2>
+    <p class="lead">The three parameters below define a hidden behavioural profile. The estimator never observes them directly; it observes only the resulting trades. Recovering the original values confirms that the measurement is valid.</p>
 
     <div class="grid">
       <div>
-        <div class="panel-title">1 · Choose a hidden personality</div>
+        <div class="panel-title">1 · Define the hidden profile</div>
 
         <div class="sliderrow">
-          <div class="top"><span><span class="name">Loss aversion</span> &nbsp;<span class="desc">how much more losing hurts</span></span><span class="val" id="v-l">2.5</span></div>
+          <div class="top"><span><span class="name">Loss aversion (λ)</span> &nbsp;<span class="desc">weight on losses vs. equal gains</span></span><span class="val" id="v-l">2.5</span></div>
           <input type="range" id="s-l" min="1" max="5" step="0.05" value="2.5">
         </div>
         <div class="sliderrow">
-          <div class="top"><span><span class="name">Sensitivity</span> &nbsp;<span class="desc">how fast big swings stop feeling bigger</span></span><span class="val" id="v-a">0.85</span></div>
+          <div class="top"><span><span class="name">Diminishing sensitivity (α)</span> &nbsp;<span class="desc">curvature of the value function</span></span><span class="val" id="v-a">0.85</span></div>
           <input type="range" id="s-a" min="0.5" max="1" step="0.01" value="0.85">
         </div>
         <div class="sliderrow">
-          <div class="top"><span><span class="name">Regret / FOMO</span> &nbsp;<span class="desc">how much it stings to lag the market</span></span><span class="val" id="v-g">1.5</span></div>
+          <div class="top"><span><span class="name">Regret / FOMO (γ)</span> &nbsp;<span class="desc">weight on underperforming the market</span></span><span class="val" id="v-g">1.5</span></div>
           <input type="range" id="s-g" min="0" max="5" step="0.05" value="1.5">
         </div>
-        <button class="btn" id="run">▶ &nbsp;Hide it in behaviour, then recover it</button>
+        <button class="btn" id="run">Embed in behaviour, then recover</button>
       </div>
 
       <div>
-        <div class="panel-title">2 · What the machine recovers</div>
+        <div class="panel-title">2 · Recovered estimates</div>
         <div class="stage" id="stage">
           <div class="idle" id="idle">
-            <div class="big">🎛️ → 📈 → 🎯</div>
-            Set the sliders, then press the button.<br>The machine will simulate ~800 trading decisions<br>and reconstruct your hidden numbers from them alone.
+            <div class="big" style="font-size:14px;letter-spacing:.14em;color:var(--dim)">DEFINE &rarr; SIMULATE &rarr; RECOVER</div>
+            Define a profile and run the recovery.<br>The estimator simulates ~800 trading decisions<br>and reconstructs the parameters from those decisions alone.
           </div>
 
           <div id="working" class="hidden" style="text-align:center">
@@ -128,10 +125,10 @@
           </div>
 
           <div id="results" class="hidden">
-            <div class="result-row"><span class="lab">Loss aversion</span><div class="bars" id="b-l"></div></div>
-            <div class="result-row"><span class="lab">Sensitivity</span><div class="bars" id="b-a"></div></div>
-            <div class="result-row"><span class="lab">Regret / FOMO</span><div class="bars" id="b-g"></div></div>
-            <div class="legend"><span><i style="background:var(--navy)"></i>What you hid</span><span><i style="background:var(--accent)"></i>What it recovered</span></div>
+            <div class="result-row"><span class="lab">Loss aversion (λ)</span><div class="bars" id="b-l"></div></div>
+            <div class="result-row"><span class="lab">Sensitivity (α)</span><div class="bars" id="b-a"></div></div>
+            <div class="result-row"><span class="lab">Regret / FOMO (γ)</span><div class="bars" id="b-g"></div></div>
+            <div class="legend"><span><i style="background:var(--navy)"></i>Set (true)</span><span><i style="background:var(--accent)"></i>Recovered</span></div>
             <div class="verdict" id="verdict"></div>
           </div>
         </div>
@@ -141,12 +138,11 @@
 
   <!-- ===== SECTION 2: the real proof ===== -->
   <div class="card">
-    <div class="kicker">The full proof · real historical market data</div>
-    <h2>It isn't a one-off — here it is across five very different investors</h2>
-    <p class="lead">Five personalities set in advance (blue), each traded six years of the real Colombo Stock Exchange, then
-    reconstructed from their decisions alone (gold). The bars line up.</p>
+    <div class="kicker">Full validation · real historical market data</div>
+    <h2>Recovery across five distinct investor profiles</h2>
+    <p class="lead">Five behavioural profiles defined in advance (blue) each traded six years of real Colombo Stock Exchange history, and were then reconstructed from their decisions alone (gold).</p>
 
-    <div class="persona head"><span>Investor</span><span>Loss aversion</span><span>Sensitivity</span><span>Regret</span></div>
+    <div class="persona head"><span>Investor</span><span>Loss aversion (λ)</span><span>Sensitivity (α)</span><span>Regret (γ)</span></div>
     <div id="personas"></div>
 
     <div class="stats">
@@ -158,16 +154,13 @@
 
   <!-- ===== SECTION 3: drift ===== -->
   <div class="card">
-    <div class="kicker">And when psychology changes</div>
-    <h2>We can follow the change over time</h2>
-    <p class="lead">Here one investor's loss aversion was made to <em>spike during the real 2022 crash</em> and settle afterwards
-    (blue). Re-reading their behaviour over time (gold) tracks the moving value — which is why the profile is updated
-    continuously rather than fixed.</p>
+    <div class="kicker">Time-varying psychology</div>
+    <h2>Recovering a time-varying parameter</h2>
+    <p class="lead">One investor's loss aversion was configured to <em>rise during the 2022 market crash</em> and relax afterwards (blue). A rolling re-estimation over time (gold) tracks the moving value, which is why the profile is re-estimated continuously rather than fixed once.</p>
     <div class="driftwrap"><svg id="drift" viewBox="0 0 1000 340" preserveAspectRatio="xMidYMid meet"></svg></div>
   </div>
 
-  <p class="foot">Every number here is recovered from simulated behaviour — no personality is ever read directly.
-  The measurement recovers a hidden input reliably; whether one calls that input "loss aversion" is a separate, theoretical question.</p>
+  <p class="foot">Every value shown is recovered from simulated behaviour; no parameter is read directly. The estimator recovers a known hidden input reliably, and the interpretation of that input as a behavioural trait is grounded in prospect and regret theory.</p>
 </div>
 
 <script>
@@ -228,7 +221,7 @@ function drawBars(el,trueV,recV,min,max){
 }
 
 // ---- run ----
-const steps=["Simulating six years of trading…","800 buy / sell / hold decisions made…","Hiding the personality inside the behaviour…","Reading the behaviour back…","Reconstructing the hidden numbers…"];
+const steps=["Simulating six years of trading…","Generating ~800 buy / sell / hold decisions…","Embedding the profile in behaviour…","Fitting the choice model…","Recovering the parameters…"];
 $('run').addEventListener('click',()=>{
   const a=+S.a.value,l=+S.l.value,g=+S.g.value;
   $('run').disabled=true;$('idle').classList.add('hidden');$('results').classList.add('hidden');
@@ -243,8 +236,8 @@ $('run').addEventListener('click',()=>{
     drawBars($('b-l'),l,r.l,1,5); drawBars($('b-a'),a,r.a,0.5,1); drawBars($('b-g'),g,r.g,0,5);
     const err=(Math.abs(a-r.a)+Math.abs(l-r.l)/4+Math.abs(g-r.g)/5)/3;
     const vv=$('verdict');
-    vv.textContent = err<0.12 ? "✓ Recovered. Your hidden personality was reconstructed from the trades alone."
-                              : "✓ Recovered — close match from behaviour alone.";
+    vv.textContent = err<0.12 ? "Parameters recovered from behaviour alone."
+                              : "Parameters recovered with a close match from behaviour alone.";
     setTimeout(()=>vv.classList.add('show'),400);
     $('run').disabled=false;
   },1650);
@@ -289,7 +282,7 @@ const RL=[1.964,2.178,2.17,2.278,2.213,2.33,2.617,2.699,2.83,2.833,3.04,2.983,3.
   s+=path(RL,'stroke="#D4A73C" stroke-width="2"');
   for(let i=0;i<X.length;i++) s+=`<circle cx="${sx(X[i]).toFixed(1)}" cy="${sy(RL[i]).toFixed(1)}" r="2.6" fill="#D4A73C"/>`;
   // legend
-  s+=`<rect x="${W-250}" y="${pad.t}" width="12" height="12" fill="#5B8DEF"/><text x="${W-232}" y="${pad.t+11}" fill="#7C8394" font-size="12" font-family="sans-serif">true (drifts)</text>`;
+  s+=`<rect x="${W-250}" y="${pad.t}" width="12" height="12" fill="#5B8DEF"/><text x="${W-232}" y="${pad.t+11}" fill="#7C8394" font-size="12" font-family="sans-serif">true (time-varying)</text>`;
   s+=`<rect x="${W-250}" y="${pad.t+22}" width="12" height="12" fill="#D4A73C"/><text x="${W-232}" y="${pad.t+33}" fill="#7C8394" font-size="12" font-family="sans-serif">recovered over time</text>`;
   $('drift').innerHTML=s;
 })();
