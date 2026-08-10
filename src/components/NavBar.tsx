@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../session/AuthContext';
+import { useSession } from '../session/SessionContext';
 import { BrandLockup } from './BrandLockup';
 import styles from './NavBar.module.css';
 
@@ -13,10 +14,17 @@ const links = [
 
 export function NavBar() {
   const { logout } = useAuth();
+  const { reset } = useSession();
   const navigate = useNavigate();
 
   function handleLogout() {
     logout();
+    // Clears the sessionStorage-backed recommendation/onboarding/profile
+    // state too -- otherwise it outlives the login (sessionStorage isn't
+    // tied to who's signed in), so the next account in this tab would land
+    // on /recommend and see the previous user's optimized table already
+    // populated instead of the "click Optimize" empty state.
+    reset();
     navigate('/login');
   }
 
