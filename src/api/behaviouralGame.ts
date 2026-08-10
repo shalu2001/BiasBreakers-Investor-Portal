@@ -33,6 +33,7 @@ export interface SessionState {
   round_label: string;
   day: number;
   total_days: number;
+  total_checkpoints: number;
   market_state: MarketState;
   cash: number;
   fixed_ticker: string | null;
@@ -64,10 +65,11 @@ export interface LogEntry {
 
 export type AdvanceResult =
   | ({ status: 'at_checkpoint'; round_label: string; day: number; total_days: number;
+       total_checkpoints: number;
        market_state: MarketState; cash: number; equity: number; benchmark: Benchmark | null })
   | ({ status: 'new_scenario_started' | 'new_block_started'; round_label: string; day: number;
-       total_days: number; market_state: MarketState; cash: number; fixed_ticker: string | null;
-       benchmark: Benchmark | null })
+       total_days: number; total_checkpoints: number; market_state: MarketState; cash: number;
+       fixed_ticker: string | null; benchmark: Benchmark | null })
   | ({ status: 'events_started'; event: GameEvent; total_events: number })
   | ({ status: 'all_blocks_complete' });
 
@@ -91,7 +93,7 @@ export async function createSession(): Promise<SessionState> {
   return data;
 }
 
-export async function getHistory(sessionId: string, ticker: string, lookback = 15): Promise<HistoryBar[]> {
+export async function getHistory(sessionId: string, ticker: string, lookback = 120): Promise<HistoryBar[]> {
   const { data } = await gameClient.get<{ history: HistoryBar[] }>(
     `/session/${sessionId}/history/${ticker}`, { params: { lookback } },
   );

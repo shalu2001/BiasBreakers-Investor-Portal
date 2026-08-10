@@ -61,8 +61,11 @@ export function RegisterPage() {
             id="password" type="password" placeholder="At least 6 characters" value={password}
             onChange={(e) => setPassword(e.target.value)} className={styles.input} required
           />
+          {password.length > 0 && password.length < 6 && (
+            <p className={styles.pwHint}>Password must be at least 6 characters.</p>
+          )}
 
-          {error && <p style={{ color: 'var(--color-danger, #c0392b)', fontSize: 13, margin: '4px 0 0' }}>{error}</p>}
+          {error && <p className={styles.error}>{error}</p>}
 
           <button type="submit" className={styles.submitButton} disabled={busy}>
             {busy ? 'Creating…' : 'Create account →'}

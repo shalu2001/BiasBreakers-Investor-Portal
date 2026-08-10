@@ -70,12 +70,22 @@
   display: flex; justify-content: space-between; align-items: center;
   padding: 18px 32px; border-bottom: 1px solid var(--color-border); background: var(--color-surface);
 }
-.topbarLeft { display: flex; align-items: center; gap: 10px; }
+.topbarLeft { display: flex; align-items: center; gap: 12px; }
 .markSmall { color: var(--color-accent); font-size: 18px; }
 .topbarLabel { font-family: var(--font-body); font-weight: 700; font-size: 16px; }
+.brandStack { display: flex; flex-direction: column; gap: 2px; }
+.brandSub {
+  font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--color-text-muted);
+}
 .roundBadge {
   font-size: 12px; font-weight: 600; color: var(--color-bg);
   background: var(--color-accent); padding: 4px 12px; border-radius: 20px; margin-left: 6px;
+}
+.sessionBadge {
+  font-size: 12px; font-weight: 600; color: var(--color-text-muted);
+  background: var(--color-surface2); border: 1px solid var(--color-border);
+  padding: 4px 12px; border-radius: 20px;
 }
 .topbarRight { display: flex; gap: 36px; }
 .stat { display: flex; flex-direction: column; gap: 4px; text-align: right; }
@@ -284,18 +294,58 @@
 .eventPrompt .mono { color: var(--color-accent); }
 
 /* ---------- results ---------- */
-.resultsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; text-align: left; }
+.resultArchetype {
+  font-size: 24px; font-weight: 700; color: var(--color-text);
+  margin-bottom: 20px; text-align: center;
+}
+.resultsGrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; row-gap: 18px; text-align: left; margin-top: 4px; }
 .resultCard { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 10px; padding: 20px; }
-.resultLabel { font-size: 12px; color: var(--g-text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.resultLabel {
+  font-size: 12px; color: var(--g-text-dim); text-transform: uppercase; letter-spacing: 0.05em;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.resultEarly {
+  font-size: 9.5px; font-weight: 600; letter-spacing: 0.03em; text-transform: uppercase;
+  color: var(--color-accent); background: var(--g-accent-soft);
+  padding: 2px 7px; border-radius: 999px;
+}
 .resultValue { font-family: var(--font-mono); font-size: 26px; font-weight: 600; color: var(--color-accent); margin-bottom: 10px; }
 .resultConf { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-bottom: 8px; cursor: help; }
 .confWarn { color: var(--color-accent); background: var(--g-accent-soft); }
 .confBad { color: var(--color-danger); background: var(--g-loss-soft); }
 .resultBlurb { font-size: 12px; color: var(--color-text-muted); line-height: 1.5; }
 .resultsNote { margin-top: 22px; font-size: 13px; color: var(--g-text-dim); }
+/* segmented toggle: investor profile vs dev detail */
+.viewToggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  margin: 4px auto 24px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+}
+.viewTab, .viewTabActive {
+  border: none; cursor: pointer; font: inherit; font-size: 13px; font-weight: 600;
+  padding: 8px 16px; border-radius: 7px;
+  background: transparent; color: var(--color-text-muted);
+}
+.viewTabActive { background: var(--color-accent); color: var(--color-bg); }
 
 /* ---------- transition ---------- */
 .transitionIcon { font-size: 28px; color: var(--color-accent); margin-bottom: 24px; }
+
+.transitionStep {
+  display: block;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--color-accent-text); margin-bottom: 14px;
+}
+.transitionDots { display: flex; justify-content: center; gap: 8px; margin-bottom: 22px; }
+.dot, .dotOn {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--color-border);
+}
+.dotOn { background: var(--color-accent); }
 
 /* ---------- help modal ---------- */
 .helpModal { position: fixed; inset: 0; z-index: 70; display: flex; align-items: center; justify-content: center; padding: 24px; }

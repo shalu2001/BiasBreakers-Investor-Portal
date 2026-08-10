@@ -81,6 +81,29 @@ class TickerOption(BaseModel):
     name: str
 
 
+class NarrativeStock(BaseModel):
+    """A stock affected by a narrative."""
+
+    ticker: str
+    name: str
+
+
+class NarrativeItem(BaseModel):
+    """A narrative view and the stocks it affects (metrics intentionally omitted)."""
+
+    id: str
+    type: str = Field(..., description="'macro' or 'micro'.")
+    title: str = Field(..., description="The narrative text (topic_name).")
+    stocks: List[NarrativeStock] = Field(default_factory=list)
+
+
+class NarrativesResponse(BaseModel):
+    """Latest narratives (ranked by confidence) and their affected stocks."""
+
+    as_of: str
+    narratives: List[NarrativeItem]
+
+
 class HealthResponse(BaseModel):
     status: str
     mongo: str

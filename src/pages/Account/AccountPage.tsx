@@ -7,20 +7,12 @@ import type { PersonaProfile } from '../../api/persona';
 import { ExistingHoldingsEditor } from '../../components/ExistingHoldingsEditor';
 import styles from './AccountPage.module.css';
 
-const GOALS = [
-  { key: 'grow', label: 'Grow my wealth' },
-  { key: 'income', label: 'Steady income' },
-  { key: 'learn', label: 'Learn & experiment' },
-  { key: 'beat', label: 'Beat the market' },
-];
-
 export function AccountPage() {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
 
   const [name, setName] = useState(user?.name ?? '');
   const [amount, setAmount] = useState('');
-  const [goal, setGoal] = useState<string | null>(null);
   const [hasExisting, setHasExisting] = useState<boolean | null>(null);
   const [holdings, setHoldings] = useState<ExistingHolding[]>([]);
   const [persona, setPersona] = useState<PersonaProfile | null>(null);
@@ -49,7 +41,6 @@ export function AccountPage() {
         if (cancelled) return;
         const ob = p.onboarding ?? {};
         setAmount(ob.investmentAmount != null ? String(ob.investmentAmount) : '');
-        setGoal(ob.goal ?? null);
         setHasExisting(ob.hasExistingPortfolio ?? null);
         setHoldings(ob.existingHoldings ?? []);
         const params = p.parameters ?? {};
@@ -98,7 +89,7 @@ export function AccountPage() {
         // before they switched their answer to "Yes".
         investmentAmount:
           hasExisting !== true && amount.trim() !== '' && !Number.isNaN(amt) && amt > 0 ? amt : null,
-        goal,
+        goal: null,
         // Must be included here too -- PUT /portal/profile/onboarding
         // replaces the whole onboarding doc, so omitting this would
         // silently wipe out holdings entered during onboarding.
@@ -169,19 +160,6 @@ export function AccountPage() {
             </div>
           </>
         )}
-
-        <label className={styles.label}>Main goal</label>
-        <div className={styles.chips}>
-          {GOALS.map((g) => (
-            <button
-              type="button" key={g.key}
-              className={goal === g.key ? styles.chipOn : styles.chip}
-              onClick={() => setGoal(g.key)}
-            >
-              {g.label}
-            </button>
-          ))}
-        </div>
 
         <div className={styles.actions}>
           <button type="submit" className={styles.saveBtn} disabled={savingPlan}>

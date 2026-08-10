@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getNews, getTickers, type NewsCategory, type NewsItem, type TickerOption } from '../../api/news';
-import { PORTFOLIO_FIXTURE } from '../../mocks/fixtures';
-import { MultiSelectDropdown } from '../../components/MultiSelectDropdown';
+import { getNews, type NewsCategory, type NewsItem } from '../../api/news';
 import { EmptyState } from '../../components/ui';
 import { formatTimeAgo } from '../../utils/timeAgo';
 import styles from './NewsPage.module.css';
@@ -10,11 +8,6 @@ import styles from './NewsPage.module.css';
 type CategoryFilter = 'all' | NewsCategory;
 
 const PAGE_SIZE = 8;
-
-const FALLBACK_TICKER_OPTIONS: TickerOption[] = PORTFOLIO_FIXTURE.map((holding) => ({
-  ticker: holding.ticker,
-  name: holding.name,
-}));
 
 function snippet(text: string, max = 180): string {
   if (!text || text.length <= max) return text;
@@ -37,9 +30,7 @@ function windowedPages(current: number, total: number): (number | 'gap')[] {
 export function NewsPage() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
-  const [tickerOptions, setTickerOptions] = useState<TickerOption[]>(FALLBACK_TICKER_OPTIONS);
   const [category, setCategory] = useState<CategoryFilter>('all');
-  const [selectedTickers, setSelectedTickers] = useState<string[]>([]);
   const [page, setPage] = useState(1);
 
   // Fetch the news window exactly once, on initial mount. No mock fallback:
@@ -53,32 +44,15 @@ export function NewsPage() {
       .catch(() => setStatus('error'));
   }, []);
 
-  useEffect(() => {
-    getTickers()
-      .then((options) => setTickerOptions(options.length > 0 ? options : FALLBACK_TICKER_OPTIONS))
-      .catch(() => setTickerOptions(FALLBACK_TICKER_OPTIONS));
-  }, []);
-
-  const dropdownOptions = useMemo(
-    () => tickerOptions.map((option) => ({ value: option.ticker, label: option.name, sublabel: option.ticker })),
-    [tickerOptions],
-  );
-
   const filtered = useMemo(
-    () =>
-      news.filter((item) => {
-        const matchesCategory = category === 'all' || item.category === category;
-        const matchesTicker =
-          selectedTickers.length === 0 || (item.ticker && selectedTickers.includes(item.ticker));
-        return matchesCategory && matchesTicker;
-      }),
-    [news, category, selectedTickers],
+    () => news.filter((item) => category === 'all' || item.category === category),
+    [news, category],
   );
 
   // any change to the filter set (or the data) sends us back to page one
   useEffect(() => {
     setPage(1);
-  }, [category, selectedTickers, news]);
+  }, [category, news]);
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const current = Math.min(page, pageCount);
@@ -101,12 +75,6 @@ export function NewsPage() {
               </button>
             ))}
           </div>
-          <MultiSelectDropdown
-            placeholder="All stocks"
-            options={dropdownOptions}
-            selected={selectedTickers}
-            onChange={setSelectedTickers}
-          />
         </div>
       </div>
 
@@ -153,8 +121,8 @@ export function NewsPage() {
             ) : (
               <EmptyState
                 icon="◷"
-                title="No stories match these filters"
-                message="Try switching category or clearing the stock filter."
+                title="No stories in this category"
+                message="Try a different category."
               />
             )}
           </div>

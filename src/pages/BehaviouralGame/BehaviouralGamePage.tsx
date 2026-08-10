@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../session/SessionContext';
 import { saveParameters } from '../../api/portal';
+import { profileToPersona, buildInsight, type TraitConfidence } from '../../session/profileToPersona';
 import {
   createSession, getHistory, allocate, advance, commitEvent, finishSession,
   type MarketState, type Benchmark, type HistoryBar, type GameEvent, type FinishResult,
@@ -11,6 +12,7 @@ import { GameCandles } from './GameCandles';
 import { HelpModal } from './HelpModal';
 import { GameTour, type TourStep } from './GameTour';
 import { DevAutoplayPanel } from './DevAutoplayPanel';
+import { BrandLockup } from '../../components/BrandLockup';
 import styles from './game.module.css';
 
 // ============================================================================
@@ -19,6 +21,9 @@ import styles from './game.module.css';
 // ============================================================================
 
 type Screen = 'start' | 'trading' | 'transition' | 'events' | 'results';
+
+// 2 behavioural blocks (loss-aversion + regret) x 3 market scenarios each.
+const TOTAL_FUNDS = 6;
 type Tone = 'neutral' | 'gain' | 'loss';
 interface Consequence { tone: Tone; text: string }
 interface DriftInfo { dir: 'up' | 'down'; ticker: string; priceChg: number; from: number; to: number }
@@ -62,6 +67,9 @@ export function BehaviouralGamePage() {
   const [roundLabel, setRoundLabel] = useState('Fund A');
   const [day, setDay] = useState(0);
   const [totalDays, setTotalDays] = useState(0);
+  const [decisionNum, setDecisionNum] = useState(1); // 1-based decision within the current fund
+  const [totalDecisions, setTotalDecisions] = useState(0); // checkpoints in the current fund
+  const [fundIndex, setFundIndex] = useState(1); // 1..TOTAL_FUNDS across the whole game
   const [benchmark, setBenchmark] = useState<Benchmark | null>(null);
   const [consequence, setConsequence] = useState<Consequence>({ tone: 'neutral', text: '' });
   const [drift, setDrift] = useState<DriftInfo | null>(null);
@@ -76,6 +84,7 @@ export function BehaviouralGamePage() {
   const [eventCommit, setEventCommit] = useState(50);
   const [commitBusy, setCommitBusy] = useState(false);
   const [results, setResults] = useState<FinishResult | null>(null);
+  const [resultView, setResultView] = useState<'profile' | 'detail'>('profile'); // investor profile vs dev/QA detail
   const navigate = useNavigate();
   const { setProfile } = useSession();
 
@@ -138,6 +147,7 @@ export function BehaviouralGamePage() {
     const sel = data.fixed_ticker || Object.keys(data.market_state)[0];
     setSelectedTicker(sel);
     setRoundLabel(data.round_label); setDay(data.day); setTotalDays(data.total_days);
+    setDecisionNum(1); setTotalDecisions(data.total_checkpoints); setFundIndex(1);
     setConsequence(introConsequence(data.fixed_ticker));
     setDrift(null); setTargetPct(50); setRoundLog([]);
     setScreen('trading');
@@ -158,6 +168,7 @@ export function BehaviouralGamePage() {
     const sel = newFixed || Object.keys(data.market_state)[0];
     setSelectedTicker(sel);
     setRoundLabel(data.round_label); setDay(data.day); setTotalDays(data.total_days);
+    setDecisionNum(1); setTotalDecisions(data.total_checkpoints); setFundIndex((f) => Math.min(f + 1, TOTAL_FUNDS));
     setConsequence(introConsequence(newFixed)); setDrift(null); setTargetPct(50);
     setRoundLog([]); // a fresh fund starts a fresh activity log
     setTransition({ title, sub, onContinue: () => { setTransition(null); setScreen('trading'); } });
@@ -193,6 +204,8 @@ export function BehaviouralGamePage() {
       setEquity(data.equity); setCash(data.cash);
       setSelectedTicker(bound);
       setRoundLabel(data.round_label); setDay(data.day); setTotalDays(data.total_days);
+      setTotalDecisions(data.total_checkpoints);
+      setDecisionNum((n) => Math.min(n + 1, data.total_checkpoints));
       const before = equityBeforeDecision.current;
       const delta = data.equity - before;
       setConsequence(consequenceFromDelta(delta, before));
@@ -318,7 +331,12 @@ export function BehaviouralGamePage() {
       <div className={styles.game}>
         <div className={styles.centered}>
           <div className={styles.card}>
-            <div className={styles.transitionIcon}>→</div>
+            <span className={styles.transitionStep}>Session {fundIndex} of {TOTAL_FUNDS}</span>
+            <div className={styles.transitionDots} aria-hidden>
+              {Array.from({ length: TOTAL_FUNDS }, (_, i) => (
+                <span key={i} className={i < fundIndex ? styles.dotOn : styles.dot} />
+              ))}
+            </div>
             <h2>{transition.title}</h2>
             <p className={styles.subcopy}>{transition.sub}</p>
             <button type="button" className={`${styles.btn} ${styles.btnPrimary}`} onClick={transition.onContinue}>Continue</button>
@@ -390,7 +408,33 @@ export function BehaviouralGamePage() {
             <div className={styles.mark}>◆</div>
             <h1>Session Complete</h1>
             <p className={styles.subcopy}>Your behavioural profile, decoded from how you actually traded.</p>
-            <ResultsGrid results={results} />
+
+            <div className={styles.viewToggle} role="tablist">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={resultView === 'profile'}
+                className={resultView === 'profile' ? styles.viewTabActive : styles.viewTab}
+                onClick={() => setResultView('profile')}
+              >
+                Investor profile
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={resultView === 'detail'}
+                className={resultView === 'detail' ? styles.viewTabActive : styles.viewTab}
+                onClick={() => setResultView('detail')}
+              >
+                Measured values (dev)
+              </button>
+            </div>
+
+            {resultView === 'profile' ? (
+              <ResultsGrid results={results} />
+            ) : (
+              <ResultsNumbers results={results} />
+            )}
             <p className={styles.resultsNote}>
               Fitted from {results.n_obs_block1 ?? '?'} loss-aversion decisions and {results.n_obs_block2 ?? '?'} regret decisions.
               {results.lambda_source === 'matched_stakes_events' ? ' Loss aversion measured from your matched-stakes calls.' : ''}
@@ -428,23 +472,26 @@ export function BehaviouralGamePage() {
       {/* top bar */}
       <header className={styles.topbar}>
         <div className={styles.topbarLeft}>
-          <span className={styles.markSmall}>◆</span>
-          <span className={styles.topbarLabel}>Portfolio Session</span>
+          <div className={styles.brandStack}>
+            <BrandLockup size={17} />
+            <span className={styles.brandSub}>Trading Session</span>
+          </div>
           <span className={styles.roundBadge}>{roundLabel}</span>
+          <span className={styles.sessionBadge}>Session {fundIndex} of {TOTAL_FUNDS}</span>
           <button type="button" className={styles.helpBtn} title="How the numbers work" onClick={() => setHelpOpen(true)}>?</button>
         </div>
         <div className={styles.topbarRight} data-tour="money">
-          <div className={styles.stat}><span className={styles.statLabel}>Decision</span><span className={`${styles.statValue} ${styles.mono}`}>{day} / {totalDays}</span></div>
+          <div className={styles.stat}><span className={styles.statLabel}>Decision</span><span className={`${styles.statValue} ${styles.mono}`}>{decisionNum} of {totalDecisions}</span></div>
           <div className={styles.stat}><span className={styles.statLabel}>Total Equity</span><span className={`${styles.statValue} ${styles.mono}`}>{money(equity)}</span></div>
           <div className={styles.stat}><span className={styles.statLabel}>Cash</span><span className={`${styles.statValue} ${styles.mono}`}>{money(cash)}</span></div>
         </div>
       </header>
 
-      {/* session progress within this fund */}
-      <div className={styles.progressTrack} title={`Decision ${day} of ${totalDays}`}>
+      {/* progress through this fund's decisions */}
+      <div className={styles.progressTrack} title={`Decision ${decisionNum} of ${totalDecisions}`}>
         <span
           className={styles.progressFill}
-          style={{ width: `${totalDays ? Math.min(100, (day / totalDays) * 100) : 0}%` }}
+          style={{ width: `${totalDecisions ? Math.min(100, (decisionNum / totalDecisions) * 100) : 0}%` }}
         />
       </div>
 
@@ -612,7 +659,37 @@ function BenchmarkStrip({ b }: { b: Benchmark }) {
   );
 }
 
+// Shows the READABLE behavioural profile (archetype + plain-language traits),
+// not the raw parameters. The numbers still go to the reward model behind the
+// scenes; they just aren't meaningful to a player.
 function ResultsGrid({ results }: { results: FinishResult }) {
+  const p = results.profile;
+  const persona = profileToPersona({ alpha: p.alpha, lambda: p.lambda, gamma: p.gamma });
+  if (!persona) return null;
+  const conf = results.confidence ?? {};
+  const confidence: TraitConfidence = { lambda: conf.lambda?.level, gamma: conf.gamma?.level };
+  const insight = buildInsight(persona, confidence);
+  return (
+    <>
+      <div className={styles.resultArchetype}>{persona.archetype}</div>
+      <div className={styles.resultsGrid}>
+        {insight.traits.map((t) => (
+          <div key={t.key} className={styles.resultCard}>
+            <div className={styles.resultLabel}>
+              {t.label}
+              {!t.reliable && <span className={styles.resultEarly}>early read</span>}
+            </div>
+            <div className={styles.resultBlurb}>{t.meaning}</div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+// DEV / QA view: the raw measured parameters (α/λ/γ + confidence + a short
+// per-parameter blurb), exactly as they're handed to the reward model.
+function ResultsNumbers({ results }: { results: FinishResult }) {
   const est = results.profile;
   const confidence = results.confidence ?? {};
   const meta: Record<'alpha' | 'lambda' | 'gamma', { label: string; blurb: (v: number) => string }> = {
@@ -633,7 +710,10 @@ function ResultsGrid({ results }: { results: FinishResult }) {
             <div className={styles.resultLabel}>{meta[key].label}</div>
             <div className={`${styles.resultValue} ${styles.mono}`}>{Number(value).toFixed(2)}</div>
             {showConf && (
-              <div className={`${styles.resultConf} ${conf!.level === 'uninformative' ? styles.confBad : styles.confWarn}`} title={conf!.reason ?? ''}>
+              <div
+                className={`${styles.resultConf} ${conf!.level === 'uninformative' ? styles.confBad : styles.confWarn}`}
+                title={conf!.reason ?? ''}
+              >
                 {conf!.level === 'uninformative' ? 'Not reliable' : 'Low confidence'}
               </div>
             )}

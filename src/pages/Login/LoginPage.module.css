@@ -106,6 +106,19 @@
   border-color: var(--color-accent);
 }
 
+/* live password-length hint, tucked just under the password field */
+.pwHint {
+  color: var(--color-danger);
+  font-size: 12.5px;
+  margin: -14px 0 16px;
+}
+
+.error {
+  color: var(--color-danger);
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
 .forgotLink {
   align-self: flex-end;
   color: var(--color-accent-text);
