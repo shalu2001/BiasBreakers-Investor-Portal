@@ -111,6 +111,36 @@ export function RecommendPage() {
     };
   }, [profile]);
 
+  // Auto-fetch on first arrival at this page when nothing's cached in the
+  // session yet (e.g. straight after login, or a hard refresh) -- the
+  // backend already has (or can compute) today's recommendation, so
+  // landing here shouldn't require a manual "Optimize" click just to see
+  // it. Only runs once, and only when rows is still empty; the visible
+  // "Optimize portfolio" button remains the way to explicitly re-run it
+  // afterwards.
+  useEffect(() => {
+    if (rows.length > 0) return;
+    let cancelled = false;
+    setOptimizing(true);
+    setOptimizeError(false);
+    getRecommendation()
+      .then((data) => {
+        if (cancelled) return;
+        setRows(data);
+        setRecommendation(data);
+      })
+      .catch(() => {
+        if (!cancelled) setOptimizeError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setOptimizing(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function handleOptimize() {
     setOptimizing(true);
     setOptimizeError(false);

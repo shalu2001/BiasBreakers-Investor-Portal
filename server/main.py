@@ -87,6 +87,22 @@ def load_model_and_data():
     (Azure pull + feature engineering can take a while) -- doing this once
     at startup, not per-request, is why this is a long-running service
     rather than a script invoked fresh each time."""
+    # FinRL's base StockPortfolioEnv.step() unconditionally does
+    # plt.savefig("results/...") on its terminal-day branch, with no
+    # directory check -- if "results/" doesn't exist relative to the
+    # process's cwd (it isn't committed, so a fresh checkout/deploy never
+    # has it), that raises inside env.step() and crashes the whole
+    # /recommendation/current request BEFORE _save_recommendation() ever
+    # runs. That's silent from the caller's side beyond a 500 -- no DB
+    # write happens, and nothing about it is visible except a traceback in
+    # the server's own console. Confirmed via backend/uvicorn_reload_test.log,
+    # which caught this exact crash at this exact call site. The 2-duplicate-
+    # day trick in latest_day_frame() means a single-shot request shouldn't
+    # normally reach that terminal branch, but there's no reason to leave a
+    # proven crash-the-request landmine in place for whenever that
+    # assumption breaks -- ensuring the directory exists is free.
+    os.makedirs("results", exist_ok=True)
+
     print("Loading model...")
     state["model"] = PPO.load(MODEL_PATH)
 
@@ -319,6 +335,12 @@ def _value(pct: float, investment_amount: float | None) -> float | None:
 
 
 def _run_recommendation(uid: str):
+    # [recommend] checkpoints -- greppable prefix so a run's progress through
+    # this pipeline is visible directly in the server console without
+    # needing to hit a separate debug endpoint. Added because two rounds of
+    # "recommendation isn't saving" couldn't be pinned to a specific step
+    # from the existing (silent-except, console-only-on-failure) logging.
+    print(f"[recommend] uid={uid} starting")
     tickers = state["tickers"]
     today_df, latest_date = latest_day_frame(state["processed"])
     today_df = apply_live_bl_returns(today_df, _current_bl_returns(tickers), tickers)
@@ -348,6 +370,12 @@ def _run_recommendation(uid: str):
         # separately-asked onboarding budget.
         investment_amount = _investment_amount_from_doc(doc)
 
+    # Real per-ticker share counts only count as "real" if we also have a
+    # budget to price them against -- without investment_amount there's no
+    # denominator to turn shares into a %, so that combination falls back to
+    # the uniform placeholder below, same as "said yes but entered nothing".
+    have_real_shares = existing_holdings is not None and investment_amount is not None
+
     env = PersonaPortfolioEnv(
         df=today_df,
         persona=_persona_from_doc(doc),
@@ -360,24 +388,44 @@ def _run_recommendation(uid: str):
     )
     obs, _ = env.reset()
     # reset() seeds current_weights uniformly across this persona's eligible
-    # (mask-passing) tickers -- there's no real per-ticker position source
-    # wired up (see onboarding), so this uniform baseline is the best
-    # available proxy for "current holdings" and is what the model itself
-    # was trained against as its reset-time observation input -- kept
-    # unchanged here regardless of has_existing_portfolio below, so the
-    # model's own prediction isn't affected by that branch, only the
-    # DISPLAYED currentPct is.
+    # (mask-passing) tickers -- the best available proxy for "current
+    # holdings" when we don't actually know them.
     current_weights = env.current_weights.copy()
+
+    if have_real_shares:
+        # Real starting portfolio known -- feed it to the env instead of the
+        # uniform placeholder, so (a) the observation the model predicts
+        # from reflects what the investor actually holds, not a fiction, and
+        # (b) prime_external_starting_portfolio() can protect currently-held
+        # tickers from being hard-excluded by persona-fit ranking alone (see
+        # its docstring). Without this, a real, currently-held position the
+        # investor holds independently of this system was invisible to the
+        # model and could be recommended away to 0% purely because it didn't
+        # match this persona's risk-profile ranking -- regardless of how
+        # well that position was actually performing.
+        current_weights = np.array([
+            (existing_holdings.get(t, 0.0) * prices[t] / investment_amount)
+            if t != 'CASH' and prices.get(t) else 0.0
+            for t in tickers
+        ])
+        env.current_weights = current_weights.copy()
+        obs = env._augment(env.last_raw_state)
+        env.prime_external_starting_portfolio(current_weights)
 
     raw_action, _ = state["model"].predict(obs, deterministic=True)
     env.step(raw_action)
     recommended_weights = env.current_weights
+    print(f"[recommend] uid={uid} env.step completed, building rows")
 
-    # Real per-ticker share counts only count as "real" if we also have a
-    # budget to price them against -- without investment_amount there's no
-    # denominator to turn shares into a %, so that combination falls back to
-    # the uniform placeholder below, same as "said yes but entered nothing".
-    have_real_shares = existing_holdings is not None and investment_amount is not None
+    # Diagnostic snapshot for GET /debug/mask-breakdown -- per-ticker
+    # candidate-ranking breakdown from this exact run, keyed by uid so the
+    # debug endpoint can serve it without re-deriving the persona/env setup
+    # itself. Overwritten on every recommendation call; not persisted.
+    state.setdefault("_debug", {})[uid] = {
+        "breakdown": env._last_full_breakdown,
+        "meta": env._last_mask_meta,
+        "persona": _persona_from_doc(doc),
+    }
 
     rows = []
     for i, ticker in enumerate(tickers):
@@ -429,7 +477,9 @@ def _run_recommendation(uid: str):
     # noise. A ticker earns a row by being currently held OR recommended.
     rows = [row for row in rows if row["currentPct"] > 0 or row["recommendedPct"] > 0]
 
+    print(f"[recommend] uid={uid} rows built ({len(rows)} rows) -- calling _save_recommendation")
     _save_recommendation(uid, latest_date, rows)
+    print(f"[recommend] uid={uid} done")
     return rows, latest_date
 
 
@@ -437,10 +487,25 @@ def _save_recommendation(uid: str, latest_date, rows: list):
     """Upsert (not insert-always) keyed on (user_id, date) -- one document
     per investor per day, so repeated page loads on the same day don't
     accumulate duplicates. Never raises: a Cosmos write failure shouldn't
-    break an already-successfully-computed recommendation response."""
+    break an already-successfully-computed recommendation response.
+
+    The outcome (including the real exception, if any) is also stashed in
+    state["_debug"][uid]["persist"] -- console-only visibility (the previous
+    behavior) wasn't enough to diagnose two rounds of "not writing to the
+    DB" reports, so this surfaces the actual failure through
+    GET /debug/mask-breakdown instead of requiring server console access.
+    Also prints a [persist] checkpoint before AND after the write, so a
+    process that dies/hangs mid-write (not just one that raises) still
+    leaves a trail: if you see "attempting" with no matching "SUCCESS" or
+    "FAILED" after it, the write itself is stalling, not failing cleanly --
+    a different problem than anything the try/except here can catch."""
+    date_str = latest_date.strftime("%Y-%m-%d")
+    print(f"[persist] uid={uid} date={date_str} attempting write to portal_recommendations "
+          f"({len(rows)} rows)")
+
+    result = {"ok": False, "error": None}
     try:
-        date_str = latest_date.strftime("%Y-%m-%d")
-        portal_db.recommendations().update_one(
+        write_result = portal_db.recommendations().update_one(
             {"user_id": uid, "date": date_str},
             {"$set": {
                 "user_id": uid,
@@ -450,8 +515,17 @@ def _save_recommendation(uid: str, latest_date, rows: list):
             }},
             upsert=True,
         )
+        result["ok"] = True
+        result["matched_count"] = write_result.matched_count
+        result["modified_count"] = write_result.modified_count
+        result["upserted_id"] = str(write_result.upserted_id) if write_result.upserted_id else None
+        print(f"[persist] uid={uid} date={date_str} SUCCESS matched={result['matched_count']} "
+              f"modified={result['modified_count']} upserted_id={result['upserted_id']}")
     except Exception as e:
-        print(f"Failed to persist recommendation for uid={uid}: {e}")
+        result["error"] = f"{type(e).__name__}: {e}"
+        print(f"[persist] uid={uid} date={date_str} FAILED: {result['error']}")
+
+    state.setdefault("_debug", {}).setdefault(uid, {})["persist"] = result
 
 
 def _synthesize_description(rows: list) -> str:
@@ -601,6 +675,49 @@ def get_universe():
 def get_recommendation(uid: str = Depends(get_current_user_id)):
     rows, latest_date = _run_recommendation(uid)
     return rows
+
+
+@app.get("/debug/mask-breakdown")
+def get_mask_breakdown(uid: str = Depends(get_current_user_id)):
+    """Diagnostic only -- not used by the frontend. Shows exactly why each
+    ticker in the universe is or isn't in this investor's candidate pool:
+    per-term (alpha/lambda/gamma/BL) contribution to combined_badness, the
+    keep_n cutoff actually applied, and whether the external-holdings grace
+    period pulled a ticker in despite a poor score. Re-runs
+    _run_recommendation() first so this always reflects the persona and
+    market data as of right now, not a stale snapshot.
+
+    Existed because a ticker's absence from a recommendation was ambiguous
+    from the outside -- mask-excluded outright vs. included but zero-
+    weighted by the policy are very different causes with different fixes,
+    and this makes the distinction (and each term's exact contribution)
+    directly inspectable instead of guessed at."""
+    _run_recommendation(uid)
+    debug = state.get("_debug", {}).get(uid)
+    if debug is None or debug["breakdown"] is None:
+        return {
+            "detail": "No ranking breakdown available for this run "
+                      "(universe was at or below MIN_CANDIDATES, so every "
+                      "ticker was kept outright with no ranking computed)."
+        }
+
+    breakdown = debug["breakdown"]
+    ticker_names = state["ticker_names"]
+    bool_cols = {"in_pool", "protected"}
+
+    tickers_out = []
+    for ticker, row in breakdown.to_dict(orient="index").items():
+        entry = {"ticker": ticker, "name": ticker_names.get(ticker, ticker)}
+        for col, val in row.items():
+            entry[col] = bool(val) if col in bool_cols else round(float(val), 5)
+        tickers_out.append(entry)
+
+    persona = debug["persona"]
+    return {
+        "persona": {"alpha": float(persona[0]), "lambda": float(persona[1]), "gamma": float(persona[2])},
+        "meta": debug["meta"],
+        "tickers": tickers_out,
+    }
 
 
 @app.get("/recommendation/history")

@@ -15,6 +15,16 @@ but meaningless prediction, not an error -- so this file intentionally does
 NOT try to simplify or "clean up" that logic, only trims the parts specific
 to the historical backtest loop (investor CSV loading, day-by-day rollout)
 that a live single-shot recommendation doesn't need.
+
+prime_external_starting_portfolio() (and the protected_tickers plumbing
+through _unified_candidate_rank/_generate_mask) is ported from
+src/rl/dynamicCandidateList_v15.py / evaluate_dynamicCandidateList_v15.py --
+this was originally missed when this file was adapted from the v14
+evaluator, which left a live investor's real, currently-held positions
+invisible to the model (only used for display) and unprotected from being
+masked to 0% purely on persona-fit ranking, regardless of the position's
+actual performance. See server/main.py's _run_recommendation() for where
+the real starting portfolio is now fed in.
 """
 import os
 import numpy as np
@@ -28,8 +38,23 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 
 from finrl.meta.preprocessor.preprocessors import FeatureEngineer
+import finrl.meta.env_portfolio_allocation.env_portfolio as _finrl_env_portfolio
 from finrl.meta.env_portfolio_allocation.env_portfolio import StockPortfolioEnv
 from finrl.config import INDICATORS
+
+# FinRL's StockPortfolioEnv.step() unconditionally plt.savefig()s a
+# cumulative-reward/rewards plot to "results/..." on its terminal-day
+# branch -- a backtest-loop diagnostic this live single-shot recommendation
+# service has no use for (it calls step() once per request and, by
+# latest_day_frame()'s 2-day-duplication trick, never actually reaches that
+# branch today). Rather than depend on that invariant holding forever --
+# and previously, when it didn't, this crashed the whole request before
+# _save_recommendation() ever ran, see main.py's startup comment -- no-op
+# the exact plt calls that branch makes. Scoped to this one imported
+# module's `plt` reference, not global, so nothing outside FinRL's own
+# terminal-step plotting is affected. Cheap and idempotent; harmless if the
+# branch really is never reached.
+_finrl_env_portfolio.plt.savefig = lambda *args, **kwargs: None
 
 BASE_DIR = os.path.dirname(__file__)
 # BL_DIR = os.path.join(BASE_DIR, 'data', 'bl')  # disabled, see BL loader functions below
@@ -188,6 +213,8 @@ class PersonaPortfolioEnv(StockPortfolioEnv):
         self._dsr_A = 0.0
         self._dsr_B = 0.0
         self._last_pool_badness = None
+        self._last_full_breakdown = None
+        self._last_mask_meta = None
 
         self.utility = 0.0
         self.prev_value = self.initial_amount
@@ -197,11 +224,36 @@ class PersonaPortfolioEnv(StockPortfolioEnv):
         self.last_rebalance_target = None
         self.last_rebalanced = True
 
+        # One-time grace period for a genuinely external starting portfolio
+        # (see prime_external_starting_portfolio() below) -- ported from
+        # dynamicCandidateList_v15.py, which this file's docstring already
+        # claims to match but previously omitted.
+        self._protect_holdings_once = False
+        self._protected_tickers = set()
+
+    def prime_external_starting_portfolio(self, weights):
+        """Call ONCE, immediately after current_weights is set to a
+        genuinely external (investor-supplied) starting portfolio. Marks the
+        NEXT _generate_mask() call to widen the candidate pool with whichever
+        currently-held tickers (weight > 1%) would otherwise be excluded
+        outright by persona-fit ranking, rather than forcing an immediate,
+        total exit from a position the investor holds independently of this
+        system. Consumed on first use."""
+        self._protect_holdings_once = True
+        self._protected_tickers = {
+            tic for tic, w in zip(self.tickers, weights)
+            if w > 0.01 and tic != 'CASH'
+        }
+
     def _unified_candidate_rank(self, real_tickers, alpha, lam, gamma,
                                  stock_volatility, stock_lambda_risk, stock_tracking_error,
-                                 stock_bl_return):
+                                 stock_bl_return, protected_tickers=None):
         if len(real_tickers) <= self.MIN_CANDIDATES:
             self._last_pool_badness = None
+            # No ranking computed -- every real ticker is kept outright, so
+            # there's nothing meaningful to break down per-term.
+            self._last_full_breakdown = None
+            self._last_mask_meta = None
             return set(real_tickers)
 
         def _intensity(x, mean, std):
@@ -242,10 +294,56 @@ class PersonaPortfolioEnv(StockPortfolioEnv):
         keep_fraction = 1.0 - 0.7 * overall_intensity
         keep_n = max(self.MIN_CANDIDATES, int(len(real_tickers) * keep_fraction))
 
-        selected = combined_badness.sort_values(ascending=True).index[:keep_n]
-        self._last_pool_badness = combined_badness.reindex(selected)
+        selected = set(combined_badness.sort_values(ascending=True).index[:keep_n])
 
-        return set(selected)
+        # Widen the pool with any currently-held ticker the grace period is
+        # protecting, even if its badness score would otherwise cut it.
+        # Included in _last_pool_badness below with its REAL (possibly poor)
+        # badness, so the fit-reward/policy signal still sees it as a
+        # poor-fitting holding -- this protects from an immediate forced
+        # exit, not permanently.
+        if protected_tickers:
+            selected = selected | (set(protected_tickers) & set(real_tickers))
+
+        self._last_pool_badness = combined_badness.reindex(list(selected))
+
+        # Diagnostic snapshot -- every real ticker's per-term contribution to
+        # combined_badness, plus whether it cleared the cutoff, was pulled in
+        # by the grace period, or was excluded outright. Exists purely so a
+        # caller (see server/main.py's debug endpoint) can see WHY a given
+        # ticker is or isn't in the pool, instead of inferring it from the
+        # final mask alone.
+        bl_term = self.BL_WEIGHT * bl_rank if ENABLE_BL_IN_RANKING else pd.Series(0.0, index=bl_rank.index)
+        self._last_full_breakdown = pd.DataFrame({
+            'volatility':       vol,
+            'downside_risk':    downside,
+            'tracking_error':   track_err,
+            'bl_return':        bl_return,
+            'alpha_rank':       alpha_rank,
+            'lam_rank':         lam_rank,
+            'gamma_rank':       gamma_rank,
+            'bl_rank':          bl_rank,
+            'alpha_term':       alpha_intensity * alpha_rank,
+            'lam_term':         lam_intensity * lam_rank,
+            'gamma_term':       gamma_intensity * gamma_rank,
+            'bl_term':          bl_term,
+            'combined_badness': combined_badness,
+            'in_pool':          combined_badness.index.isin(selected),
+            'protected':        combined_badness.index.isin(protected_tickers or set()),
+        }).sort_values('combined_badness')
+
+        self._last_mask_meta = {
+            'alpha_intensity':   alpha_intensity,
+            'lam_intensity':     lam_intensity,
+            'gamma_intensity':   gamma_intensity,
+            'overall_intensity': overall_intensity,
+            'keep_fraction':     keep_fraction,
+            'keep_n':            keep_n,
+            'universe_size':     len(real_tickers),
+            'bl_weight_applied': ENABLE_BL_IN_RANKING,
+        }
+
+        return selected
 
     def _generate_mask(self):
         alpha, lam, gamma = self.persona
@@ -261,10 +359,15 @@ class PersonaPortfolioEnv(StockPortfolioEnv):
 
         real_tickers = [t for t in self.tickers if t != 'CASH']
 
+        protected = None
+        if self._protect_holdings_once:
+            protected = self._protected_tickers
+            self._protect_holdings_once = False
+
         candidate_list = self._unified_candidate_rank(
             real_tickers, alpha, lam, gamma,
             stock_volatility, stock_lambda_risk, stock_tracking_error,
-            stock_bl_return
+            stock_bl_return, protected_tickers=protected
         )
         candidate_list.add('CASH')
 
@@ -580,6 +683,24 @@ def prepare_market_data():
     index_df = pd.DataFrame(list(db["sp_sl20_index"].find({}, {"_id": 0})))
     index_df['date'] = pd.to_datetime(index_df['date'])
     index_df = index_df.sort_values('date').reset_index(drop=True)
+
+    # The date universe below is driven entirely by index_df (sp_sl20_index),
+    # not by the stock collection -- any stock row dated after
+    # index_df['date'].max() has no matching date in full_combination and is
+    # silently dropped by the merge just below, regardless of how fresh the
+    # stock collection itself is. Logged here (once, at startup) because that
+    # mismatch previously took a full code trace to diagnose after updating
+    # only the stock collection and seeing the "latest date" stay stuck.
+    stock_max_date = df['date'].max()
+    index_max_date = index_df['date'].max()
+    if stock_max_date != index_max_date:
+        print(f"[market-data] WARNING: stock collection max date "
+              f"({stock_max_date.date()}) != sp_sl20_index max date "
+              f"({index_max_date.date()}) -- recommendations will be capped "
+              f"at {min(stock_max_date, index_max_date).date()} "
+              f"until sp_sl20_index is updated to match.")
+    else:
+        print(f"[market-data] stock collection and sp_sl20_index both max out at {stock_max_date.date()}.")
 
     unique_tickers = df.tic.unique()
     unique_dates = index_df.date.unique()
